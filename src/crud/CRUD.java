@@ -1,8 +1,8 @@
-package dao;
+package crud;
 
 import java.util.List;
 
-public interface Dao<T> {
+public interface CRUD<T> {
     
     List<T> getAll();
 

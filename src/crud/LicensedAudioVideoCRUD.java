@@ -1,4 +1,4 @@
-package dao;
+package crud;
 
 import mediaDB.LicensedAudioVideo;
 
@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LicensedAudioVideoDao implements Dao<LicensedAudioVideo> {
+public class LicensedAudioVideoCRUD implements CRUD<LicensedAudioVideo> {
 
     private static final LinkedList<LicensedAudioVideo> licensedAudioVideoList = new LinkedList<>();
 

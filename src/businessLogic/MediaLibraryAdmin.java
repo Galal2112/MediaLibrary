@@ -1,8 +1,8 @@
 package businessLogic;
 
-import dao.InteractiveVideoDao;
-import dao.LicensedAudioVideoDao;
-import dao.UploaderDao;
+import crud.InteractiveVideoCRUD;
+import crud.LicensedAudioVideoCRUD;
+import crud.UploaderCRUD;
 import mediaDB.*;
 
 import java.math.BigDecimal;
@@ -13,14 +13,14 @@ public class MediaLibraryAdmin implements MediaAdmin {
     // 1 Gigabyte storage
     private static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1024);
 
-    private final UploaderDao uploaderDao = new UploaderDao();
-    private final InteractiveVideoDao interactiveVideoDao = new InteractiveVideoDao();
-    private final LicensedAudioVideoDao licensedAudioVideoDao = new LicensedAudioVideoDao();
+    private final UploaderCRUD uploaderCRUD = new UploaderCRUD();
+    private final InteractiveVideoCRUD interactiveVideoCRUD = new InteractiveVideoCRUD();
+    private final LicensedAudioVideoCRUD licensedAudioVideoCRUD = new LicensedAudioVideoCRUD();
 
     @Override
     public void create(Uploader uploader) {
-        if (!uploaderDao.get(uploader.getName()).isPresent()) {
-            uploaderDao.create(uploader);
+        if (!uploaderCRUD.get(uploader.getName()).isPresent()) {
+            uploaderCRUD.create(uploader);
         } else {
             throw new IllegalArgumentException("Username is taken");
         }
@@ -34,9 +34,9 @@ public class MediaLibraryAdmin implements MediaAdmin {
         }
 
         // check producer exists
-        UploaderDao producerDao = new UploaderDao();
+        UploaderCRUD producerCRUD = new UploaderCRUD();
 
-        Optional<Uploader> optionalUploader = producerDao.get(media.getUploader().getName());
+        Optional<Uploader> optionalUploader = producerCRUD.get(media.getUploader().getName());
         if (!optionalUploader.isPresent()) {
             throw new IllegalArgumentException("Producer does not exist");
         }
@@ -54,20 +54,20 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
         // save media content
         if (media instanceof InteractiveVideo) {
-            interactiveVideoDao.create((InteractiveVideo) media);
+            interactiveVideoCRUD.create((InteractiveVideo) media);
         } else {
-            licensedAudioVideoDao.create((LicensedAudioVideo) media);
+            licensedAudioVideoCRUD.create((LicensedAudioVideo) media);
         }
     }
 
     @Override
     public Map<Uploader, Integer> listProducersAndUploadsCount() {
-        List<Uploader> producers = uploaderDao.getAll();
+        List<Uploader> producers = uploaderCRUD.getAll();
         HashMap<Uploader, Integer> producerUploadCount = new HashMap<>();
         producers.forEach(producer -> producerUploadCount.put(producer, 0));
         List<Uploadable> uploadsList = new ArrayList<>();
-        uploadsList.addAll(interactiveVideoDao.getAll());
-        uploadsList.addAll(licensedAudioVideoDao.getAll());
+        uploadsList.addAll(interactiveVideoCRUD.getAll());
+        uploadsList.addAll(licensedAudioVideoCRUD.getAll());
         uploadsList.forEach(media -> {
             int count = producerUploadCount.get(media.getUploader());
             producerUploadCount.put(media.getUploader(), count + 1);
@@ -79,16 +79,16 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) {
         if (type == null) {
             List<Uploadable> uploadsList = new ArrayList<>();
-            uploadsList.addAll(interactiveVideoDao.getAll());
-            uploadsList.addAll(licensedAudioVideoDao.getAll());
+            uploadsList.addAll(interactiveVideoCRUD.getAll());
+            uploadsList.addAll(licensedAudioVideoCRUD.getAll());
             return uploadsList;
         }
         if (type == InteractiveVideo.class) {
-            return interactiveVideoDao.getAll();
+            return interactiveVideoCRUD.getAll();
         }
 
         if (type == LicensedAudioVideo.class) {
-            return licensedAudioVideoDao.getAll();
+            return licensedAudioVideoCRUD.getAll();
         }
         throw new IllegalArgumentException("Unsupported media type");
     }

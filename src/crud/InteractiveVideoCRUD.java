@@ -1,4 +1,4 @@
-package dao;
+package crud;
 
 import mediaDB.InteractiveVideo;
 
@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class InteractiveVideoDao implements Dao<InteractiveVideo> {
+public class InteractiveVideoCRUD implements CRUD<InteractiveVideo> {
 
     private static final LinkedList<InteractiveVideo> interactiveVideos = new LinkedList<>();
 

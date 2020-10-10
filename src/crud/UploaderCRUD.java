@@ -1,4 +1,4 @@
-package dao;
+package crud;
 
 import mediaDB.Uploader;
 
@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public class UploaderDao implements Dao<Uploader> {
+public class UploaderCRUD implements CRUD<Uploader> {
 
     private static final LinkedList<Uploader> uploaders = new LinkedList<>();
 
