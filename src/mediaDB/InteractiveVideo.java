@@ -1,3 +1,3 @@
 package mediaDB;
 
-public interface InteractiveVideo extends Video,Interactive {}
+public interface InteractiveVideo extends Video, Interactive {}
