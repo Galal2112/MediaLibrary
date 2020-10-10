@@ -35,6 +35,6 @@ public class InteractiveVideoDao implements Dao<InteractiveVideo> {
 
     @Override
     public void delete(InteractiveVideo interactiveVideo) {
-        interactiveVideos.removeIf(v -> v.getAddress() == interactiveVideo.getAddress());
+        interactiveVideos.removeIf(v -> v.getAddress().equals(interactiveVideo.getAddress()));
     }
 }

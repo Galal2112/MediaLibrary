@@ -40,6 +40,6 @@ public class UploaderDao implements Dao<Uploader> {
 
     @Override
     public void delete(Uploader uploader) {
-        uploaders.removeIf(u -> u.getName() == uploader.getName());
+        uploaders.removeIf(u -> u.getName().equals(uploader.getName()));
     }
 }

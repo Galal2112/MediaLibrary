@@ -35,6 +35,6 @@ public class LicensedAudioVideoDao implements Dao<LicensedAudioVideo> {
 
     @Override
     public void delete(LicensedAudioVideo licensedAudioVideo) {
-        licensedAudioVideoList.removeIf(v -> v.getAddress() == licensedAudioVideo.getAddress());
+        licensedAudioVideoList.removeIf(v -> v.getAddress().equals(licensedAudioVideo.getAddress()));
     }
 }
