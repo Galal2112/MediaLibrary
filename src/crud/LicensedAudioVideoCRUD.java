@@ -35,6 +35,10 @@ public class LicensedAudioVideoCRUD implements CRUD<LicensedAudioVideo> {
 
     @Override
     public void delete(LicensedAudioVideo licensedAudioVideo) {
-        licensedAudioVideoList.removeIf(v -> v.getAddress().equals(licensedAudioVideo.getAddress()));
+        delete(licensedAudioVideo.getAddress());
+    }
+
+    public void delete(String address) {
+        licensedAudioVideoList.removeIf(v -> v.getAddress().equals(address));
     }
 }

@@ -4,7 +4,6 @@ import crud.InteractiveVideoCRUD;
 import crud.LicensedAudioVideoCRUD;
 import crud.UploaderCRUD;
 import mediaDB.*;
-import oracle.jvm.hotspot.jfr.Producer;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -115,6 +114,28 @@ public class MediaLibraryAdmin implements MediaAdmin {
     @Override
     public void delete(Uploader uploader) {
         uploaderCRUD.delete(uploader);
+    }
+
+    @Override
+    public <T extends MediaContent & Uploadable> void delete(T media) {
+        if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
+            throw new IllegalArgumentException("Unsupported media type");
+        }
+
+        if (media instanceof InteractiveVideo) {
+            interactiveVideoCRUD.delete((InteractiveVideo) media);
+        } else {
+            licensedAudioVideoCRUD.delete((LicensedAudioVideo) media);
+        }
+    }
+
+    @Override
+    public void deleteMedia(String address) {
+        // if address belongs to InteractiveVideo ... delete
+        interactiveVideoCRUD.delete(address);
+
+        // if address belongs to InteractiveVideo ... delete
+        licensedAudioVideoCRUD.delete(address);
     }
 
     private String getAddress(Object o) {

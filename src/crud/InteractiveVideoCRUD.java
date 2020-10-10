@@ -37,4 +37,8 @@ public class InteractiveVideoCRUD implements CRUD<InteractiveVideo> {
     public void delete(InteractiveVideo interactiveVideo) {
         interactiveVideos.removeIf(v -> v.getAddress().equals(interactiveVideo.getAddress()));
     }
+
+    public void delete(String address) {
+        interactiveVideos.removeIf(v -> v.getAddress().equals(address));
+    }
 }
