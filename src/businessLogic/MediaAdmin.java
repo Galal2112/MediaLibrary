@@ -14,4 +14,6 @@ public interface MediaAdmin {
     Map<Uploader, Integer> listProducersAndUploadsCount();
     <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type);
     List<Tag> getAllTags();
+    void deleteProducer(String name);
+    void delete(Uploader uploader);
 }

@@ -4,6 +4,7 @@ import crud.InteractiveVideoCRUD;
 import crud.LicensedAudioVideoCRUD;
 import crud.UploaderCRUD;
 import mediaDB.*;
+import oracle.jvm.hotspot.jfr.Producer;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -104,6 +105,16 @@ public class MediaLibraryAdmin implements MediaAdmin {
     @Override
     public List<Tag> getAllTags() {
         return Arrays.asList(Tag.values());
+    }
+
+    @Override
+    public void deleteProducer(String name) {
+        uploaderCRUD.delete(name);
+    }
+
+    @Override
+    public void delete(Uploader uploader) {
+        uploaderCRUD.delete(uploader);
     }
 
     private String getAddress(Object o) {

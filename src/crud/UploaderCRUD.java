@@ -40,6 +40,10 @@ public class UploaderCRUD implements CRUD<Uploader> {
 
     @Override
     public void delete(Uploader uploader) {
-        uploaders.removeIf(u -> u.getName().equals(uploader.getName()));
+        delete(uploader.getName());
+    }
+
+    public void delete(String name) {
+        uploaders.removeIf(u -> u.getName().equals(name));
     }
 }
