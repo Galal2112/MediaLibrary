@@ -7,4 +7,5 @@ public interface Content {
     void setAddress(String address);
     Collection<Tag> getTags();
     long getAccessCount();
+    void setAccessCount(long count);
 }

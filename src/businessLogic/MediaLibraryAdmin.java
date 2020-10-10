@@ -77,20 +77,28 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     @Override
     public <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) {
+        List<MediaContent> result = new ArrayList<>();;
         if (type == null) {
-            List<Uploadable> uploadsList = new ArrayList<>();
-            uploadsList.addAll(interactiveVideoCRUD.getAll());
-            uploadsList.addAll(licensedAudioVideoCRUD.getAll());
-            return uploadsList;
-        }
-        if (type == InteractiveVideo.class) {
-            return interactiveVideoCRUD.getAll();
+            result.addAll(interactiveVideoCRUD.getAll());
+            result.addAll(licensedAudioVideoCRUD.getAll());
+        } else if (type == InteractiveVideo.class) {
+            result.addAll(interactiveVideoCRUD.getAll());
+        } else if (type == LicensedAudioVideo.class) {
+            result.addAll(licensedAudioVideoCRUD.getAll());
+        } else {
+            throw new IllegalArgumentException("Unsupported media type");
         }
 
-        if (type == LicensedAudioVideo.class) {
-            return licensedAudioVideoCRUD.getAll();
+        // update access count
+        for (MediaContent content : result) {
+            content.setAccessCount(content.getAccessCount() + 1);
+            if (content instanceof InteractiveVideo) {
+                interactiveVideoCRUD.update((InteractiveVideo) content);
+            } else {
+                licensedAudioVideoCRUD.update((LicensedAudioVideo) content);
+            }
         }
-        throw new IllegalArgumentException("Unsupported media type");
+        return result;
     }
 
     @Override
