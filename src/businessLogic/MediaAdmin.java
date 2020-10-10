@@ -1,6 +1,9 @@
 package businessLogic;
 
-import mediaDB.*;
+import mediaDB.MediaContent;
+import mediaDB.Tag;
+import mediaDB.Uploadable;
+import mediaDB.Uploader;
 
 import java.util.List;
 import java.util.Map;

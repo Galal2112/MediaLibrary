@@ -1,8 +1,6 @@
 package dao;
 
-import mediaDB.InteractiveVideo;
 import mediaDB.LicensedAudioVideo;
-import mediaDB.Uploadable;
 
 import java.util.Iterator;
 import java.util.LinkedList;

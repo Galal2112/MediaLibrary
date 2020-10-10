@@ -1,9 +1,11 @@
 package dao;
 
-import mediaDB.InteractiveVideo;
 import mediaDB.Uploader;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 public class UploaderDao implements Dao<Uploader> {
 
