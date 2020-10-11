@@ -2,10 +2,7 @@ package crud;
 
 import mediaDB.Uploader;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class UploaderCRUD implements CRUD<Uploader> {
 
@@ -17,7 +14,7 @@ public class UploaderCRUD implements CRUD<Uploader> {
 
     @Override
     public List<Uploader> getAll() {
-        return uploaders;
+        return new ArrayList<>(uploaders);
     }
 
     @Override

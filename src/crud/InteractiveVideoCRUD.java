@@ -2,6 +2,7 @@ package crud;
 
 import mediaDB.InteractiveVideo;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +13,7 @@ public class InteractiveVideoCRUD implements CRUD<InteractiveVideo> {
 
     @Override
     public List<InteractiveVideo> getAll() {
-        return interactiveVideos;
+        return new ArrayList<>(interactiveVideos);
     }
 
     @Override
