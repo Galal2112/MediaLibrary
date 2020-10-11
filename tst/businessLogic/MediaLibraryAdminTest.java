@@ -175,9 +175,20 @@ class MediaLibraryAdminTest {
 
     @Test
     void deleteMedia() {
+        InteractiveVideo interactiveVideo = mock(InteractiveVideo.class);
+        mediaAdmin.deleteMedia(interactiveVideo);
+        verify(interactiveVideoCRUD).delete(interactiveVideo);
+
+        LicensedAudioVideo licensedAudioVideo = mock(LicensedAudioVideo.class);
+        mediaAdmin.deleteMedia(licensedAudioVideo);
+        verify(licensedAudioVideoCRUD).delete(licensedAudioVideo);
     }
 
     @Test
     void deleteMediaByAddress() {
+        String deletedAddress = "deleted address";
+        mediaAdmin.deleteMediaByAddress(deletedAddress);
+        verify(interactiveVideoCRUD).delete(deletedAddress);
+        verify(licensedAudioVideoCRUD).delete(deletedAddress);
     }
 }
