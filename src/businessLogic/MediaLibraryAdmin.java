@@ -11,7 +11,7 @@ import java.util.*;
 public class MediaLibraryAdmin implements MediaAdmin {
 
     // 1 Gigabyte storage
-    private static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1024);
+    public static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1024);
 
     private final UploaderCRUD uploaderCRUD;
     private final InteractiveVideoCRUD interactiveVideoCRUD;
@@ -41,9 +41,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         }
 
         // check producer exists
-        UploaderCRUD producerCRUD = new UploaderCRUD();
-
-        Optional<Uploader> optionalUploader = producerCRUD.get(media.getUploader().getName());
+        Optional<Uploader> optionalUploader = uploaderCRUD.get(media.getUploader().getName());
         if (!optionalUploader.isPresent()) {
             throw new IllegalArgumentException("Producer does not exist");
         }
