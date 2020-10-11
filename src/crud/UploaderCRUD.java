@@ -14,7 +14,7 @@ public class UploaderCRUD implements CRUD<Uploader> {
 
     @Override
     public List<Uploader> getAll() {
-        return new ArrayList<>(uploaders);
+        return new LinkedList<>(uploaders);
     }
 
     @Override

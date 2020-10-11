@@ -2,7 +2,6 @@ package crud;
 
 import mediaDB.LicensedAudioVideo;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +12,7 @@ public class LicensedAudioVideoCRUD implements CRUD<LicensedAudioVideo> {
 
     @Override
     public List<LicensedAudioVideo> getAll() {
-        return new ArrayList<>(licensedAudioVideoList);
+        return new LinkedList<>(licensedAudioVideoList);
     }
 
     @Override

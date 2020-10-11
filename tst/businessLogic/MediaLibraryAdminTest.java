@@ -3,10 +3,7 @@ package businessLogic;
 import crud.InteractiveVideoCRUD;
 import crud.LicensedAudioVideoCRUD;
 import crud.UploaderCRUD;
-import mediaDB.InteractiveVideo;
-import mediaDB.LicensedAudioVideo;
-import mediaDB.LicensedVideo;
-import mediaDB.Uploader;
+import mediaDB.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -144,6 +141,12 @@ class MediaLibraryAdminTest {
 
     @Test
     void getAllTags() {
+        Tag[] expectedTags = Tag.values();
+        List<Tag> tags = mediaAdmin.getAllTags();
+        assertEquals(expectedTags.length, tags.size());
+        for (int i = 0; i < expectedTags.length; i ++) {
+            assertEquals(expectedTags[i], tags.get(i));
+        }
     }
 
     @Test
