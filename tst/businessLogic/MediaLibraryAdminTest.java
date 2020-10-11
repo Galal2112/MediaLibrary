@@ -127,6 +127,19 @@ class MediaLibraryAdminTest {
 
     @Test
     void listMedia() {
+        List<InteractiveVideo> interactiveVideos = new ArrayList<>();
+        interactiveVideos.add(mock(InteractiveVideo.class));
+        when(interactiveVideoCRUD.getAll()).thenReturn(interactiveVideos);
+
+        List<LicensedAudioVideo> audioVideos = new ArrayList<>();
+        audioVideos.add(mock(LicensedAudioVideo.class));
+        audioVideos.add(mock(LicensedAudioVideo.class));
+        when(licensedAudioVideoCRUD.getAll()).thenReturn(audioVideos);
+
+        // Test result size
+        assertEquals(mediaAdmin.listMedia(InteractiveVideo.class).size(), interactiveVideos.size());
+        assertEquals(mediaAdmin.listMedia(LicensedAudioVideo.class).size(), audioVideos.size());
+        assertEquals(mediaAdmin.listMedia(null).size(), interactiveVideos.size() + audioVideos.size());
     }
 
     @Test
