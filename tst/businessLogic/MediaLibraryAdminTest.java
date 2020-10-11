@@ -158,18 +158,26 @@ class MediaLibraryAdminTest {
 
     @Test
     void deleteUploaderByName() {
-
+        String uploaderName = "DeletedUploader";
+        mediaAdmin.deleteUploaderByName(uploaderName);
+        verify(uploaderCRUD).delete(uploaderName);
     }
 
     @Test
     void deleteUploader() {
-    }
+        String uploaderName = "DeletedUploader";
+        Uploader uploader = Mockito.mock(Uploader.class);
+        when(uploader.getName()).thenReturn(uploaderName);
 
-    @Test
-    void testDeleteUploader() {
+        mediaAdmin.deleteUploader(uploader);
+        verify(uploaderCRUD).delete(uploader);
     }
 
     @Test
     void deleteMedia() {
+    }
+
+    @Test
+    void deleteMediaByAddress() {
     }
 }

@@ -16,6 +16,6 @@ public interface MediaAdmin {
     List<Tag> getAllTags();
     void deleteUploaderByName(String name);
     void deleteUploader(Uploader uploader);
-    <T extends MediaContent & Uploadable> void deleteUploader(T media);
-    void deleteMedia(String address);
+    <T extends MediaContent & Uploadable> void deleteMedia(T media);
+    void deleteMediaByAddress(String address);
 }

@@ -122,7 +122,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public <T extends MediaContent & Uploadable> void deleteUploader(T media) {
+    public <T extends MediaContent & Uploadable> void deleteMedia(T media) {
         if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
             throw new IllegalArgumentException("Unsupported media type");
         }
@@ -135,7 +135,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public void deleteMedia(String address) {
+    public void deleteMediaByAddress(String address) {
         // if address belongs to InteractiveVideo ... delete
         interactiveVideoCRUD.delete(address);
 
