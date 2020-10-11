@@ -135,8 +135,15 @@ class MediaLibraryAdminTest {
 
         // Test result size
         assertEquals(mediaAdmin.listMedia(InteractiveVideo.class).size(), interactiveVideos.size());
+        verify(interactiveVideos.get(0)).setAccessCount(1);
+        verify(interactiveVideoCRUD).update(interactiveVideos.get(0));
+
         assertEquals(mediaAdmin.listMedia(LicensedAudioVideo.class).size(), audioVideos.size());
+        verify(audioVideos.get(0)).setAccessCount(1);
+        verify(licensedAudioVideoCRUD).update(audioVideos.get(0));
+
         assertEquals(mediaAdmin.listMedia(null).size(), interactiveVideos.size() + audioVideos.size());
+
     }
 
     @Test
@@ -151,6 +158,7 @@ class MediaLibraryAdminTest {
 
     @Test
     void deleteUploaderByName() {
+
     }
 
     @Test
