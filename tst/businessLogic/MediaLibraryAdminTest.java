@@ -3,6 +3,7 @@ package businessLogic;
 import crud.InteractiveVideoCRUD;
 import crud.LicensedAudioVideoCRUD;
 import crud.UploaderCRUD;
+import mediaDB.InteractiveVideo;
 import mediaDB.LicensedAudioVideo;
 import mediaDB.LicensedVideo;
 import mediaDB.Uploader;
@@ -11,14 +12,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class MediaLibraryAdminTest {
 
-    MediaLibraryAdmin mediaAdmin;
+    MediaAdmin mediaAdmin;
     InteractiveVideoCRUD interactiveVideoCRUD;
     LicensedAudioVideoCRUD licensedAudioVideoCRUD;
     UploaderCRUD uploaderCRUD;
@@ -80,6 +81,48 @@ class MediaLibraryAdminTest {
 
     @Test
     void listProducersAndUploadsCount() {
+        int producersCount = 5;
+
+        Map<String, Integer> expectedCounts = new HashMap<>();
+        List<Uploader> uploaders = new ArrayList<>();
+        List<InteractiveVideo> interactiveVideos = new ArrayList<>();
+        List<LicensedAudioVideo> audioVideos = new ArrayList<>();
+        // mock producers and videos
+        for (int i = 0; i < producersCount; i ++) {
+            String name = "uploader " + i;
+            Uploader uploader = Mockito.mock(Uploader.class);
+            when(uploader.getName()).thenReturn(name);
+            uploaders.add(uploader);
+            if (i == 0) {
+                // fitst uploader has no videos
+                expectedCounts.put(name, 0);
+                continue;
+            }
+            InteractiveVideo interactiveVideo = mock(InteractiveVideo.class);
+            when(interactiveVideo.getUploader()).thenReturn(uploader);
+            interactiveVideos.add(interactiveVideo);
+            if (i % 2 == 0) {
+                LicensedAudioVideo licensedAudioVideo = mock(LicensedAudioVideo.class);
+                when(licensedAudioVideo.getUploader()).thenReturn(uploader);
+                audioVideos.add(licensedAudioVideo);
+                expectedCounts.put(name, 2);
+            } else {
+                expectedCounts.put(name, 1);
+            }
+        }
+        when(uploaderCRUD.getAll()).thenReturn(uploaders);
+        when(interactiveVideoCRUD.getAll()).thenReturn(interactiveVideos);
+        when(licensedAudioVideoCRUD.getAll()).thenReturn(audioVideos);
+
+        // Test get uploader and counts
+        Map<Uploader, Integer> uploaderCounts = mediaAdmin.listProducersAndUploadsCount();
+        Set<Uploader> resultUploaders = uploaderCounts.keySet();
+        // check result has all the producers
+        assertEquals(resultUploaders.size(), producersCount);
+        // check uploads count
+        for (Uploader uploader : resultUploaders) {
+            assertEquals(uploaderCounts.get(uploader), expectedCounts.get(uploader.getName()));
+        }
     }
 
     @Test
