@@ -13,12 +13,19 @@ public class MediaLibraryAdmin implements MediaAdmin {
     // 1 Gigabyte storage
     private static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1024);
 
-    private final UploaderCRUD uploaderCRUD = new UploaderCRUD();
-    private final InteractiveVideoCRUD interactiveVideoCRUD = new InteractiveVideoCRUD();
-    private final LicensedAudioVideoCRUD licensedAudioVideoCRUD = new LicensedAudioVideoCRUD();
+    private final UploaderCRUD uploaderCRUD;
+    private final InteractiveVideoCRUD interactiveVideoCRUD;
+    private final LicensedAudioVideoCRUD licensedAudioVideoCRUD;
+
+    public MediaLibraryAdmin(UploaderCRUD uploaderCRUD, InteractiveVideoCRUD interactiveVideoCRUD,
+                             LicensedAudioVideoCRUD licensedAudioVideoCRUD) {
+        this.uploaderCRUD = uploaderCRUD;
+        this.interactiveVideoCRUD = interactiveVideoCRUD;
+        this.licensedAudioVideoCRUD = licensedAudioVideoCRUD;
+    }
 
     @Override
-    public void create(Uploader uploader) {
+    public void createUploader(Uploader uploader) {
         if (!uploaderCRUD.get(uploader.getName()).isPresent()) {
             uploaderCRUD.create(uploader);
         } else {
@@ -107,17 +114,17 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public void deleteProducer(String name) {
+    public void deleteUploaderByName(String name) {
         uploaderCRUD.delete(name);
     }
 
     @Override
-    public void delete(Uploader uploader) {
+    public void deleteUploader(Uploader uploader) {
         uploaderCRUD.delete(uploader);
     }
 
     @Override
-    public <T extends MediaContent & Uploadable> void delete(T media) {
+    public <T extends MediaContent & Uploadable> void deleteUploader(T media) {
         if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
             throw new IllegalArgumentException("Unsupported media type");
         }
