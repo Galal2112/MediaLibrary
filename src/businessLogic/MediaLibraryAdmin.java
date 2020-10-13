@@ -11,9 +11,9 @@ public class MediaLibraryAdmin implements MediaAdmin {
     // 1 Gigabyte storage
     public static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1024);
 
-    private CRUD<Uploader> uploaderCRUD;
-    private CRUD<InteractiveVideo> interactiveVideoCRUD;
-    private CRUD<LicensedAudioVideo> licensedAudioVideoCRUD;
+    private final CRUD<Uploader> uploaderCRUD;
+    private final CRUD<InteractiveVideo> interactiveVideoCRUD;
+    private final CRUD<LicensedAudioVideo> licensedAudioVideoCRUD;
 
     public MediaLibraryAdmin(CRUD<Uploader> uploaderCRUD, CRUD<InteractiveVideo> interactiveVideoCRUD,
                              CRUD<LicensedAudioVideo> licensedAudioVideoCRUD) {
@@ -68,7 +68,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         List<Uploader> producers = uploaderCRUD.getAll();
         HashMap<Uploader, Integer> producerUploadCount = new HashMap<>();
         producers.forEach(producer -> producerUploadCount.put(producer, 0));
-        List<Uploadable> uploadsList = new ArrayList<>();
+        List<Uploadable> uploadsList = new LinkedList<>();
         uploadsList.addAll(interactiveVideoCRUD.getAll());
         uploadsList.addAll(licensedAudioVideoCRUD.getAll());
         uploadsList.forEach(media -> {
@@ -79,8 +79,9 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
+    // return interactiveVideo or lincensedAudioVideo
     public <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) {
-        List<MediaContent> result = new ArrayList<>();
+        List<MediaContent> result = new LinkedList<>();
         if (type == null) {
             result.addAll(interactiveVideoCRUD.getAll());
             result.addAll(licensedAudioVideoCRUD.getAll());
@@ -95,6 +96,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         // update access count
         for (MediaContent content : result) {
             content.setAccessCount(content.getAccessCount() + 1);
+            //update acessCount in the DBx
             if (content instanceof InteractiveVideo) {
                 interactiveVideoCRUD.update((InteractiveVideo) content);
             } else {

@@ -9,7 +9,7 @@ public class UploaderCRUD implements CRUD<Uploader> {
     private static final LinkedList<Uploader> uploaders = new LinkedList<>();
 
     public Optional<Uploader> get(String name) {
-        return uploaders.stream().filter(Uploader -> Uploader.getName().equals(name)).findFirst();
+        return uploaders.stream().filter(uploader -> uploader.getName().equals(name)).findFirst();
     }
 
     @Override
