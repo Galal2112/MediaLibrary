@@ -1,6 +1,7 @@
 package crud;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CRUD<T> {
     
@@ -11,4 +12,8 @@ public interface CRUD<T> {
     void update(T t);
 
     void delete(T t);
+
+    Optional<T> get(String id);
+
+    void deleteById(String id);
 }

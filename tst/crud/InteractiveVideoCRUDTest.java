@@ -1,7 +1,6 @@
 package crud;
 
 import mediaDB.InteractiveVideo;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -72,7 +71,7 @@ class InteractiveVideoCRUDTest {
         InteractiveVideo testVideo = getMockVideo();
         interactiveVideoCRUD.create(testVideo);
         List<InteractiveVideo> originalVideos = interactiveVideoCRUD.getAll();
-        interactiveVideoCRUD.delete(testVideo.getAddress());
+        interactiveVideoCRUD.deleteById(testVideo.getAddress());
         List<InteractiveVideo> newVideosList = interactiveVideoCRUD.getAll();
         assertEquals(originalVideos.size() - 1, newVideosList.size());
     }

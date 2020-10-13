@@ -5,6 +5,7 @@ import mediaDB.InteractiveVideo;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class InteractiveVideoCRUD implements CRUD<InteractiveVideo> {
 
@@ -34,11 +35,16 @@ public class InteractiveVideoCRUD implements CRUD<InteractiveVideo> {
     }
 
     @Override
-    public void delete(InteractiveVideo interactiveVideo) {
-        interactiveVideos.removeIf(v -> v.getAddress().equals(interactiveVideo.getAddress()));
+    public Optional<InteractiveVideo> get(String address) {
+        return interactiveVideos.stream().filter(v -> v.getAddress().equals(address)).findFirst();
     }
 
-    public void delete(String address) {
+    @Override
+    public void delete(InteractiveVideo interactiveVideo) {
+        interactiveVideos.removeIf( v -> v.getAddress().equals(interactiveVideo.getAddress()));
+    }
+    @Override
+    public void deleteById(String address) {
         interactiveVideos.removeIf(v -> v.getAddress().equals(address));
     }
 }

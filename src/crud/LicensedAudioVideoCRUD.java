@@ -5,6 +5,7 @@ import mediaDB.LicensedAudioVideo;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class LicensedAudioVideoCRUD implements CRUD<LicensedAudioVideo> {
 
@@ -35,10 +36,15 @@ public class LicensedAudioVideoCRUD implements CRUD<LicensedAudioVideo> {
 
     @Override
     public void delete(LicensedAudioVideo licensedAudioVideo) {
-        delete(licensedAudioVideo.getAddress());
+        deleteById(licensedAudioVideo.getAddress());
     }
 
-    public void delete(String address) {
+    public void deleteById(String address) {
         licensedAudioVideoList.removeIf(v -> v.getAddress().equals(address));
+    }
+
+    @Override
+    public Optional<LicensedAudioVideo> get(String address) {
+        return licensedAudioVideoList.stream().filter(v -> v.getAddress().equals(address)).findFirst();
     }
 }

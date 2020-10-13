@@ -1,8 +1,6 @@
 package businessLogic;
 
-import crud.InteractiveVideoCRUD;
-import crud.LicensedAudioVideoCRUD;
-import crud.UploaderCRUD;
+import crud.CRUD;
 import mediaDB.*;
 
 import java.math.BigDecimal;
@@ -13,12 +11,12 @@ public class MediaLibraryAdmin implements MediaAdmin {
     // 1 Gigabyte storage
     public static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1024);
 
-    private final UploaderCRUD uploaderCRUD;
-    private final InteractiveVideoCRUD interactiveVideoCRUD;
-    private final LicensedAudioVideoCRUD licensedAudioVideoCRUD;
+    private CRUD<Uploader> uploaderCRUD;
+    private CRUD<InteractiveVideo> interactiveVideoCRUD;
+    private CRUD<LicensedAudioVideo> licensedAudioVideoCRUD;
 
-    public MediaLibraryAdmin(UploaderCRUD uploaderCRUD, InteractiveVideoCRUD interactiveVideoCRUD,
-                             LicensedAudioVideoCRUD licensedAudioVideoCRUD) {
+    public MediaLibraryAdmin(CRUD<Uploader> uploaderCRUD, CRUD<InteractiveVideo> interactiveVideoCRUD,
+                             CRUD<LicensedAudioVideo> licensedAudioVideoCRUD) {
         this.uploaderCRUD = uploaderCRUD;
         this.interactiveVideoCRUD = interactiveVideoCRUD;
         this.licensedAudioVideoCRUD = licensedAudioVideoCRUD;
@@ -113,7 +111,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     @Override
     public void deleteUploaderByName(String name) {
-        uploaderCRUD.delete(name);
+        uploaderCRUD.deleteById(name);
     }
 
     @Override
@@ -137,10 +135,10 @@ public class MediaLibraryAdmin implements MediaAdmin {
     @Override
     public void deleteMediaByAddress(String address) {
         // if address belongs to InteractiveVideo ... delete
-        interactiveVideoCRUD.delete(address);
+        interactiveVideoCRUD.deleteById(address);
 
         // if address belongs to InteractiveVideo ... delete
-        licensedAudioVideoCRUD.delete(address);
+        licensedAudioVideoCRUD.deleteById(address);
     }
 
     private String getAddress(Object o) {

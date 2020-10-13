@@ -160,7 +160,7 @@ class MediaLibraryAdminTest {
     void deleteUploaderByName() {
         String uploaderName = "DeletedUploader";
         mediaAdmin.deleteUploaderByName(uploaderName);
-        verify(uploaderCRUD).delete(uploaderName);
+        verify(uploaderCRUD).deleteById(uploaderName);
     }
 
     @Test
@@ -186,9 +186,9 @@ class MediaLibraryAdminTest {
 
     @Test
     void deleteMediaByAddress() {
-        String deletedAddress = "deleted address";
+        String deletedAddress = "test address";
         mediaAdmin.deleteMediaByAddress(deletedAddress);
-        verify(interactiveVideoCRUD).delete(deletedAddress);
-        verify(licensedAudioVideoCRUD).delete(deletedAddress);
+        verify(interactiveVideoCRUD).deleteById(deletedAddress);
+        verify(licensedAudioVideoCRUD).deleteById(deletedAddress);
     }
 }
