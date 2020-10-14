@@ -1,5 +1,4 @@
-package crud;
-
+import crud.InteractiveVideoCRUD;
 import mediaDB.InteractiveVideo;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
