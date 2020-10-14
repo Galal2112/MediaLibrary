@@ -80,7 +80,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     @Override
     // return interactiveVideo or lincensedAudioVideo
-    public <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) {
+    public <T extends MediaContent & Uploadable> List<? extends MediaContent> listMedia(Class<T> type) {
         List<MediaContent> result = new LinkedList<>();
         if (type == null) {
             result.addAll(interactiveVideoCRUD.getAll());

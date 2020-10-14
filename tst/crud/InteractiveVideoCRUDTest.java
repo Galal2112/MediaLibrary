@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 
 class InteractiveVideoCRUDTest {
 
-    private InteractiveVideoCRUD interactiveVideoCRUD = new InteractiveVideoCRUD();;
+    private final InteractiveVideoCRUD interactiveVideoCRUD = new InteractiveVideoCRUD();;
 
     @Test
     void getAll() {

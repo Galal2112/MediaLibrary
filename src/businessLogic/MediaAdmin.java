@@ -12,7 +12,7 @@ public interface MediaAdmin {
     void createUploader(Uploader uploader);
     <T extends MediaContent & Uploadable> void upload(T media);
     Map<Uploader, Integer> listProducersAndUploadsCount();
-    <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type);
+    <T extends MediaContent & Uploadable> List<? extends MediaContent> listMedia(Class<T> type);
     List<Tag> getAllTags();
     void deleteUploaderByName(String name);
     void deleteUploader(Uploader uploader);

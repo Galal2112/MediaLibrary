@@ -16,10 +16,10 @@ import static org.mockito.Mockito.*;
 
 class MediaLibraryAdminTest {
 
-    MediaAdmin mediaAdmin;
-    InteractiveVideoCRUD interactiveVideoCRUD;
-    LicensedAudioVideoCRUD licensedAudioVideoCRUD;
-    UploaderCRUD uploaderCRUD;
+    private MediaAdmin mediaAdmin;
+    private InteractiveVideoCRUD interactiveVideoCRUD;
+    private LicensedAudioVideoCRUD licensedAudioVideoCRUD;
+    private UploaderCRUD uploaderCRUD;
 
     @BeforeEach
     void setUp() {
@@ -91,7 +91,7 @@ class MediaLibraryAdminTest {
             when(uploader.getName()).thenReturn(name);
             uploaders.add(uploader);
             if (i == 0) {
-                // fitst uploader has no videos
+                // set first uploader videos count to zero
                 expectedCounts.put(name, 0);
                 continue;
             }
@@ -113,6 +113,10 @@ class MediaLibraryAdminTest {
 
         // Test get uploader and counts
         Map<Uploader, Integer> uploaderCounts = mediaAdmin.listProducersAndUploadsCount();
+        verify(uploaderCRUD).getAll();
+        verify(interactiveVideoCRUD).getAll();
+        verify(licensedAudioVideoCRUD).getAll();
+
         Set<Uploader> resultUploaders = uploaderCounts.keySet();
         // check result has all the producers
         assertEquals(resultUploaders.size(), producersCount);
