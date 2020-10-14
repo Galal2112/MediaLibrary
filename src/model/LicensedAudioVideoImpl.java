@@ -25,6 +25,20 @@ public class LicensedAudioVideoImpl implements LicensedAudioVideo {
     private Uploader uploader;
     private Date uploadDate;
 
+    public LicensedAudioVideoImpl(int samplingRate, int width, int height, String encoding,
+                                  String holder, Long bitrate, Duration length, BigDecimal size,
+                                  Uploader uploader) {
+        this.samplingRate = samplingRate;
+        this.width = width;
+        this.height = height;
+        this.encoding = encoding;
+        this.holder = holder;
+        this.bitrate = bitrate;
+        this.length = length;
+        this.size = size;
+        this.uploader = uploader;
+    }
+
     @Override
     public int getSamplingRate() {
         return samplingRate;
@@ -103,5 +117,13 @@ public class LicensedAudioVideoImpl implements LicensedAudioVideo {
     @Override
     public void setUploadDate(Date date) {
         this.uploadDate = date;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LicensedAudioVideoImpl licensedAudioVideo = (LicensedAudioVideoImpl) o;
+        return address.equals(licensedAudioVideo.address);
     }
 }

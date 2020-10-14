@@ -13,7 +13,7 @@ public class InteractiveVideoImpl implements InteractiveVideo {
 
     private String type;
     private int width;
-    private int heigh;
+    private int height;
     private String encoding;
     private long bitrate;
     private Duration length;
@@ -24,6 +24,17 @@ public class InteractiveVideoImpl implements InteractiveVideo {
     private Uploader uploader;
     private Date uploadDate;
 
+    public InteractiveVideoImpl(String type, int width, int height, String encoding,
+                                long bitrate, Duration length, BigDecimal size, Uploader uploader) {
+        this.type = type;
+        this.width = width;
+        this.height = height;
+        this.encoding = encoding;
+        this.bitrate = bitrate;
+        this.length = length;
+        this.size = size;
+        this.uploader = uploader;
+    }
 
 
     @Override
@@ -38,7 +49,7 @@ public class InteractiveVideoImpl implements InteractiveVideo {
 
     @Override
     public int getHeight() {
-        return heigh;
+        return height;
     }
 
     @Override

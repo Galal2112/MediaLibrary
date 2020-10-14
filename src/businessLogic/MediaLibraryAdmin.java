@@ -144,7 +144,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     private String getAddress(Object o) {
-        return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
+        return o.getClass().getSimpleName() + '@' + Integer.toHexString(o.hashCode());
     }
 
 }

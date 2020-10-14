@@ -4,7 +4,6 @@ import mediaDB.Uploader;
 
 public class Producer implements Uploader {
     private String name;
-    private int uploadsCount;
 
     public Producer(String name) {
         this.name = name;
@@ -18,14 +17,6 @@ public class Producer implements Uploader {
     @Override
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getUploadsCount() {
-        return uploadsCount;
-    }
-
-    public void setUploadsCount(int uploadsCount) {
-        this.uploadsCount = uploadsCount;
     }
 
     @Override
