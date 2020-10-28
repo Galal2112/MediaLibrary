@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface MediaAdmin {
-    void createUploader(Uploader uploader);
+    void createUploader(Uploader uploader) throws IllegalArgumentException;
     <T extends MediaContent & Uploadable> void upload(T media);
     Map<Uploader, Integer> listProducersAndUploadsCount();
     <T extends MediaContent & Uploadable> List<? extends MediaContent> listMedia(Class<T> type);

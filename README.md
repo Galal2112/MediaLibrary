@@ -23,3 +23,4 @@ public static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1
 * Dao pattern in java: https://www.baeldung.com/java-dao-pattern
 * Wildcards: https://www.geeksforgeeks.org/wildcards-in-java/
 * Mockito: https://www.youtube.com/watch?v=HsQ9OwKA79s
+* https://www.geeksforgeeks.org/mvc-design-pattern/

@@ -23,7 +23,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public void createUploader(Uploader uploader) {
+    public void createUploader(Uploader uploader) throws IllegalArgumentException {
         if (!uploaderCRUD.get(uploader.getName()).isPresent()) {
             uploaderCRUD.create(uploader);
         } else {
