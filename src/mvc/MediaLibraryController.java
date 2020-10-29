@@ -2,24 +2,20 @@ package mvc;
 
 import businessLogic.MediaAdmin;
 import events.InputEvent;
-import mediaDB.LicensedAudioVideo;
-import mediaDB.Uploader;
+import mediaDB.*;
 import model.InteractiveVideoImpl;
 import model.LicensedAudioVideoImpl;
 import model.Producer;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class MediaLibraryController implements MediaController {
 
     private final MediaView mediaView;
     private final MediaAdmin mediaAdmin;
     private final ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(Command.CREATE, Command.DELETE,
-            Command.VIEW,Command.UPDATE));
+            Command.VIEW, Command.UPDATE));
     private Command currentCommand = null;
 
     public MediaLibraryController(MediaView mediaView, MediaAdmin mediaAdmin) {
@@ -45,7 +41,7 @@ public class MediaLibraryController implements MediaController {
             mediaView.displayError("Not a vaild input");
             return;
         }
-        if(event.getText().equals("exit"))
+        if (event.getText().equalsIgnoreCase("exit"))
             System.exit(0);
 
         if (currentCommand == null) {
@@ -61,8 +57,10 @@ public class MediaLibraryController implements MediaController {
                     handleCreateEvent(event);
                     break;
                 case VIEW:
-                    if (event.getText().equals("uploader")) {
+                    if (event.getText().equalsIgnoreCase("uploader")) {
                         viewUploaders();
+                    } else if (event.getText().toLowerCase().startsWith("content")) {
+                        viewContent(event);
                     }
                     break;
                 default:
@@ -74,9 +72,50 @@ public class MediaLibraryController implements MediaController {
 
     private void viewUploaders() {
         Map<Uploader, Integer> uploadersAndCounts = mediaAdmin.listProducersAndUploadsCount();
+        if (uploadersAndCounts.size() == 0) {
+            mediaView.displayMessage("No registered uploader");
+            return;
+        }
         for (Uploader uploader : uploadersAndCounts.keySet()) {
             mediaView.displayUploader(uploader.getName(), uploadersAndCounts.get(uploader));
         }
+    }
+
+    private void viewContent(InputEvent event) {
+        String[] split = event.getText().split(" ");
+        List<?> mediaList;
+        if (split.length == 1) {
+            mediaList = mediaAdmin.listMedia(null);
+        } else {
+            String type = split[1];
+            if (isInteractiveVideo(type)) {
+                mediaList = mediaAdmin.listMedia(InteractiveVideo.class);
+            } else if (isLicensedAudioVideo(type)) {
+                mediaList = mediaAdmin.listMedia(LicensedAudioVideo.class);
+            } else {
+                mediaView.displayError("Unsupported Media type");
+                return;
+            }
+        }
+
+        String[] retrievalAddress = new String[mediaList.size()];
+        Date[] uploadDate = new Date[mediaList.size()];
+        long[] accessCount = new long[mediaList.size()];
+        for (int i = 0; i < mediaList.size(); i ++) {
+            Object media = mediaList.get(i);
+            if (media instanceof InteractiveVideo) {
+                InteractiveVideo interactiveVideo = (InteractiveVideo) media;
+                retrievalAddress[i] = interactiveVideo.getAddress();
+                uploadDate[i] = interactiveVideo.getUploadDate();
+                accessCount[i] = interactiveVideo.getAccessCount();
+            } else if (media instanceof LicensedAudioVideo) {
+                LicensedAudioVideo licensedAudioVideo = (LicensedAudioVideo) media;
+                retrievalAddress[i] = licensedAudioVideo.getAddress();
+                uploadDate[i] = licensedAudioVideo.getUploadDate();
+                accessCount[i] = licensedAudioVideo.getAccessCount();
+            }
+        }
+        mediaView.displayMedia(retrievalAddress, uploadDate, accessCount);
     }
 
     private void handleCreateEvent(InputEvent event) {
@@ -100,12 +139,12 @@ public class MediaLibraryController implements MediaController {
             int height = Integer.parseInt(parsedString[6]);
             int width = Integer.parseInt(parsedString[7]);
 
-            if (mediaType.equals("InteractiveVideo")) {
+            if (isInteractiveVideo(mediaType)) {
                 InteractiveVideoImpl interactiveVideo = new InteractiveVideoImpl(mediaType, width, height,
                         videoEncoding, bitrate, duration, producer);
 //                interactiveVideo.setTags(Arrays.asList(tags));
-                 mediaAdmin.upload(interactiveVideo);
-            } else if (mediaType.equals("LicensedAudioVideo")) {
+                mediaAdmin.upload(interactiveVideo);
+            } else if (isLicensedAudioVideo(mediaType)) {
                 String audioEncoding = parsedString[8];
                 int samplingRate = Integer.parseInt(parsedString[9]);
                 String holder = parsedString[10];
@@ -129,5 +168,13 @@ public class MediaLibraryController implements MediaController {
         } catch (IllegalArgumentException e) {
             mediaView.displayError(e.getMessage());
         }
+    }
+
+    private boolean isInteractiveVideo(String mediaType) {
+        return mediaType.equals("InteractiveVideo");
+    }
+
+    private boolean isLicensedAudioVideo(String mediaType) {
+        return mediaType.equals("LicensedAudioVideo");
     }
 }

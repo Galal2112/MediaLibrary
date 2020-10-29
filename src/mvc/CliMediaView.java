@@ -3,6 +3,7 @@ package mvc;
 import events.InputEvent;
 import events.InputEventHandler;
 
+import java.util.Date;
 import java.util.List;
 
 public class CliMediaView implements MediaView {
@@ -35,6 +36,11 @@ public class CliMediaView implements MediaView {
     }
 
     @Override
+    public void displayMessage(String message) {
+        System.out.println(message);
+    }
+
+    @Override
     public void readInput(String title) {
         String input = console.readStringFromStdin(title);
         InputEvent e = new InputEvent(this, input);
@@ -46,5 +52,15 @@ public class CliMediaView implements MediaView {
     @Override
     public void displayUploader(String name, int uploadsCount) {
         System.out.println(name + " " + uploadsCount);
+    }
+
+    @Override
+    public void displayMedia(String[] retrievalAddress, Date[] uploadDate, long[] accessCount) {
+
+        System.out.println(String.format("%20s %15s %10s %15s %10s", "Retrieval Address", "|", "Upload Date", "|", "Access Count"));
+        System.out.println(String.format("%s", "----------------------------------------------------------------------------------------------------------------"));
+       for(int i =0 ; i< retrievalAddress.length; i++) {
+           System.out.println(String.format("%20s %15s %10s %15s %10s", retrievalAddress[i], "|", uploadDate[i], "|", accessCount[i]));
+       }//  System.out.format("%20s|%20s|%10s\n", retrievalAddress, uploadDate, accessCount);
     }
 }
