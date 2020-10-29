@@ -26,7 +26,7 @@ public class LicensedAudioVideoImpl implements LicensedAudioVideo {
     private Date uploadDate;
 
     public LicensedAudioVideoImpl(int samplingRate, int width, int height, String encoding,
-                                  String holder, Long bitrate, Duration length, BigDecimal size,
+                                  String holder, Long bitrate, Duration length,
                                   Uploader uploader) {
         this.samplingRate = samplingRate;
         this.width = width;
@@ -35,7 +35,7 @@ public class LicensedAudioVideoImpl implements LicensedAudioVideo {
         this.holder = holder;
         this.bitrate = bitrate;
         this.length = length;
-        this.size = size;
+        this.size = MedisSizeUtil.getMedisSize(bitrate, length);
         this.uploader = uploader;
     }
 
@@ -92,6 +92,10 @@ public class LicensedAudioVideoImpl implements LicensedAudioVideo {
     @Override
     public Collection<Tag> getTags() {
         return tags;
+    }
+
+    public void setTags(Collection<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override

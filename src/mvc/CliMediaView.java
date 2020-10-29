@@ -7,6 +7,8 @@ import java.util.List;
 
 public class CliMediaView implements MediaView {
 
+    public static final String CONSOLE_COLOR_RED = "\u001B[31m";
+    public static final String CONSOLE_COLOR_RESET = "\033[0m";  // Text Reset
     private final Console console;
     private InputEventHandler handler;
 
@@ -29,7 +31,7 @@ public class CliMediaView implements MediaView {
 
     @Override
     public void displayError(String error) {
-        System.err.println(error);
+        System.out.println(CONSOLE_COLOR_RED + "Error: " + error + CONSOLE_COLOR_RESET);
     }
 
     @Override

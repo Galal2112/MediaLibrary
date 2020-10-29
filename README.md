@@ -14,10 +14,14 @@ private String getAddress(Object o) {
 }
 ```
 -------
-Storage available is 1 GB, implement as a static attribute inside media admin
+Storage available is 512 GB, implement as a static attribute inside media admin
 ```java
 public static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1024);
+Add sample
 ```
+
+VideoSize = ((bitrate(Mb/s)/8) * length(seconds)) / 1024 * 1024 MB;
+Storage 25 GB
 -----
 #### References
 * Dao pattern in java: https://www.baeldung.com/java-dao-pattern

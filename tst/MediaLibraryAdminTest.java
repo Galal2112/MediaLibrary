@@ -63,7 +63,7 @@ class MediaLibraryAdminTest {
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 
         // Test insufficient storage
-        when(licensedAudioVideo.getSize()).thenReturn(MediaLibraryAdmin.availableStorage.add(new BigDecimal(1)));
+        when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(MediaLibraryAdmin.availableStorageTB.incrementAndGet()));
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 
         // Test upload

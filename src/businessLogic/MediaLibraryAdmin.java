@@ -3,13 +3,13 @@ package businessLogic;
 import crud.CRUD;
 import mediaDB.*;
 
-import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class MediaLibraryAdmin implements MediaAdmin {
 
-    // 1 Gigabyte storage
-    public static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1024);
+    // 11 Terabyte storage
+    public static final AtomicLong availableStorageTB = new AtomicLong((10 * 1000));
 
     private final CRUD<Uploader> uploaderCRUD;
     private final CRUD<InteractiveVideo> interactiveVideoCRUD;
@@ -32,7 +32,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public <T extends MediaContent & Uploadable> void upload(T media) {
+    public <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException {
 
         if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
             throw new IllegalArgumentException("Unsupported media type");
@@ -45,9 +45,12 @@ public class MediaLibraryAdmin implements MediaAdmin {
         }
 
         // check size
-        if (availableStorage.compareTo(media.getSize()) < 0) {
+        long newStorageValue = availableStorageTB.longValue() - media.getSize().longValue();
+        if (newStorageValue < 0) {
             throw new IllegalArgumentException("Insufficient storage");
         }
+
+        availableStorageTB.set(newStorageValue);
 
         // Set address
         media.setAddress(getAddress(media));

@@ -25,14 +25,14 @@ public class InteractiveVideoImpl implements InteractiveVideo {
     private Date uploadDate;
 
     public InteractiveVideoImpl(String type, int width, int height, String encoding,
-                                long bitrate, Duration length, BigDecimal size, Uploader uploader) {
+                                long bitrate, Duration length, Uploader uploader) {
         this.type = type;
         this.width = width;
         this.height = height;
         this.encoding = encoding;
         this.bitrate = bitrate;
         this.length = length;
-        this.size = size;
+        this.size = MedisSizeUtil.getMedisSize(bitrate, length);
         this.uploader = uploader;
     }
 
@@ -85,6 +85,10 @@ public class InteractiveVideoImpl implements InteractiveVideo {
     @Override
     public Collection<Tag> getTags() {
         return tags;
+    }
+
+    public void setTags(Collection<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override
