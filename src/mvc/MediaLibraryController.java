@@ -15,7 +15,7 @@ public class MediaLibraryController implements MediaController {
     private final MediaView mediaView;
     private final MediaAdmin mediaAdmin;
     private final ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(Command.CREATE, Command.DELETE,
-            Command.VIEW, Command.UPDATE));
+            Command.VIEW));
     private Command currentCommand = null;
 
     public MediaLibraryController(MediaView mediaView, MediaAdmin mediaAdmin) {
@@ -26,10 +26,11 @@ public class MediaLibraryController implements MediaController {
     @Override
     public void start() {
         mediaView.displayCommands("Media Library available commands", commandList);
-        mediaView.readInput("Please select command: ");
         while (true) {
             if (currentCommand != null) {
                 mediaView.readInput(">> ");
+            } else {
+                mediaView.readInput("Please select command: ");
             }
         }
     }
@@ -63,8 +64,17 @@ public class MediaLibraryController implements MediaController {
                     }
                     break;
 
-                case DELETE: //TODO
-                case UPDATE: //TODO
+                case DELETE:
+                    try {
+                        mediaAdmin.deleteUploaderByName(event.getText());
+                    } catch (IllegalArgumentException e) {
+                        try {
+                            mediaAdmin.deleteMediaByAddress(event.getText());
+
+                        } catch (IllegalArgumentException u) {
+                            mediaView.displayError("Invalid Input");
+                        }
+                    }
                 default:
                     break;
             }

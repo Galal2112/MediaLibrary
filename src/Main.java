@@ -4,10 +4,14 @@ import crud.InteractiveVideoCRUD;
 import crud.LicensedAudioVideoCRUD;
 import crud.UploaderCRUD;
 import events.InputEventHandler;
+import model.MediaStorge;
 import mvc.*;
+import observer.MediaStorageObserver;
 
 public class Main {
     public static void main(String[] args) {
+        //Observer
+        MediaStorageObserver observer = new MediaStorageObserver(MediaStorge.sharedInstance);
 
         // create media admin
         InteractiveVideoCRUD interactiveVideoCRUD = new InteractiveVideoCRUD();
@@ -28,5 +32,6 @@ public class Main {
         view.setHandler(handler);
 
         controller.start();
+
     }
 }

@@ -1,6 +1,6 @@
 package observer;
 
-public interface Observable {
+public interface Subject {
     void register(Observer observer);
     void unsubscribe(Observer observer);
     void benachrichtige();
