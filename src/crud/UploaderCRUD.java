@@ -8,6 +8,7 @@ public class UploaderCRUD implements CRUD<Uploader> {
 
     private static final LinkedList<Uploader> uploaders = new LinkedList<>();
 
+    //get uploader by Name
     public Optional<Uploader> get(String name) {
         return uploaders.stream().filter(uploader -> uploader.getName().equals(name)).findFirst();
     }

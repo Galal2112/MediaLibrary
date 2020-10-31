@@ -39,6 +39,7 @@ public class LicensedAudioVideoImpl implements LicensedAudioVideo {
         this.uploader = uploader;
     }
 
+
     @Override
     public int getSamplingRate() {
         return samplingRate;

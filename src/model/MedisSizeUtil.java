@@ -3,16 +3,16 @@ package model;
 import java.math.BigDecimal;
 import java.time.Duration;
 
-public abstract class MedisSizeUtil {
+public interface MedisSizeUtil {
 
     /**
      * Estimate for media size based on bitrate and length
      *
      * @param bitrate Mb/s
      * @param length Media duration
-     * @return estimated size in GB
+     * @return estimated size in MB
      */
-    public static BigDecimal getMedisSize(long bitrate, Duration length) {
-        return new BigDecimal( bitrate * length.getSeconds() / (8 * 1024));
+     static BigDecimal getMedisSize(long bitrate, Duration length) {
+        return new BigDecimal( bitrate * length.getSeconds() / 8);
     }
 }

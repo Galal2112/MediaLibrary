@@ -2,14 +2,11 @@ package businessLogic;
 
 import crud.CRUD;
 import mediaDB.*;
+import model.MediaStorge;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class MediaLibraryAdmin implements MediaAdmin {
-
-    // 11 Terabyte storage
-    public static final AtomicLong availableStorageTB = new AtomicLong((10 * 1000));
 
     private final CRUD<Uploader> uploaderCRUD;
     private final CRUD<InteractiveVideo> interactiveVideoCRUD;
@@ -44,13 +41,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
             throw new IllegalArgumentException("Producer does not exist");
         }
 
-        // check size
-        long newStorageValue = availableStorageTB.longValue() - media.getSize().longValue();
-        if (newStorageValue < 0) {
-            throw new IllegalArgumentException("Insufficient storage");
-        }
-
-        availableStorageTB.set(newStorageValue);
+        MediaStorge.sharedInstance.addMediaInStorage(media);
 
         // Set address
         media.setAddress(getAddress(media));
@@ -83,7 +74,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     @Override
     // return interactiveVideo or lincensedAudioVideo
-    public <T extends MediaContent & Uploadable> List<? extends MediaContent> listMedia(Class<T> type) {
+    public <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) throws IllegalArgumentException {
         List<MediaContent> result = new LinkedList<>();
         if (type == null) {
             result.addAll(interactiveVideoCRUD.getAll());
@@ -99,7 +90,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         // update access count
         for (MediaContent content : result) {
             content.setAccessCount(content.getAccessCount() + 1);
-            //update acessCount in the DBx
+            //update acessCount in the DB
             if (content instanceof InteractiveVideo) {
                 interactiveVideoCRUD.update((InteractiveVideo) content);
             } else {
@@ -115,35 +106,53 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public void deleteUploaderByName(String name) {
-        uploaderCRUD.deleteById(name);
+    public void deleteUploaderByName(String name) throws IllegalArgumentException {
+        if (uploaderCRUD.get(name).isPresent()) {
+            uploaderCRUD.deleteById(name);
+        } else {
+            throw new IllegalArgumentException("Uploader name doesn't exist");
+        }
+
     }
 
     @Override
-    public void deleteUploader(Uploader uploader) {
-        uploaderCRUD.delete(uploader);
+    public void deleteUploader(Uploader uploader) throws IllegalArgumentException {
+        if (uploaderCRUD.get(uploader.getName()).isPresent()) {
+            uploaderCRUD.delete(uploader);
+        } else {
+            throw new IllegalArgumentException("Uploader name doesn't exist");
+
+        }
     }
 
     @Override
-    public <T extends MediaContent & Uploadable> void deleteMedia(T media) {
+    public <T extends MediaContent & Uploadable> void deleteMedia(T media) throws IllegalArgumentException {
         if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
             throw new IllegalArgumentException("Unsupported media type");
         }
-
-        if (media instanceof InteractiveVideo) {
-            interactiveVideoCRUD.delete((InteractiveVideo) media);
-        } else {
-            licensedAudioVideoCRUD.delete((LicensedAudioVideo) media);
+        if (interactiveVideoCRUD.get(media.getAddress()).isPresent() || licensedAudioVideoCRUD.get(media.getAddress()).isPresent()) {
+            MediaStorge.sharedInstance.deletedMediaFromStorage(media);
+            if (media instanceof InteractiveVideo) {
+                interactiveVideoCRUD.delete((InteractiveVideo) media);
+            } else {
+                licensedAudioVideoCRUD.delete((LicensedAudioVideo) media);
+            }
         }
     }
 
     @Override
-    public void deleteMediaByAddress(String address) {
-        // if address belongs to InteractiveVideo ... delete
-        interactiveVideoCRUD.deleteById(address);
+    public void deleteMediaByAddress(String address) throws IllegalArgumentException {
 
-        // if address belongs to InteractiveVideo ... delete
-        licensedAudioVideoCRUD.deleteById(address);
+        if (interactiveVideoCRUD.get(address).isPresent() || licensedAudioVideoCRUD.get(address).isPresent()) {
+            MediaStorge.sharedInstance.deleteMediaByAddress(address);
+            // if address belongs to InteractiveVideo ... delete
+            interactiveVideoCRUD.deleteById(address);
+
+            // if address belongs to InteractiveVideo ... delete
+            licensedAudioVideoCRUD.deleteById(address);
+        } else {
+            throw new IllegalArgumentException("Invalid Address");
+        }
     }
 
     private String getAddress(Object o) {

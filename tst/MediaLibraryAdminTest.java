@@ -4,6 +4,7 @@ import crud.InteractiveVideoCRUD;
 import crud.LicensedAudioVideoCRUD;
 import crud.UploaderCRUD;
 import mediaDB.*;
+import model.MediaStorge;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -63,7 +64,8 @@ class MediaLibraryAdminTest {
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 
         // Test insufficient storage
-        when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(MediaLibraryAdmin.availableStorageTB.incrementAndGet()));
+        BigDecimal storage = MediaStorge.sharedInstance.getAvailableMediaStorageInMB();
+        when(licensedAudioVideo.getSize()).thenReturn(storage.add(new BigDecimal(1)));
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 
         // Test upload
