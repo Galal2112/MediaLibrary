@@ -25,11 +25,10 @@ public class MediaLibraryController implements MediaController {
 
     @Override
     public void start() {
+        mediaView.displayCommands("Media Library available commands", commandList);
+        mediaView.readInput("Please select command: ");
         while (true) {
-            if (currentCommand == null) {
-                mediaView.displayCommands("Media Library available commands", commandList);
-                mediaView.readInput("Please select command: ");
-            } else {
+            if (currentCommand != null) {
                 mediaView.readInput(">> ");
             }
         }
@@ -44,7 +43,7 @@ public class MediaLibraryController implements MediaController {
         if (event.getText().equalsIgnoreCase("exit"))
             System.exit(0);
 
-        if (currentCommand == null) {
+        if (currentCommand == null || event.getText().startsWith(":")) {
             Optional<Command> commandOptional = commandList.stream().filter(c -> c.getKey().equals(event.getText())).findFirst();
             if (commandOptional.isPresent()) {
                 currentCommand = commandOptional.get();
@@ -63,10 +62,12 @@ public class MediaLibraryController implements MediaController {
                         viewContent(event);
                     }
                     break;
+
+                case DELETE: //TODO
+                case UPDATE: //TODO
                 default:
                     break;
             }
-            currentCommand = null;
         }
     }
 
@@ -101,7 +102,7 @@ public class MediaLibraryController implements MediaController {
         String[] retrievalAddress = new String[mediaList.size()];
         Date[] uploadDate = new Date[mediaList.size()];
         long[] accessCount = new long[mediaList.size()];
-        for (int i = 0; i < mediaList.size(); i ++) {
+        for (int i = 0; i < mediaList.size(); i++) {
             Object media = mediaList.get(i);
             if (media instanceof InteractiveVideo) {
                 InteractiveVideo interactiveVideo = (InteractiveVideo) media;
