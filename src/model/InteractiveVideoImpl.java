@@ -87,6 +87,7 @@ public class InteractiveVideoImpl implements InteractiveVideo {
         return tags;
     }
 
+    @Override
     public void setTags(Collection<Tag> tags) {
         this.tags = tags;
     }

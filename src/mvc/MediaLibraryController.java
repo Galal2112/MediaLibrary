@@ -2,7 +2,10 @@ package mvc;
 
 import businessLogic.MediaAdmin;
 import events.InputEvent;
-import mediaDB.*;
+import mediaDB.InteractiveVideo;
+import mediaDB.LicensedAudioVideo;
+import mediaDB.Tag;
+import mediaDB.Uploader;
 import model.InteractiveVideoImpl;
 import model.LicensedAudioVideoImpl;
 import model.Producer;
@@ -141,7 +144,16 @@ public class MediaLibraryController implements MediaController {
         try {
             String mediaType = parsedString[0];
             Producer producer = new Producer(parsedString[1]);
-            String[] tags = parsedString[2].split(",");
+            String[] inputTags = parsedString[2].split(",");
+            List<Tag> tags = new ArrayList<>();
+            for (String inputTag : inputTags) {
+                try {
+                    tags.add(Tag.valueOf(inputTag));
+                } catch (IllegalArgumentException e) {
+                    // Non existing tags
+                }
+            }
+
             long bitrate = Long.parseLong(parsedString[3]);
             long durationInSeconds = Long.parseLong(parsedString[4]);
             Duration duration = Duration.ofSeconds(durationInSeconds);
@@ -151,9 +163,9 @@ public class MediaLibraryController implements MediaController {
             int width = Integer.parseInt(parsedString[7]);
 
             if (isInteractiveVideo(mediaType)) {
-                InteractiveVideoImpl interactiveVideo = new InteractiveVideoImpl(mediaType, width, height,
+                InteractiveVideo interactiveVideo = new InteractiveVideoImpl(mediaType, width, height,
                         videoEncoding, bitrate, duration, producer);
-//                interactiveVideo.setTags(Arrays.asList(tags));
+                interactiveVideo.setTags(tags);
                 mediaAdmin.upload(interactiveVideo);
             } else if (isLicensedAudioVideo(mediaType)) {
                 String audioEncoding = parsedString[8];
@@ -161,6 +173,7 @@ public class MediaLibraryController implements MediaController {
                 String holder = parsedString[10];
                 LicensedAudioVideo licensedAudioVideo = new LicensedAudioVideoImpl(samplingRate, width, height,
                         audioEncoding, holder, bitrate, duration, producer);
+                licensedAudioVideo.setTags(tags);
                 mediaAdmin.upload(licensedAudioVideo);
             } else {
                 mediaView.displayError("Unsupported Media type");

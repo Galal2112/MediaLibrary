@@ -2,6 +2,8 @@ package model;
 
 import mediaDB.Uploader;
 
+import java.util.Objects;
+
 public class Producer implements Uploader {
     private String name;
 
@@ -17,6 +19,11 @@ public class Producer implements Uploader {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
     @Override

@@ -95,6 +95,7 @@ public class LicensedAudioVideoImpl implements LicensedAudioVideo {
         return tags;
     }
 
+    @Override
     public void setTags(Collection<Tag> tags) {
         this.tags = tags;
     }
