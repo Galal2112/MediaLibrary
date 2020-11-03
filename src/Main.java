@@ -3,6 +3,7 @@ import businessLogic.MediaLibraryAdmin;
 import crud.InteractiveVideoCRUD;
 import crud.LicensedAudioVideoCRUD;
 import crud.UploaderCRUD;
+import events.ExitEventListener;
 import events.InputEventHandler;
 import model.MediaStorge;
 import mvc.*;
@@ -28,6 +29,7 @@ public class Main {
 
         // set handler and listener
         InputEventHandler handler = new InputEventHandler();
+        handler.add(new ExitEventListener());
         handler.add(controller);
         view.setHandler(handler);
 

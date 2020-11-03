@@ -44,9 +44,6 @@ public class MediaLibraryController implements MediaController {
             mediaView.displayError("Not a vaild input");
             return;
         }
-        if (event.getText().equalsIgnoreCase("exit"))
-            System.exit(0);
-
         if (currentCommand == null || event.getText().startsWith(":")) {
             Optional<Command> commandOptional = commandList.stream().filter(c -> c.getKey().equals(event.getText())).findFirst();
             if (commandOptional.isPresent()) {
