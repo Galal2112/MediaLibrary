@@ -165,6 +165,9 @@ class MediaLibraryAdminTest {
     @Test
     void deleteUploaderByName() {
         String uploaderName = "DeletedUploader";
+        Uploader uploader = Mockito.mock(Uploader.class);
+        when(uploaderCRUD.get(uploaderName)).thenReturn(Optional.of(uploader));
+        mediaAdmin.createUploader(uploader);
         mediaAdmin.deleteUploaderByName(uploaderName);
         verify(uploaderCRUD).deleteById(uploaderName);
     }
@@ -174,6 +177,7 @@ class MediaLibraryAdminTest {
         String uploaderName = "DeletedUploader";
         Uploader uploader = Mockito.mock(Uploader.class);
         when(uploader.getName()).thenReturn(uploaderName);
+        when(uploaderCRUD.get(uploaderName)).thenReturn(Optional.of(uploader));
 
         mediaAdmin.deleteUploader(uploader);
         verify(uploaderCRUD).delete(uploader);
@@ -182,10 +186,14 @@ class MediaLibraryAdminTest {
     @Test
     void deleteMedia() {
         InteractiveVideo interactiveVideo = mock(InteractiveVideo.class);
+        when(interactiveVideo.getSize()).thenReturn(new BigDecimal(10));
+        when(interactiveVideoCRUD.get(any())).thenReturn(Optional.of(interactiveVideo));
         mediaAdmin.deleteMedia(interactiveVideo);
         verify(interactiveVideoCRUD).delete(interactiveVideo);
 
         LicensedAudioVideo licensedAudioVideo = mock(LicensedAudioVideo.class);
+        when(licensedAudioVideoCRUD.get(any())).thenReturn(Optional.of(licensedAudioVideo));
+        when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(10));
         mediaAdmin.deleteMedia(licensedAudioVideo);
         verify(licensedAudioVideoCRUD).delete(licensedAudioVideo);
     }
@@ -193,6 +201,16 @@ class MediaLibraryAdminTest {
     @Test
     void deleteMediaByAddress() {
         String deletedAddress = "test address";
+
+        Uploader uploader = Mockito.mock(Uploader.class);
+        when(uploaderCRUD.get(any())).thenReturn(Optional.of(uploader));
+        LicensedAudioVideo licensedAudioVideo = mock(LicensedAudioVideo.class);
+        when(licensedAudioVideoCRUD.get(any())).thenReturn(Optional.of(licensedAudioVideo));
+        when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(10));
+        when(licensedAudioVideo.getAddress()).thenReturn(deletedAddress);
+        when(licensedAudioVideo.getUploader()).thenReturn(uploader);
+        mediaAdmin.upload(licensedAudioVideo);
+
         mediaAdmin.deleteMediaByAddress(deletedAddress);
         verify(interactiveVideoCRUD).deleteById(deletedAddress);
         verify(licensedAudioVideoCRUD).deleteById(deletedAddress);
