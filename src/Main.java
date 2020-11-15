@@ -3,8 +3,6 @@ import businessLogic.MediaLibraryAdmin;
 import crud.InteractiveVideoCRUD;
 import crud.LicensedAudioVideoCRUD;
 import crud.UploaderCRUD;
-import events.ExitEventListener;
-import events.InputEventHandler;
 import model.MediaStorge;
 import mvc.*;
 import observer.MediaStorageObserver;
@@ -26,13 +24,6 @@ public class Main {
 
         // create controller
         MediaController controller = new MediaLibraryController(view, mediaAdmin);
-
-        // set handler and listener
-        InputEventHandler handler = new InputEventHandler();
-        handler.add(new ExitEventListener());
-        handler.add(controller);
-        view.setHandler(handler);
-
         controller.start();
 
     }

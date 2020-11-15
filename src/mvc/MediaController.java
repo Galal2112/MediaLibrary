@@ -1,7 +1,5 @@
 package mvc;
 
-import events.InputEventListener;
-
-public interface MediaController extends InputEventListener {
+public interface MediaController {
     void start();
 }

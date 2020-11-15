@@ -13,6 +13,7 @@ public class MediaStorge implements Subject {
 
     private final List<Observer> observerList = new LinkedList<>();
 
+    //10 TB
     private final BigDecimal diskSize = BigDecimal.valueOf(1024.0 * 1024.0 * 10);
 
     private BigDecimal availableMediaStorageInMB;
@@ -33,19 +34,19 @@ public class MediaStorge implements Subject {
         } else {
             hardDisk.put(mediaContent.getAddress(), mediaContent);
             availableMediaStorageInMB = availableMediaStorageInMB.subtract(mediaContent.getSize());
-            benachrichtige();
+            notifyObserver();
         }
     }
 
     public void deletedMediaFromStorage(MediaContent mediaContent) {
         hardDisk.remove(mediaContent.getAddress());
         availableMediaStorageInMB = availableMediaStorageInMB.add(mediaContent.getSize());
-        benachrichtige();
+        notifyObserver();
     }
 
     public void deleteMediaByAddress(String address) throws IllegalArgumentException {
         MediaContent media = hardDisk.get(address);
-        if(media == null) {
+        if (media == null) {
             throw new IllegalArgumentException("Invalid address");
         }
         deletedMediaFromStorage(media);
@@ -65,12 +66,12 @@ public class MediaStorge implements Subject {
     }
 
     @Override
-    public void unsubscribe(Observer observer) {
+    public void unregister(Observer observer) {
         observerList.remove(observer);
     }
 
     @Override
-    public void benachrichtige() {
+    public void notifyObserver() {
         for (Observer observer : observerList) {
             observer.updateObserver();
         }

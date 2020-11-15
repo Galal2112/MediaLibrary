@@ -41,10 +41,10 @@ public class MediaLibraryAdmin implements MediaAdmin {
             throw new IllegalArgumentException("Producer does not exist");
         }
 
-        MediaStorge.sharedInstance.addMediaInStorage(media);
-
         // Set address
         media.setAddress(getAddress(media));
+
+        MediaStorge.sharedInstance.addMediaInStorage(media);
 
         // set date
         media.setUploadDate(new Date());
