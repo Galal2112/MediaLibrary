@@ -1,8 +1,9 @@
 import businessLogic.MediaAdmin;
 import businessLogic.MediaLibraryAdmin;
-import crud.InteractiveVideoCRUD;
-import crud.LicensedAudioVideoCRUD;
+import crud.CRUD;
+import crud.MediaCRUD;
 import crud.UploaderCRUD;
+import mediaDB.MediaContent;
 import model.MediaStorage;
 import mvc.*;
 import observer.MediaStorageObserver;
@@ -13,10 +14,9 @@ public class Main {
         MediaStorageObserver observer = new MediaStorageObserver(MediaStorage.sharedInstance);
 
         // create media admin
-        InteractiveVideoCRUD interactiveVideoCRUD = new InteractiveVideoCRUD();
-        LicensedAudioVideoCRUD licensedAudioVideoCRUD = new LicensedAudioVideoCRUD();
+        CRUD<MediaContent> mediaCRUD = new MediaCRUD();
         UploaderCRUD uploaderCRUD = new UploaderCRUD();
-        MediaAdmin mediaAdmin = new MediaLibraryAdmin(uploaderCRUD, interactiveVideoCRUD, licensedAudioVideoCRUD);
+        MediaAdmin mediaAdmin = new MediaLibraryAdmin(uploaderCRUD, mediaCRUD);
 
         // create view
         Console console = new Console();

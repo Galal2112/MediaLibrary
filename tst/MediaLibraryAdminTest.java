@@ -1,7 +1,6 @@
 import businessLogic.MediaAdmin;
 import businessLogic.MediaLibraryAdmin;
-import crud.InteractiveVideoCRUD;
-import crud.LicensedAudioVideoCRUD;
+import crud.MediaCRUD;
 import crud.UploaderCRUD;
 import mediaDB.*;
 import model.MediaStorage;
@@ -18,16 +17,14 @@ import static org.mockito.Mockito.*;
 class MediaLibraryAdminTest {
 
     private MediaAdmin mediaAdmin;
-    private InteractiveVideoCRUD interactiveVideoCRUD;
-    private LicensedAudioVideoCRUD licensedAudioVideoCRUD;
+    private MediaCRUD mediaCRUD;
     private UploaderCRUD uploaderCRUD;
 
     @BeforeEach
     void setUp() {
-        interactiveVideoCRUD = Mockito.mock(InteractiveVideoCRUD.class);
-        licensedAudioVideoCRUD = Mockito.mock(LicensedAudioVideoCRUD.class);
+        mediaCRUD = Mockito.mock(MediaCRUD.class);
         uploaderCRUD = Mockito.mock(UploaderCRUD.class);
-        mediaAdmin = new MediaLibraryAdmin(uploaderCRUD, interactiveVideoCRUD, licensedAudioVideoCRUD);
+        mediaAdmin = new MediaLibraryAdmin(uploaderCRUD, mediaCRUD);
     }
 
     @Test
@@ -79,7 +76,7 @@ class MediaLibraryAdminTest {
         // verify set address and upload date
         verify(licensedAudioVideo).setAddress(any());
         verify(licensedAudioVideo).setUploadDate(any());
-        verify(licensedAudioVideoCRUD).create(licensedAudioVideo);
+        verify(mediaCRUD).create(licensedAudioVideo);
     }
 
     @Test
@@ -114,14 +111,15 @@ class MediaLibraryAdminTest {
             }
         }
         when(uploaderCRUD.getAll()).thenReturn(uploaders);
-        when(interactiveVideoCRUD.getAll()).thenReturn(interactiveVideos);
-        when(licensedAudioVideoCRUD.getAll()).thenReturn(audioVideos);
+        List<MediaContent> allMedia = new LinkedList<>();
+        allMedia.addAll(interactiveVideos);
+        allMedia.addAll(audioVideos);
+        when(mediaCRUD.getAll()).thenReturn(allMedia);
 
         // Test get uploader and counts
         Map<Uploader, Integer> uploaderCounts = mediaAdmin.listProducersAndUploadsCount();
         verify(uploaderCRUD).getAll();
-        verify(interactiveVideoCRUD).getAll();
-        verify(licensedAudioVideoCRUD).getAll();
+        verify(mediaCRUD).getAll();
 
         Set<Uploader> resultUploaders = uploaderCounts.keySet();
         // check result has all the producers
@@ -136,21 +134,24 @@ class MediaLibraryAdminTest {
     void listMedia() {
         List<InteractiveVideo> interactiveVideos = new ArrayList<>();
         interactiveVideos.add(mock(InteractiveVideo.class));
-        when(interactiveVideoCRUD.getAll()).thenReturn(interactiveVideos);
 
         List<LicensedAudioVideo> audioVideos = new ArrayList<>();
         audioVideos.add(mock(LicensedAudioVideo.class));
         audioVideos.add(mock(LicensedAudioVideo.class));
-        when(licensedAudioVideoCRUD.getAll()).thenReturn(audioVideos);
+
+        List<MediaContent> allMedia = new LinkedList<>();
+        allMedia.addAll(interactiveVideos);
+        allMedia.addAll(audioVideos);
+        when(mediaCRUD.getAll()).thenReturn(allMedia);
 
         // Test result size
         assertEquals(mediaAdmin.listMedia(InteractiveVideo.class).size(), interactiveVideos.size());
         verify(interactiveVideos.get(0)).setAccessCount(1);
-        verify(interactiveVideoCRUD).update(interactiveVideos.get(0));
+        verify(mediaCRUD).update(interactiveVideos.get(0));
 
         assertEquals(mediaAdmin.listMedia(LicensedAudioVideo.class).size(), audioVideos.size());
         verify(audioVideos.get(0)).setAccessCount(1);
-        verify(licensedAudioVideoCRUD).update(audioVideos.get(0));
+        verify(mediaCRUD).update(audioVideos.get(0));
 
         assertEquals(mediaAdmin.listMedia(null).size(), interactiveVideos.size() + audioVideos.size());
 
@@ -189,17 +190,21 @@ class MediaLibraryAdminTest {
 
     @Test
     void deleteMedia() {
+        String interactiveVideoAddress = "interactiveVideoAddress";
         InteractiveVideo interactiveVideo = mock(InteractiveVideo.class);
+        when(interactiveVideo.getAddress()).thenReturn(interactiveVideoAddress);
         when(interactiveVideo.getSize()).thenReturn(new BigDecimal(10));
-        when(interactiveVideoCRUD.get(any())).thenReturn(Optional.of(interactiveVideo));
+        when(mediaCRUD.get(interactiveVideoAddress)).thenReturn(Optional.of(interactiveVideo));
         mediaAdmin.deleteMedia(interactiveVideo);
-        verify(interactiveVideoCRUD).delete(interactiveVideo);
+        verify(mediaCRUD).delete(interactiveVideo);
 
+        String licensedAudioVideoAddress = "licensedAudioVideoAddress";
         LicensedAudioVideo licensedAudioVideo = mock(LicensedAudioVideo.class);
-        when(licensedAudioVideoCRUD.get(any())).thenReturn(Optional.of(licensedAudioVideo));
+        when(licensedAudioVideo.getAddress()).thenReturn(licensedAudioVideoAddress);
+        when(mediaCRUD.get(licensedAudioVideoAddress)).thenReturn(Optional.of(licensedAudioVideo));
         when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(10));
         mediaAdmin.deleteMedia(licensedAudioVideo);
-        verify(licensedAudioVideoCRUD).delete(licensedAudioVideo);
+        verify(mediaCRUD).delete(licensedAudioVideo);
     }
 
     @Test
@@ -209,7 +214,7 @@ class MediaLibraryAdminTest {
         Uploader uploader = Mockito.mock(Uploader.class);
         when(uploaderCRUD.get(any())).thenReturn(Optional.of(uploader));
         LicensedAudioVideo licensedAudioVideo = mock(LicensedAudioVideo.class);
-        when(licensedAudioVideoCRUD.get(any())).thenReturn(Optional.of(licensedAudioVideo));
+        when(mediaCRUD.get(deletedAddress)).thenReturn(Optional.of(licensedAudioVideo));
         when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(10));
         when(licensedAudioVideo.getAddress()).thenReturn(deletedAddress);
         when(licensedAudioVideo.getUploader()).thenReturn(uploader);
@@ -220,7 +225,6 @@ class MediaLibraryAdminTest {
         }
 
         mediaAdmin.deleteMediaByAddress(deletedAddress);
-        verify(interactiveVideoCRUD).deleteById(deletedAddress);
-        verify(licensedAudioVideoCRUD).deleteById(deletedAddress);
+        verify(mediaCRUD).deleteById(deletedAddress);
     }
 }

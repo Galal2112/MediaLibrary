@@ -5,18 +5,16 @@ import mediaDB.*;
 import model.MediaStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MediaLibraryAdmin implements MediaAdmin {
 
     private final CRUD<Uploader> uploaderCRUD;
-    private final CRUD<InteractiveVideo> interactiveVideoCRUD;
-    private final CRUD<LicensedAudioVideo> licensedAudioVideoCRUD;
+    private final CRUD<MediaContent> mediaContentCRUD;
 
-    public MediaLibraryAdmin(CRUD<Uploader> uploaderCRUD, CRUD<InteractiveVideo> interactiveVideoCRUD,
-                             CRUD<LicensedAudioVideo> licensedAudioVideoCRUD) {
+    public MediaLibraryAdmin(CRUD<Uploader> uploaderCRUD, CRUD<MediaContent> mediaContentCRUD) {
         this.uploaderCRUD = uploaderCRUD;
-        this.interactiveVideoCRUD = interactiveVideoCRUD;
-        this.licensedAudioVideoCRUD = licensedAudioVideoCRUD;
+        this.mediaContentCRUD = mediaContentCRUD;
     }
 
     @Override
@@ -50,11 +48,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         media.setUploadDate(new Date());
 
         // save media content
-        if (media instanceof InteractiveVideo) {
-            interactiveVideoCRUD.create((InteractiveVideo) media);
-        } else {
-            licensedAudioVideoCRUD.create((LicensedAudioVideo) media);
-        }
+        mediaContentCRUD.create(media);
     }
 
     @Override
@@ -62,9 +56,8 @@ public class MediaLibraryAdmin implements MediaAdmin {
         List<Uploader> producers = uploaderCRUD.getAll();
         HashMap<Uploader, Integer> producerUploadCount = new HashMap<>();
         producers.forEach(producer -> producerUploadCount.put(producer, 0));
-        List<Uploadable> uploadsList = new LinkedList<>();
-        uploadsList.addAll(interactiveVideoCRUD.getAll());
-        uploadsList.addAll(licensedAudioVideoCRUD.getAll());
+        List<Uploadable> uploadsList = mediaContentCRUD.getAll().stream().map(media -> (Uploadable) media)
+                .collect(Collectors.toList());
         uploadsList.forEach(media -> {
             int count = producerUploadCount.get(media.getUploader());
             producerUploadCount.put(media.getUploader(), count + 1);
@@ -73,29 +66,20 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    // return interactiveVideo or lincensedAudioVideo
     public <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) throws IllegalArgumentException {
         List<MediaContent> result = new LinkedList<>();
         if (type == null) {
-            result.addAll(interactiveVideoCRUD.getAll());
-            result.addAll(licensedAudioVideoCRUD.getAll());
-        } else if (type == InteractiveVideo.class) {
-            result.addAll(interactiveVideoCRUD.getAll());
-        } else if (type == LicensedAudioVideo.class) {
-            result.addAll(licensedAudioVideoCRUD.getAll());
+            result.addAll(mediaContentCRUD.getAll());
         } else {
-            throw new IllegalArgumentException("Unsupported media type");
+            // Get media data based on type using isInstance
+            result.addAll(mediaContentCRUD.getAll().stream().filter(type :: isInstance).collect(Collectors.toList()));
         }
 
         // update access count
         for (MediaContent content : result) {
             content.setAccessCount(content.getAccessCount() + 1);
             //update acessCount in the DB
-            if (content instanceof InteractiveVideo) {
-                interactiveVideoCRUD.update((InteractiveVideo) content);
-            } else {
-                licensedAudioVideoCRUD.update((LicensedAudioVideo) content);
-            }
+            mediaContentCRUD.update(content);
         }
         return result;
     }
@@ -130,26 +114,18 @@ public class MediaLibraryAdmin implements MediaAdmin {
         if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
             throw new IllegalArgumentException("Unsupported media type");
         }
-        if (interactiveVideoCRUD.get(media.getAddress()).isPresent() || licensedAudioVideoCRUD.get(media.getAddress()).isPresent()) {
+        if (mediaContentCRUD.get(media.getAddress()).isPresent()) {
             MediaStorage.sharedInstance.deletedMediaFromStorage(media);
-            if (media instanceof InteractiveVideo) {
-                interactiveVideoCRUD.delete((InteractiveVideo) media);
-            } else {
-                licensedAudioVideoCRUD.delete((LicensedAudioVideo) media);
-            }
+            mediaContentCRUD.delete(media);
         }
     }
 
     @Override
     public void deleteMediaByAddress(String address) throws IllegalArgumentException {
 
-        if (interactiveVideoCRUD.get(address).isPresent() || licensedAudioVideoCRUD.get(address).isPresent()) {
+        if (mediaContentCRUD.get(address).isPresent()) {
             MediaStorage.sharedInstance.deleteMediaByAddress(address);
-            // if address belongs to InteractiveVideo ... delete
-            interactiveVideoCRUD.deleteById(address);
-
-            // if address belongs to InteractiveVideo ... delete
-            licensedAudioVideoCRUD.deleteById(address);
+            mediaContentCRUD.deleteById(address);
         } else {
             throw new IllegalArgumentException("Invalid Address");
         }
