@@ -137,7 +137,7 @@ public class MediaLibraryController implements MediaController {
                 }
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 mediaView.displayError("Invalid insert command");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException | InterruptedException e) {
                 mediaView.displayError(e.getMessage());
             }
         }

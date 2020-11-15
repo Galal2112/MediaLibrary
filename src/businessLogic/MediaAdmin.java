@@ -12,7 +12,7 @@ public interface MediaAdmin {
 
     void createUploader(Uploader uploader) throws IllegalArgumentException;
 
-    <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException;
+    <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException, InterruptedException;
 
     Map<Uploader, Integer> listProducersAndUploadsCount();
 

@@ -2,7 +2,7 @@ package businessLogic;
 
 import crud.CRUD;
 import mediaDB.*;
-import model.MediaStorge;
+import model.MediaStorage;
 
 import java.util.*;
 
@@ -29,7 +29,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException {
+    public <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException, InterruptedException {
 
         if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
             throw new IllegalArgumentException("Unsupported media type");
@@ -44,7 +44,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         // Set address
         media.setAddress(getAddress(media));
 
-        MediaStorge.sharedInstance.addMediaInStorage(media);
+        MediaStorage.sharedInstance.addMediaInStorage(media);
 
         // set date
         media.setUploadDate(new Date());
@@ -131,7 +131,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
             throw new IllegalArgumentException("Unsupported media type");
         }
         if (interactiveVideoCRUD.get(media.getAddress()).isPresent() || licensedAudioVideoCRUD.get(media.getAddress()).isPresent()) {
-            MediaStorge.sharedInstance.deletedMediaFromStorage(media);
+            MediaStorage.sharedInstance.deletedMediaFromStorage(media);
             if (media instanceof InteractiveVideo) {
                 interactiveVideoCRUD.delete((InteractiveVideo) media);
             } else {
@@ -144,7 +144,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public void deleteMediaByAddress(String address) throws IllegalArgumentException {
 
         if (interactiveVideoCRUD.get(address).isPresent() || licensedAudioVideoCRUD.get(address).isPresent()) {
-            MediaStorge.sharedInstance.deleteMediaByAddress(address);
+            MediaStorage.sharedInstance.deleteMediaByAddress(address);
             // if address belongs to InteractiveVideo ... delete
             interactiveVideoCRUD.deleteById(address);
 

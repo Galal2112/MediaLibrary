@@ -4,7 +4,7 @@ import crud.InteractiveVideoCRUD;
 import crud.LicensedAudioVideoCRUD;
 import crud.UploaderCRUD;
 import mediaDB.*;
-import model.MediaStorge;
+import model.MediaStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -64,14 +64,18 @@ class MediaLibraryAdminTest {
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 
         // Test insufficient storage
-        BigDecimal storage = MediaStorge.sharedInstance.getAvailableMediaStorageInMB();
+        BigDecimal storage = MediaStorage.sharedInstance.getAvailableMediaStorageInMB();
         when(licensedAudioVideo.getSize()).thenReturn(storage.add(new BigDecimal(1)));
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 
         // Test upload
         when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(4 * 1024));
         when(uploaderCRUD.get(uploaderName)).thenReturn(Optional.of(uploader));
-        mediaAdmin.upload(licensedAudioVideo);
+        try {
+            mediaAdmin.upload(licensedAudioVideo);
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
         // verify set address and upload date
         verify(licensedAudioVideo).setAddress(any());
         verify(licensedAudioVideo).setUploadDate(any());
@@ -209,7 +213,11 @@ class MediaLibraryAdminTest {
         when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(10));
         when(licensedAudioVideo.getAddress()).thenReturn(deletedAddress);
         when(licensedAudioVideo.getUploader()).thenReturn(uploader);
-        mediaAdmin.upload(licensedAudioVideo);
+        try {
+            mediaAdmin.upload(licensedAudioVideo);
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
 
         mediaAdmin.deleteMediaByAddress(deletedAddress);
         verify(interactiveVideoCRUD).deleteById(deletedAddress);

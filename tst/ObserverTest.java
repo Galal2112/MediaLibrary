@@ -1,5 +1,5 @@
 import mediaDB.InteractiveVideo;
-import model.MediaStorge;
+import model.MediaStorage;
 import observer.MediaStorageObserver;
 import observer.Observer;
 import org.junit.jupiter.api.Test;
@@ -20,11 +20,11 @@ public class ObserverTest {
     void testObserverPrintStorageWarning() {
         final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
-        MediaStorge mediaStorge = Mockito.mock(MediaStorge.class);
-        MediaStorageObserver mediaStorageObserver = new MediaStorageObserver(mediaStorge);
+        MediaStorage mediaStorage = Mockito.mock(MediaStorage.class);
+        MediaStorageObserver mediaStorageObserver = new MediaStorageObserver(mediaStorage);
         BigDecimal storage = new BigDecimal(100);
-        when(mediaStorge.getDiskSize()).thenReturn(storage);
-        when(mediaStorge.getAvailableMediaStorageInMB()).thenReturn(new BigDecimal(7));
+        when(mediaStorage.getDiskSize()).thenReturn(storage);
+        when(mediaStorage.getAvailableMediaStorageInMB()).thenReturn(new BigDecimal(7));
         mediaStorageObserver.updateObserver();
         assertEquals("⚠ Warning: 93.0% of Storage is Used", outContent.toString().trim());
     }
@@ -33,23 +33,23 @@ public class ObserverTest {
     void testObserverIgnoreLessThan90PercenFilled() {
         final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
-        MediaStorge mediaStorge = Mockito.mock(MediaStorge.class);
-        MediaStorageObserver mediaStorageObserver = new MediaStorageObserver(mediaStorge);
+        MediaStorage mediaStorage = Mockito.mock(MediaStorage.class);
+        MediaStorageObserver mediaStorageObserver = new MediaStorageObserver(mediaStorage);
         BigDecimal storage = new BigDecimal(100);
-        when(mediaStorge.getDiskSize()).thenReturn(storage);
-        when(mediaStorge.getAvailableMediaStorageInMB()).thenReturn(new BigDecimal(80));
+        when(mediaStorage.getDiskSize()).thenReturn(storage);
+        when(mediaStorage.getAvailableMediaStorageInMB()).thenReturn(new BigDecimal(80));
         mediaStorageObserver.updateObserver();
         assertEquals("", outContent.toString().trim());
     }
 
     @Test
-    void testMediaStorageNotifiesObserver() {
+    void testMediaStorageNotifiesObserver() throws InterruptedException {
         Observer observer = Mockito.mock(Observer.class);
-        MediaStorge.sharedInstance.register(observer);
+        MediaStorage.sharedInstance.register(observer);
         InteractiveVideo interactiveVideo = Mockito.mock(InteractiveVideo.class);
-        BigDecimal storage = MediaStorge.sharedInstance.getAvailableMediaStorageInMB();
+        BigDecimal storage = MediaStorage.sharedInstance.getAvailableMediaStorageInMB();
         when(interactiveVideo.getSize()).thenReturn(storage.divide(new BigDecimal(2)));
-        MediaStorge.sharedInstance.addMediaInStorage(interactiveVideo);
+        MediaStorage.sharedInstance.addMediaInStorage(interactiveVideo);
         verify(observer).updateObserver();
     }
 }

@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 public class ListenersTest {
 
     @Test
-    void testCreateEvent() {
+    void testCreateEvent() throws InterruptedException {
         String createLicensedAudioVideoCommand = "LicensedAudioVideo Produzent1 , 8000 600 DCT 1400 900 MDCT 44100 EdBangerRecords";
         Console console = Mockito.mock(Console.class);
         String readModeTitle = "Mode:";
@@ -30,7 +30,7 @@ public class ListenersTest {
     }
 
     @Test
-    void testDeleteEvent() {
+    void testDeleteEvent()  {
         String deletedProducterName = "Produzent1";
         Console console = Mockito.mock(Console.class);
         String readModeTitle = "Mode:";
