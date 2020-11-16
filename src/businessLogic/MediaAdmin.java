@@ -7,6 +7,7 @@ import mediaDB.Uploader;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface MediaAdmin {
 
@@ -27,4 +28,6 @@ public interface MediaAdmin {
     <T extends MediaContent & Uploadable> void deleteMedia(T media) throws IllegalArgumentException;
 
     void deleteMediaByAddress(String address) throws IllegalArgumentException;
+
+    Optional<Uploader> getUploader(String name);
 }

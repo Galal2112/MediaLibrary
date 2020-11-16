@@ -18,7 +18,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public void createUploader(Uploader uploader) throws IllegalArgumentException {
+    public synchronized void createUploader(Uploader uploader) throws IllegalArgumentException {
         if (!uploaderCRUD.get(uploader.getName()).isPresent()) {
             uploaderCRUD.create(uploader);
         } else {
@@ -27,7 +27,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException, InterruptedException {
+    public synchronized <T extends MediaContent & Uploadable>  void upload(T media) throws IllegalArgumentException, InterruptedException {
 
         if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
             throw new IllegalArgumentException("Unsupported media type");
@@ -52,7 +52,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public Map<Uploader, Integer> listProducersAndUploadsCount() {
+    public synchronized Map<Uploader, Integer> listProducersAndUploadsCount() {
         List<Uploader> producers = uploaderCRUD.getAll();
         HashMap<Uploader, Integer> producerUploadCount = new HashMap<>();
         producers.forEach(producer -> producerUploadCount.put(producer, 0));
@@ -66,7 +66,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) throws IllegalArgumentException {
+    public synchronized <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) throws IllegalArgumentException {
         List<MediaContent> result = new LinkedList<>();
         if (type == null) {
             result.addAll(mediaContentCRUD.getAll());
@@ -85,12 +85,12 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public List<Tag> getAllTags() {
+    public synchronized List<Tag> getAllTags() {
         return Arrays.asList(Tag.values());
     }
 
     @Override
-    public void deleteUploaderByName(String name) throws IllegalArgumentException {
+    public synchronized void deleteUploaderByName(String name) throws IllegalArgumentException {
         if (uploaderCRUD.get(name).isPresent()) {
             uploaderCRUD.deleteById(name);
         } else {
@@ -100,7 +100,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public void deleteUploader(Uploader uploader) throws IllegalArgumentException {
+    public synchronized void deleteUploader(Uploader uploader) throws IllegalArgumentException {
         if (uploaderCRUD.get(uploader.getName()).isPresent()) {
             uploaderCRUD.delete(uploader);
         } else {
@@ -110,7 +110,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public <T extends MediaContent & Uploadable> void deleteMedia(T media) throws IllegalArgumentException {
+    public synchronized <T extends MediaContent & Uploadable> void deleteMedia(T media) throws IllegalArgumentException {
         if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
             throw new IllegalArgumentException("Unsupported media type");
         }
@@ -121,7 +121,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public void deleteMediaByAddress(String address) throws IllegalArgumentException {
+    public synchronized void deleteMediaByAddress(String address) throws IllegalArgumentException {
 
         if (mediaContentCRUD.get(address).isPresent()) {
             MediaStorage.sharedInstance.deleteMediaByAddress(address);
@@ -129,6 +129,11 @@ public class MediaLibraryAdmin implements MediaAdmin {
         } else {
             throw new IllegalArgumentException("Invalid Address");
         }
+    }
+
+    @Override
+    public Optional<Uploader> getUploader(String name) {
+        return uploaderCRUD.get(name);
     }
 
     private String getAddress(Object o) {
