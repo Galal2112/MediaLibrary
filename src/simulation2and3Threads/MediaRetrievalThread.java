@@ -1,4 +1,4 @@
-package simulation2Threads;
+package simulation2and3Threads;
 
 import businessLogic.MediaAdmin;
 import mediaDB.Content;

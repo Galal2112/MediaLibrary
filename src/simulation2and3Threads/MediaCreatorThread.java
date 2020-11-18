@@ -1,4 +1,4 @@
-package simulation2Threads;
+package simulation2and3Threads;
 
 import businessLogic.MediaAdmin;
 import mediaDB.MediaContent;
@@ -32,13 +32,13 @@ public class MediaCreatorThread extends Thread {
                         e.printStackTrace();
                     } catch (InsufficientStorageException e) {
                         // No space available
-                        System.out.println("No space available");
+                        System.out.println(Thread.currentThread().getName() + ": No space available");
                         synchronized (mediaStorage) {
                             mediaStorage.wait();
                         }
                     }
                 } catch (InterruptedException ie) {
-                    System.out.println("Thread interrupted");
+                    System.out.println(Thread.currentThread().getName() + ": Thread interrupted");
                 }
             }
     }
@@ -50,6 +50,6 @@ public class MediaCreatorThread extends Thread {
     }
 
     private <T extends Uploadable & MediaContent> void printMedia(T media) {
-        System.out.println("Bitrate: " + media.getBitrate() + " Length: " + media.getLength().toMinutes() + " Size: " + media.getSize().doubleValue());
+        System.out.println(Thread.currentThread().getName() + ": Bitrate: " + media.getBitrate() + " Length: " + media.getLength().toMinutes() + " Size: " + media.getSize().doubleValue());
     }
 }

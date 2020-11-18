@@ -12,7 +12,7 @@ public interface MedisSizeUtil {
      * @param length Media duration
      * @return estimated size in MB
      */
-     static BigDecimal getMedisSize(long bitrate, Duration length) {
-         return new BigDecimal( bitrate * length.getSeconds() / 8).divide(new BigDecimal(1000));
+     static BigDecimal getMediaSize(long bitrate, Duration length) {
+         return new BigDecimal( bitrate * length.getSeconds() / 8).divide(new BigDecimal(1024));
     }
 }

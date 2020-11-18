@@ -35,7 +35,7 @@ public class LicensedAudioVideoImpl implements LicensedAudioVideo {
         this.holder = holder;
         this.bitrate = bitrate;
         this.length = length;
-        this.size = MedisSizeUtil.getMedisSize(bitrate, length);
+        this.size = MedisSizeUtil.getMediaSize(bitrate, length);
         this.uploader = uploader;
     }
 

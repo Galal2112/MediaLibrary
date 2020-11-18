@@ -1,4 +1,4 @@
-package simulation2Threads;
+package simulation2and3Threads;
 
 import businessLogic.MediaAdmin;
 import mediaDB.Audio;
@@ -8,12 +8,12 @@ import storage.MediaStorage;
 
 import java.util.List;
 
-public class MediaListAndDeleteLessViewed extends Thread {
+public class Simultation2DeletionThread extends Thread {
 
     private MediaAdmin mediaAdmin;
     private MediaStorage mediaStorage;
 
-    public MediaListAndDeleteLessViewed(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
+    public Simultation2DeletionThread(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
         this.mediaAdmin = mediaAdmin;
         this.mediaStorage = mediaStorage;
     }
