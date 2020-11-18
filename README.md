@@ -49,3 +49,4 @@ Storage 25 GB
 * Wildcards: https://www.geeksforgeeks.org/wildcards-in-java/
 * Mockito: https://www.youtube.com/watch?v=HsQ9OwKA79s
 * https://www.geeksforgeeks.org/mvc-design-pattern/
+* https://www.techyourchance.com/thread-safe-observer-design-pattern-in-java

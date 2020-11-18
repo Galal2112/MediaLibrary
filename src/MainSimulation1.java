@@ -6,6 +6,7 @@ import crud.UploaderCRUD;
 import mediaDB.MediaContent;
 import simulation1Threads.MediaCreatorThread;
 import simulation1Threads.MediaListAndRandomDeleteThread;
+import storage.MediaStorage;
 
 public class MainSimulation1 {
 
@@ -16,7 +17,7 @@ public class MainSimulation1 {
         UploaderCRUD uploaderCRUD = new UploaderCRUD();
         MediaAdmin mediaAdmin = new MediaLibraryAdmin(uploaderCRUD, mediaCRUD);
 
-        new MediaCreatorThread(mediaAdmin).start();
+        new MediaCreatorThread(mediaAdmin, MediaStorage.sharedInstance).start();
         new MediaListAndRandomDeleteThread(mediaAdmin).start();
     }
 }

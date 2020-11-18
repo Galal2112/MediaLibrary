@@ -4,6 +4,7 @@ import mediaDB.MediaContent;
 import mediaDB.Tag;
 import mediaDB.Uploadable;
 import mediaDB.Uploader;
+import storage.InsufficientStorageException;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ public interface MediaAdmin {
 
     void createUploader(Uploader uploader) throws IllegalArgumentException;
 
-    <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException, InterruptedException;
+    <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException, InsufficientStorageException;
 
     Map<Uploader, Integer> listProducersAndUploadsCount();
 

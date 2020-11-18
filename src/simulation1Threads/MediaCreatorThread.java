@@ -1,43 +1,75 @@
 package simulation1Threads;
 
 import businessLogic.MediaAdmin;
-import mediaDB.InteractiveVideo;
-import mediaDB.LicensedAudioVideo;
+import mediaDB.MediaContent;
+import mediaDB.Uploadable;
 import mediaDB.Uploader;
+import mediaDB.Video;
+import observer.Observer;
+import storage.InsufficientStorageException;
+import storage.MediaStorage;
 import util.RandomGenerator;
 
-public class MediaCreatorThread extends Thread {
+import java.math.BigDecimal;
 
-    private MediaAdmin mediaAdmin;
+public class MediaCreatorThread extends Thread implements Observer {
 
-    public MediaCreatorThread(MediaAdmin mediaAdmin) {
+    private final MediaAdmin mediaAdmin;
+    private final MediaStorage mediaStorage;
+
+    public MediaCreatorThread(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
         this.mediaAdmin = mediaAdmin;
+        this.mediaStorage = mediaStorage;
+        mediaStorage.register(this);
     }
 
     @Override
     public void run() {
         while (true) {
-            try {
-                int random = RandomGenerator.getBoundedRandomNumber(2);
-                if (random == 1) {
-                    InteractiveVideo interactiveVideo = RandomGenerator.getRandomMedia(InteractiveVideo.class);
-                    createUploaderIfNotExist(interactiveVideo.getUploader());
-                    mediaAdmin.upload(interactiveVideo);
-                } else {
-                    LicensedAudioVideo licensedAudioVideo = RandomGenerator.getRandomMedia(LicensedAudioVideo.class);
-                    createUploaderIfNotExist(licensedAudioVideo.getUploader());
-                    mediaAdmin.upload(licensedAudioVideo);
-                }
-            } catch (InterruptedException | IllegalArgumentException e) {
-                e.printStackTrace();
-            }
 
-        }
+                try {
+                    Video randomVideo = RandomGenerator.getRandomMedia();
+                    try {
+                        createUploaderIfNotExist(randomVideo.getUploader());
+                        mediaAdmin.upload(randomVideo);
+                        printMedia(randomVideo);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (InsufficientStorageException e) {
+                        // No space available
+                        System.out.println("No space available");
+                        synchronized (this) {
+                            wait();
+                        }
+                    }
+                } catch (InterruptedException ie) {
+                    mediaStorage.unregister(this);
+                }
+            }
     }
 
     private void createUploaderIfNotExist(Uploader uploader) {
         if (!mediaAdmin.getUploader(uploader.getName()).isPresent()) {
             mediaAdmin.createUploader(uploader);
         }
+    }
+
+    @Override
+    public void updateObserver() {
+        if (getState() == State.WAITING) {
+            BigDecimal hardTotalSize = mediaStorage.getDiskSize();
+            BigDecimal freeSize = mediaStorage.getAvailableMediaStorageInMB();
+            float freeSizePercent = freeSize.divide(hardTotalSize).floatValue() * 100;
+            if (freeSizePercent >= 20) {
+                System.out.println("New space available " + freeSize.doubleValue());
+                synchronized (this) {
+                    notify();
+                }
+            }
+        }
+    }
+
+    private <T extends Uploadable & MediaContent> void printMedia(T media) {
+        System.out.println("Bitrate: " + media.getBitrate() + " Length: " + media.getLength().toMinutes() + " Size: " + media.getSize().doubleValue());
     }
 }

@@ -1,4 +1,4 @@
-package model;
+package storage;
 
 import mediaDB.MediaContent;
 import observer.Observer;
@@ -18,12 +18,12 @@ public class MediaStorage implements Subject {
     private final ConcurrentLinkedQueue<Observer> observerList = new ConcurrentLinkedQueue<>();
 
     //10 TB
-    private final BigDecimal diskSize = BigDecimal.valueOf(1024.0 * 1024.0 * 10);
+    private final BigDecimal diskSize = BigDecimal.valueOf(1024.0 * 1024.0 * 1);
 
     private BigDecimal availableMediaStorageInMB;
     private final HashMap<String, MediaContent> hardDisk = new HashMap<>();
 
-    public static MediaStorage sharedInstance = new MediaStorage();
+    public final static MediaStorage sharedInstance = new MediaStorage();
 
 
     private MediaStorage() {
@@ -31,13 +31,13 @@ public class MediaStorage implements Subject {
         availableMediaStorageInMB = diskSize;
     }
 
-    public void addMediaInStorage(MediaContent mediaContent) throws InterruptedException {
+    public void addMediaInStorage(MediaContent mediaContent) throws InsufficientStorageException {
         //Anfang des Kritischen Bereichs;
         this.lock.lock();
         try {
             // check sufficient Storage
             if (availableMediaStorageInMB.compareTo(mediaContent.getSize()) < 0) {
-                throw new IllegalArgumentException("Insufficient Storage");
+                throw new InsufficientStorageException();
             } else {
                 hardDisk.put(mediaContent.getAddress(), mediaContent);
                 availableMediaStorageInMB = availableMediaStorageInMB.subtract(mediaContent.getSize());
@@ -83,11 +83,13 @@ public class MediaStorage implements Subject {
 
     @Override
     public void register(Observer observer) {
+        if (observer == null) return;
         observerList.add(observer);
     }
 
     @Override
     public void unregister(Observer observer) {
+        if (observer == null) return;
         observerList.remove(observer);
     }
 

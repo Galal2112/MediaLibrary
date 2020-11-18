@@ -1,6 +1,6 @@
 package observer;
 
-import model.MediaStorage;
+import storage.MediaStorage;
 
 import java.math.BigDecimal;
 

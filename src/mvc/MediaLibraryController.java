@@ -12,6 +12,7 @@ import mediaDB.Uploader;
 import model.InteractiveVideoImpl;
 import model.LicensedAudioVideoImpl;
 import model.Producer;
+import storage.InsufficientStorageException;
 
 import java.time.Duration;
 import java.util.*;
@@ -137,7 +138,7 @@ public class MediaLibraryController implements MediaController {
                 }
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 mediaView.displayError("Invalid insert command");
-            } catch (IllegalArgumentException | InterruptedException e) {
+            } catch (IllegalArgumentException | InsufficientStorageException e) {
                 mediaView.displayError(e.getMessage());
             }
         }

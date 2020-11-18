@@ -8,11 +8,11 @@ public interface MedisSizeUtil {
     /**
      * Estimate for media size based on bitrate and length
      *
-     * @param bitrate Mb/s
+     * @param bitrate Kbps
      * @param length Media duration
      * @return estimated size in MB
      */
      static BigDecimal getMedisSize(long bitrate, Duration length) {
-        return new BigDecimal( bitrate * length.getSeconds() / 8);
+         return new BigDecimal( bitrate * length.getSeconds() / 8).divide(new BigDecimal(1000));
     }
 }

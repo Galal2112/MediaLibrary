@@ -3,7 +3,8 @@ import businessLogic.MediaLibraryAdmin;
 import crud.MediaCRUD;
 import crud.UploaderCRUD;
 import mediaDB.*;
-import model.MediaStorage;
+import storage.InsufficientStorageException;
+import storage.MediaStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -70,7 +71,7 @@ class MediaLibraryAdminTest {
         when(uploaderCRUD.get(uploaderName)).thenReturn(Optional.of(uploader));
         try {
             mediaAdmin.upload(licensedAudioVideo);
-        } catch (InterruptedException e) {
+        } catch (InsufficientStorageException e) {
             fail(e.getMessage());
         }
         // verify set address and upload date
@@ -220,7 +221,7 @@ class MediaLibraryAdminTest {
         when(licensedAudioVideo.getUploader()).thenReturn(uploader);
         try {
             mediaAdmin.upload(licensedAudioVideo);
-        } catch (InterruptedException e) {
+        } catch (InsufficientStorageException e) {
             fail(e.getMessage());
         }
 

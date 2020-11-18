@@ -1,9 +1,6 @@
 package util;
 
-import mediaDB.InteractiveVideo;
-import mediaDB.LicensedAudioVideo;
-import mediaDB.MediaContent;
-import mediaDB.Uploadable;
+import mediaDB.*;
 import model.InteractiveVideoImpl;
 import model.LicensedAudioVideoImpl;
 import model.Producer;
@@ -18,7 +15,7 @@ public final class RandomGenerator {
             , new Producer("Produzent3")};
     private static final String[] availableHolders = {"EdBangerRecords"};
 
-    public static <T extends MediaContent & Uploadable> T getRandomMedia(Class<T> type) {
+    public static Video getRandomMedia() {
         // 480, 960, 1440, ......., 3840
         int width = getBoundedRandomNumber(8) * 480 ;
         // 270, 540, 810, 1080, ....., 2160
@@ -30,18 +27,18 @@ public final class RandomGenerator {
         // Video length in the range from 30 seconds to 30 minutes
         long lengthSeconds = getBoundedRandomNumber(60) * 30;
 
-        if (type == InteractiveVideo.class) {
-            return (T) new InteractiveVideoImpl("Interactive", width, height,
+        int random = RandomGenerator.getBoundedRandomNumber(2);
+
+        if (random == 1) {
+            return new InteractiveVideoImpl("Interactive", width, height,
                     availableEncodings[encodingIndex], bitrate, Duration.ofSeconds(lengthSeconds),
                     availableUploaders[uploaderIndex]);
-        } else if (type == LicensedAudioVideo.class) {
+        } else {
             int samplingRate = getBoundedRandomNumber(8000) * 8;
             int holderIndex = getBoundedRandomNumber(availableHolders.length) - 1;
-            return (T) new LicensedAudioVideoImpl(samplingRate, width, height, availableEncodings[encodingIndex],
+            return new LicensedAudioVideoImpl(samplingRate, width, height, availableEncodings[encodingIndex],
                     availableHolders[holderIndex], bitrate, Duration.ofSeconds(lengthSeconds),
                     availableUploaders[uploaderIndex]);
-        } else {
-            return null;
         }
     }
 

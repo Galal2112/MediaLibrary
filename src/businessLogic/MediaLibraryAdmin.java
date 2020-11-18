@@ -2,7 +2,8 @@ package businessLogic;
 
 import crud.CRUD;
 import mediaDB.*;
-import model.MediaStorage;
+import storage.InsufficientStorageException;
+import storage.MediaStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public synchronized <T extends MediaContent & Uploadable>  void upload(T media) throws IllegalArgumentException, InterruptedException {
+    public synchronized <T extends MediaContent & Uploadable>  void upload(T media) throws IllegalArgumentException, InsufficientStorageException {
 
         if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
             throw new IllegalArgumentException("Unsupported media type");

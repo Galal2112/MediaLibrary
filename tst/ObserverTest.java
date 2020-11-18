@@ -1,5 +1,6 @@
 import mediaDB.InteractiveVideo;
-import model.MediaStorage;
+import storage.InsufficientStorageException;
+import storage.MediaStorage;
 import observer.MediaStorageObserver;
 import observer.Observer;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ public class ObserverTest {
     }
 
     @Test
-    void testMediaStorageNotifiesObserver() throws InterruptedException {
+    void testMediaStorageNotifiesObserver() throws InsufficientStorageException {
         Observer observer = Mockito.mock(Observer.class);
         MediaStorage.sharedInstance.register(observer);
         InteractiveVideo interactiveVideo = Mockito.mock(InteractiveVideo.class);
