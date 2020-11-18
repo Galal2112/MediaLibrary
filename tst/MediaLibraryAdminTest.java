@@ -47,10 +47,6 @@ class MediaLibraryAdminTest {
 
     @Test
     void upload() {
-        // Verify only InteractiveVideo and LicensedAudioVideo supported
-        LicensedVideo licensedVideo = mock(LicensedVideo.class);
-        assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedVideo));
-
         String uploaderName = "TestUploader";
         Uploader uploader = Mockito.mock(Uploader.class);
         when(uploader.getName()).thenReturn(uploaderName);

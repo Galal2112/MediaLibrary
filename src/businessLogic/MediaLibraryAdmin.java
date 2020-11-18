@@ -12,27 +12,34 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     private final CRUD<Uploader> uploaderCRUD;
     private final CRUD<MediaContent> mediaContentCRUD;
+    private volatile BusinessLogicObserver businessLogicObserver;
 
     public MediaLibraryAdmin(CRUD<Uploader> uploaderCRUD, CRUD<MediaContent> mediaContentCRUD) {
         this.uploaderCRUD = uploaderCRUD;
         this.mediaContentCRUD = mediaContentCRUD;
     }
 
+    public synchronized void registerObserver(BusinessLogicObserver serverObserver) {
+        this.businessLogicObserver = serverObserver;
+    }
+
+    public synchronized void unregisterObserver() {
+        this.businessLogicObserver = null;
+    }
+
     @Override
     public synchronized void createUploader(Uploader uploader) throws IllegalArgumentException {
         if (!uploaderCRUD.get(uploader.getName()).isPresent()) {
             uploaderCRUD.create(uploader);
+            if (businessLogicObserver != null) businessLogicObserver.didCreateUploader(uploader.getName());
         } else {
+            if (businessLogicObserver != null) businessLogicObserver.uploaderAlreadyRegistered(uploader.getName());
             throw new IllegalArgumentException("Username is taken");
         }
     }
 
     @Override
     public synchronized <T extends MediaContent & Uploadable>  void upload(T media) throws IllegalArgumentException, InsufficientStorageException {
-
-        if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
-            throw new IllegalArgumentException("Unsupported media type");
-        }
 
         // check producer exists
         Optional<Uploader> optionalUploader = uploaderCRUD.get(media.getUploader().getName());
@@ -50,6 +57,8 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
         // save media content
         mediaContentCRUD.create(media);
+
+        if (businessLogicObserver != null) businessLogicObserver.didUpload(media);
     }
 
     @Override
@@ -63,6 +72,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
             int count = producerUploadCount.get(media.getUploader());
             producerUploadCount.put(media.getUploader(), count + 1);
         });
+        if (businessLogicObserver != null) businessLogicObserver.didListProducersAndUploadsCount();
         return producerUploadCount;
     }
 
@@ -82,11 +92,13 @@ public class MediaLibraryAdmin implements MediaAdmin {
             //update acessCount in the DB
             mediaContentCRUD.update(content);
         }
+        if (businessLogicObserver != null) businessLogicObserver.didListMedia(result.size());
         return result;
     }
 
     @Override
     public synchronized List<Tag> getAllTags() {
+        if (businessLogicObserver != null) businessLogicObserver.didListTags();
         return Arrays.asList(Tag.values());
     }
 
@@ -94,6 +106,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public synchronized void deleteUploaderByName(String name) throws IllegalArgumentException {
         if (uploaderCRUD.get(name).isPresent()) {
             uploaderCRUD.deleteById(name);
+            if (businessLogicObserver != null) businessLogicObserver.didDeleteUploaderWithName(name);
         } else {
             throw new IllegalArgumentException("Uploader name doesn't exist");
         }
@@ -104,6 +117,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public synchronized void deleteUploader(Uploader uploader) throws IllegalArgumentException {
         if (uploaderCRUD.get(uploader.getName()).isPresent()) {
             uploaderCRUD.delete(uploader);
+            if (businessLogicObserver != null) businessLogicObserver.didDeleteUploaderWithName(uploader.getName());
         } else {
             throw new IllegalArgumentException("Uploader name doesn't exist");
 
@@ -112,12 +126,10 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     @Override
     public synchronized <T extends MediaContent & Uploadable> void deleteMedia(T media) throws IllegalArgumentException {
-        if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
-            throw new IllegalArgumentException("Unsupported media type");
-        }
         if (mediaContentCRUD.get(media.getAddress()).isPresent()) {
             MediaStorage.sharedInstance.deletedMediaFromStorage(media);
             mediaContentCRUD.delete(media);
+            if (businessLogicObserver != null) businessLogicObserver.didDeleteMediaAtAddress(media.getAddress());
         }
     }
 
@@ -127,6 +139,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         if (mediaContentCRUD.get(address).isPresent()) {
             MediaStorage.sharedInstance.deleteMediaByAddress(address);
             mediaContentCRUD.deleteById(address);
+            if (businessLogicObserver != null) businessLogicObserver.didDeleteMediaAtAddress(address);
         } else {
             throw new IllegalArgumentException("Invalid Address");
         }
@@ -134,13 +147,28 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     @Override
     public Optional<Uploader> getUploader(String name) {
-        return uploaderCRUD.get(name);
+        Optional<Uploader> uploaderOptional = uploaderCRUD.get(name);
+        if (businessLogicObserver != null) {
+            if (uploaderOptional.isPresent()) {
+                businessLogicObserver.didRetrieveUploader(name);
+            } else {
+                businessLogicObserver.requestedUploaderNotFount(name);
+            }
+        }
+        return uploaderOptional;
     }
 
     @Override
     public Optional<MediaContent> retrieveMediaByAddress(String address) {
         Optional<MediaContent> media = mediaContentCRUD.get(address);
         media.ifPresent(mediaContent -> mediaContent.setAccessCount(mediaContent.getAccessCount() + 1));
+        if (businessLogicObserver != null) {
+            if (media.isPresent()) {
+                businessLogicObserver.didRetrieveMediaAtAddress(address);
+            } else {
+                businessLogicObserver.mediaNotFoundAtAddress(address);
+            }
+        }
         return media;
     }
 
