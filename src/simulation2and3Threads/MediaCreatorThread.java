@@ -22,34 +22,36 @@ public class MediaCreatorThread extends Thread {
     @Override
     public void run() {
         while (true) {
+            try {
+                Video randomVideo = RandomGenerator.getRandomMedia();
                 try {
-                    Video randomVideo = RandomGenerator.getRandomMedia();
-                    try {
-                        createUploaderIfNotExist(randomVideo.getUploader());
-                        mediaAdmin.upload(randomVideo);
-                        printMedia(randomVideo);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (InsufficientStorageException e) {
-                        // No space available
-                        System.out.println(Thread.currentThread().getName() + ": No space available");
-                        synchronized (mediaStorage) {
-                            mediaStorage.wait();
-                        }
+                    createUploaderIfNotExist(randomVideo.getUploader());
+                    mediaAdmin.upload(randomVideo);
+                    printMedia(randomVideo);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (InsufficientStorageException e) {
+                    // No space available
+                    System.out.println(getName() + " did receive insufficient storage message");
+                    synchronized (mediaStorage) {
+                        mediaStorage.wait();
+                        System.out.println(getName() + " moved to waiting state \"Insufficient Storage\"");
                     }
-                } catch (InterruptedException ie) {
-                    System.out.println(Thread.currentThread().getName() + ": Thread interrupted");
                 }
+            } catch (InterruptedException ie) {
+                System.out.println(Thread.currentThread().getName() + " was interrupted");
             }
+        }
     }
 
     private void createUploaderIfNotExist(Uploader uploader) {
         if (!mediaAdmin.getUploader(uploader.getName()).isPresent()) {
             mediaAdmin.createUploader(uploader);
+            System.out.println(getName() + "created new uploader with name: " + uploader.getName());
         }
     }
 
     private <T extends Uploadable & MediaContent> void printMedia(T media) {
-        System.out.println(Thread.currentThread().getName() + ": Bitrate: " + media.getBitrate() + " Length: " + media.getLength().toMinutes() + " Size: " + media.getSize().doubleValue());
+        System.out.println(currentThread().getName() + " did upload video of size: " + media.getSize().doubleValue());
     }
 }

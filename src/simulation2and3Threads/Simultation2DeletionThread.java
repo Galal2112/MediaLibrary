@@ -22,6 +22,7 @@ public class Simultation2DeletionThread extends Thread {
     public void run() {
         while (true) {
             List<?> mediaContentList = mediaAdmin.listMedia(null);
+            System.out.println(getName() + " retrieved media list of size: " + mediaContentList.size());
             if (mediaContentList.size() == 0) {
                 continue;
             }
@@ -40,9 +41,10 @@ public class Simultation2DeletionThread extends Thread {
                 } else if (mediaWithFewestRequests instanceof Audio) {
                     mediaAdmin.deleteMedia((Audio) mediaWithFewestRequests);
                 }
-                System.out.println("Delete media with size: " + mediaWithFewestRequests.getSize());
+                System.out.println(getName() + " delete the media with lowest access count, deleted size: " + mediaWithFewestRequests.getSize());
                 synchronized (mediaStorage) {
                     mediaStorage.notifyAll();
+                    System.out.println(currentThread().getName()+" notify all threads after the deletion of media" );
                 }
             }
         }

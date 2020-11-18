@@ -18,6 +18,7 @@ public class MediaRetrievalThread extends Thread {
     public void run() {
         while (true) {
             List<?> mediaContentList = mediaAdmin.listMedia(null);
+            System.out.println(getName() + " retrieved media list of size: " + mediaContentList.size());
             if (mediaContentList.size() == 0) {
                 continue;
             }
@@ -25,7 +26,7 @@ public class MediaRetrievalThread extends Thread {
             Content media = (Content) mediaContentList.get(randomIndex);
             // This method increases the access count
             mediaAdmin.retrieveMediaByAddress(media.getAddress());
-            System.out.println("Update access count");
+            System.out.println(getName() + " updated the access count of random media");
         }
     }
 }

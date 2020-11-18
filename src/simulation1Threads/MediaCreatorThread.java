@@ -26,20 +26,21 @@ public class MediaCreatorThread extends Thread implements Observer {
     @Override
     public void run() {
         while (true) {
-
                 try {
                     Video randomVideo = RandomGenerator.getRandomMedia();
                     try {
                         createUploaderIfNotExist(randomVideo.getUploader());
                         mediaAdmin.upload(randomVideo);
-                        printMedia(randomVideo);
+                        printUploadedMedia(randomVideo);
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     } catch (InsufficientStorageException e) {
                         // No space available
-                        System.out.println("No space available");
+                        System.out.println(getName() + " did receive insufficient storage message");
                         synchronized (this) {
                             wait();
+                            System.out.println(getName() + " moved to waiting state \"Insufficient Storage\"");
+
                         }
                     }
                 } catch (InterruptedException ie) {
@@ -51,6 +52,7 @@ public class MediaCreatorThread extends Thread implements Observer {
     private void createUploaderIfNotExist(Uploader uploader) {
         if (!mediaAdmin.getUploader(uploader.getName()).isPresent()) {
             mediaAdmin.createUploader(uploader);
+            System.out.println(getName() + "created new uploader with name: " + uploader.getName());
         }
     }
 
@@ -61,15 +63,17 @@ public class MediaCreatorThread extends Thread implements Observer {
             BigDecimal freeSize = mediaStorage.getAvailableMediaStorageInMB();
             float freeSizePercent = freeSize.divide(hardTotalSize).floatValue() * 100;
             if (freeSizePercent >= 20) {
-                System.out.println("New space available " + freeSize.doubleValue());
+                System.out.println(getName() + " was notified by storage, space available " + freeSize.doubleValue());
                 synchronized (this) {
                     notify();
+                    System.out.println(getName() + " moved to running state");
+
                 }
             }
         }
     }
 
-    private <T extends Uploadable & MediaContent> void printMedia(T media) {
-        System.out.println("Bitrate: " + media.getBitrate() + " Length: " + media.getLength().toMinutes() + " Size: " + media.getSize().doubleValue());
+    private <T extends Uploadable & MediaContent> void printUploadedMedia(T media) {
+        System.out.println(getName() + " did upload video of size: " + media.getSize().doubleValue());
     }
 }

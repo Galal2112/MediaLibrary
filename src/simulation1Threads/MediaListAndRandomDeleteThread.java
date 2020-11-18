@@ -19,6 +19,7 @@ public class MediaListAndRandomDeleteThread extends Thread {
     public void run() {
         while (true) {
             List<?> mediaContentList = mediaAdmin.listMedia(null);
+            System.out.println(getName() + " retrieved media list of size: " + mediaContentList.size());
             if (mediaContentList.size() == 0) {
                 continue;
             }
@@ -29,6 +30,7 @@ public class MediaListAndRandomDeleteThread extends Thread {
             } else if (media instanceof Audio) {
                 mediaAdmin.deleteMedia((Audio) mediaContentList.get(randomIndex));
             }
+            System.out.println(getName() + " deleted video of size: " + ((Video) media).getSize());
         }
     }
 }

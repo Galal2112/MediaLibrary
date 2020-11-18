@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class Simultation3DeletionThread  extends Thread {
+public class Simultation3DeletionThread extends Thread {
 
     private MediaAdmin mediaAdmin;
     private MediaStorage mediaStorage;
@@ -31,9 +31,10 @@ public class Simultation3DeletionThread  extends Thread {
             if (deletionCount == 0) {
                 continue;
             }
+            System.out.println(Thread.currentThread().getName() + " will delete " + deletionCount + " media files");
             // sort descending based on access count
             Collections.sort(mediaContentList, Comparator.comparingLong(video -> ((MediaContent) video).getAccessCount()));
-            for (int i = 0; i < deletionCount; i ++) {
+            for (int i = 0; i < deletionCount; i++) {
                 MediaContent media = (MediaContent) mediaContentList.get(i);
                 if (media instanceof Video) {
                     mediaAdmin.deleteMedia((Video) media);
@@ -41,10 +42,11 @@ public class Simultation3DeletionThread  extends Thread {
                     mediaAdmin.deleteMedia((Audio) media);
                 }
 
-                System.out.println(Thread.currentThread().getName() + ": Delete media with size: " + media.getSize());
+                System.out.println(Thread.currentThread().getName() + " deleted media of size: " + media.getSize());
             }
             synchronized (mediaStorage) {
                 mediaStorage.notifyAll();
+                System.out.println(currentThread().getName() + " notify all threads after the deletion of media");
             }
         }
     }
