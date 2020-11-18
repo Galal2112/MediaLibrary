@@ -31,4 +31,6 @@ public interface MediaAdmin {
     void deleteMediaByAddress(String address) throws IllegalArgumentException;
 
     Optional<Uploader> getUploader(String name);
+
+   Optional<MediaContent> retrieveMediaByAddress(String address);
 }

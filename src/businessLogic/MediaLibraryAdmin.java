@@ -137,8 +137,16 @@ public class MediaLibraryAdmin implements MediaAdmin {
         return uploaderCRUD.get(name);
     }
 
+    @Override
+    public Optional<MediaContent> retrieveMediaByAddress(String address) {
+        Optional<MediaContent> media = mediaContentCRUD.get(address);
+        media.ifPresent(mediaContent -> mediaContent.setAccessCount(mediaContent.getAccessCount() + 1));
+        return media;
+    }
+
     private String getAddress(Object o) {
         return o.getClass().getSimpleName() + '@' + Integer.toHexString(o.hashCode());
     }
+
 
 }

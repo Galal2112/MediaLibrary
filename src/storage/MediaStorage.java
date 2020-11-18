@@ -18,7 +18,7 @@ public class MediaStorage implements Subject {
     private final ConcurrentLinkedQueue<Observer> observerList = new ConcurrentLinkedQueue<>();
 
     //10 TB
-    private final BigDecimal diskSize = BigDecimal.valueOf(1024.0 * 1024.0 * 1);
+    private final BigDecimal diskSize = BigDecimal.valueOf(1024.0 * 1024.0 * 10);
 
     private BigDecimal availableMediaStorageInMB;
     private final HashMap<String, MediaContent> hardDisk = new HashMap<>();
