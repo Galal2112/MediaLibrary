@@ -12,12 +12,12 @@ import util.RandomGenerator;
 
 import java.math.BigDecimal;
 
-public class MediaCreatorThread extends Thread implements Observer {
+public class MediaCreatorObserverThread extends Thread implements Observer {
 
     private final MediaAdmin mediaAdmin;
     private final MediaStorage mediaStorage;
 
-    public MediaCreatorThread(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
+    public MediaCreatorObserverThread(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
         this.mediaAdmin = mediaAdmin;
         this.mediaStorage = mediaStorage;
         mediaStorage.register(this);
@@ -52,7 +52,7 @@ public class MediaCreatorThread extends Thread implements Observer {
     private void createUploaderIfNotExist(Uploader uploader) {
         if (!mediaAdmin.getUploader(uploader.getName()).isPresent()) {
             mediaAdmin.createUploader(uploader);
-            System.out.println(getName() + "created new uploader with name: " + uploader.getName());
+            System.out.println(getName() + " created new uploader with name: " + uploader.getName());
         }
     }
 

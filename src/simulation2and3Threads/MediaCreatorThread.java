@@ -47,7 +47,7 @@ public class MediaCreatorThread extends Thread {
     private void createUploaderIfNotExist(Uploader uploader) {
         if (!mediaAdmin.getUploader(uploader.getName()).isPresent()) {
             mediaAdmin.createUploader(uploader);
-            System.out.println(getName() + "created new uploader with name: " + uploader.getName());
+            System.out.println(getName() + " created new uploader with name: " + uploader.getName());
         }
     }
 

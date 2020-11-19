@@ -1,22 +1,25 @@
 # Media Library
 ### erledigte Punkte
 
-1. zipArchiv 
-2. IntelliJ-Projekt (kein Gradle, Maven o.ä.) 
-3. readmevorhanden 
-4. Java8(languagelevel) 
-5. kompilierbar 
-6. main-Methoden nur im default package 
-7. ausführbar 
-8. DarstellungslogikundGeschäftslogikgetrennt 
-9. prototypisches CLI (nicht notwendig, wenn umfangreicheres CLI realisiert ist) 
-11. Trennung zwischen Test- und Produktiv-Code 
-12. JUnit5 als Testframework 
-13. Mockito als Mock/Spy-framework 
-14. keine leeren Test 
-15. Auflisten der Mediadateien im CLI realisiert 16.Beobachterentwurfsmuster und events realisiert
-17. zwei Tests für Beobachter realisiert 
-18. zwei listener getestet 19.angemessene Aufzählungstypen verwendet 20.nach MVC strukturiert
+1. zip Archiv
+2. IntelliJ-Projekt (kein Gradle, Maven o.ä.)
+3. readme vorhanden
+4. Java8 (language level)
+5. kompilierbar
+6. main-Methoden nur im default package
+7. ausführbar
+8. Simulation 1
+10. 10.Trennung zwischen Test- und Produktiv-Code
+11. 11.JUnit5 als Testframework
+12. 12.Mockito als Mock/Spy-framework
+13. 13.keine Verwendung von Thread.sleep bzw. nur mit 0-Werten
+14. 14.ändernde Aktionen der threads produzieren Ausgaben auf der Konsole
+15. 15.Änderungen an der Geschäftslogik produzieren Ausgaben auf der Konsole
+16. 16.Trennung zwischen Verwaltungs- und Simulationslogik
+17. 17.Simulation 2
+18. 18.mindestens je ein Test für alle in der Simulation verwendeten Methoden die auf die Geschäftslogik zugreifen
+19. 19.Simulation 3
+20. 20.alle Tests sind deterministisch
 
 
 
