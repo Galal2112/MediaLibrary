@@ -80,6 +80,7 @@ class MediaCRUDTest {
         InteractiveVideo video = Mockito.mock(InteractiveVideo.class);
         when(video.getAddress()).thenReturn("InteractiveVideo@" + System.currentTimeMillis());
         when(video.getUploadDate()).thenReturn(new Date());
+        when(video.copy()).thenReturn(video);
         return video;
     }
 }

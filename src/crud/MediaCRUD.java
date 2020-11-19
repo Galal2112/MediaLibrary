@@ -18,7 +18,9 @@ public class MediaCRUD implements CRUD<MediaContent> {
         this.lock.lock();
 
         try {
-            return new LinkedList<>(mediaList);
+            LinkedList<MediaContent> resultList = new LinkedList<>();
+            mediaList.forEach((media) -> resultList.add((MediaContent) media.copy()));
+            return resultList;
 
         } finally {
             this.lock.unlock();
@@ -31,7 +33,7 @@ public class MediaCRUD implements CRUD<MediaContent> {
         this.lock.lock();
 
         try {
-            mediaList.add(media);
+            mediaList.add((MediaContent) media.copy());
         } finally {
             this.lock.unlock();
         }
@@ -46,7 +48,7 @@ public class MediaCRUD implements CRUD<MediaContent> {
             int index = 0;
             while (it.hasNext()) {
                 if (it.next().getAddress().equals(media.getAddress())) {
-                    mediaList.set(index, media);
+                    mediaList.set(index, (MediaContent) media.copy());
                     break;
                 }
                 index++;
@@ -62,8 +64,8 @@ public class MediaCRUD implements CRUD<MediaContent> {
         this.lock.lock();
 
         try {
-            return mediaList.stream().filter(v -> v.getAddress().equals(address)).findFirst();
-
+            Optional<MediaContent> mediaContentOptional = mediaList.stream().filter(v -> v.getAddress().equals(address)).findFirst();
+            return mediaContentOptional.map(mediaContent -> (MediaContent) mediaContent.copy());
         } finally {
             this.lock.unlock();
         }

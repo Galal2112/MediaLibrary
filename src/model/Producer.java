@@ -33,4 +33,9 @@ public class Producer implements Uploader {
         Producer producer = (Producer) o;
         return name.equals(producer.name);
     }
+
+    @Override
+    public Uploader copy() {
+        return new Producer(name);
+    }
 }

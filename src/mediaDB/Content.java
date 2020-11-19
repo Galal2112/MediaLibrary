@@ -9,4 +9,5 @@ public interface Content {
     void setTags(Collection<Tag> tags);
     long getAccessCount();
     void setAccessCount(long count);
+    Content copy();
 }

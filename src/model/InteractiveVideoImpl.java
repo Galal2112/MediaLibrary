@@ -124,4 +124,15 @@ public class InteractiveVideoImpl implements InteractiveVideo {
         InteractiveVideoImpl interactiveVideo = (InteractiveVideoImpl) o;
         return address.equals(interactiveVideo.address);
     }
+
+    @Override
+    public InteractiveVideo copy() {
+        InteractiveVideoImpl interactiveVideo = new InteractiveVideoImpl(type, width, height, encoding, bitrate, length, uploader);
+        interactiveVideo.accessCount = accessCount;
+        interactiveVideo.address = address;
+        interactiveVideo.uploadDate = uploadDate;
+        interactiveVideo.tags = tags;
+        interactiveVideo.encoding = encoding;
+        return interactiveVideo;
+    }
 }

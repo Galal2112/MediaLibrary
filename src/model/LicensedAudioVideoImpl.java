@@ -132,4 +132,15 @@ public class LicensedAudioVideoImpl implements LicensedAudioVideo {
         LicensedAudioVideoImpl licensedAudioVideo = (LicensedAudioVideoImpl) o;
         return address.equals(licensedAudioVideo.address);
     }
+
+    @Override
+    public LicensedAudioVideo copy() {
+        LicensedAudioVideoImpl licensedAudioVideo = new LicensedAudioVideoImpl(samplingRate, width, height, encoding, holder, bitrate, length, uploader);
+        licensedAudioVideo.accessCount = accessCount;
+        licensedAudioVideo.address = address;
+        licensedAudioVideo.uploadDate = uploadDate;
+        licensedAudioVideo.tags = tags;
+        licensedAudioVideo.encoding = encoding;
+        return licensedAudioVideo;
+    }
 }

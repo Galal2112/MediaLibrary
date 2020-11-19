@@ -2,7 +2,10 @@ package crud;
 
 import mediaDB.Uploader;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -17,8 +20,8 @@ public class UploaderCRUD implements CRUD<Uploader> {
     public Optional<Uploader> get(String name) {
         this.lock.lock();
         try {
-            return uploaders.stream().filter(uploader -> uploader.getName().equals(name)).findFirst();
-
+            Optional<Uploader> uploaderOptional = uploaders.stream().filter(uploader -> uploader.getName().equals(name)).findFirst();
+            return uploaderOptional.map(Uploader::copy);
         } finally {
             this.lock.unlock();
         }
@@ -28,8 +31,9 @@ public class UploaderCRUD implements CRUD<Uploader> {
     public List<Uploader> getAll() {
         this.lock.lock();
         try {
-            return new LinkedList<>(uploaders);
-
+            LinkedList<Uploader> resultList = new LinkedList<>();
+            uploaders.forEach((uploader) -> resultList.add(uploader.copy()));
+            return resultList;
         } finally {
             this.lock.unlock();
         }
@@ -39,7 +43,7 @@ public class UploaderCRUD implements CRUD<Uploader> {
     public void create(Uploader uploader) {
         this.lock.lock();
         try {
-            uploaders.add(uploader);
+            uploaders.add(uploader.copy());
 
         } finally {
             this.lock.unlock();
@@ -54,7 +58,7 @@ public class UploaderCRUD implements CRUD<Uploader> {
             int index = 0;
             while (it.hasNext()) {
                 if (it.next().getName().equals(uploader.getName())) {
-                    uploaders.set(index, uploader);
+                    uploaders.set(index, uploader.copy());
                     break;
                 }
                 index++;
