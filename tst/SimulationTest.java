@@ -51,7 +51,27 @@ public class SimulationTest {
         verify(mediaAdmin, never()).listProducersAndUploadsCount();
     }
 
-        private void sleep(int seconds) {
+    @Test
+    void testSimulation3() throws InsufficientStorageException {
+        MediaAdmin mediaAdmin = Mockito.mock(MediaAdmin.class);
+        InteractiveVideo interactiveVideo = Mockito.mock(InteractiveVideo.class);
+        String videoAddress = "InteractiveVideo@Address";
+        when(interactiveVideo.getAddress()).thenReturn(videoAddress);
+        List<InteractiveVideo> interactiveVideos = Collections.singletonList(interactiveVideo);
+        when(mediaAdmin.listMedia(null)).thenReturn((List) interactiveVideos);
+        MainSimulation3.startSimulation(mediaAdmin);
+        sleep(3);
+        verify(mediaAdmin, atLeastOnce()).getUploader(any());
+        verify(mediaAdmin, atLeastOnce()).createUploader(any());
+        verify(mediaAdmin, atLeastOnce()).upload(any());
+        verify(mediaAdmin, atLeastOnce()).listMedia(null);
+        verify(mediaAdmin, atLeastOnce()).deleteMedia(interactiveVideo);
+        verify(mediaAdmin, atLeastOnce()).retrieveMediaByAddress(videoAddress);
+        verify(mediaAdmin, never()).deleteUploader(any());
+        verify(mediaAdmin, never()).listProducersAndUploadsCount();
+    }
+
+    private void sleep(int seconds) {
         try {
             TimeUnit.SECONDS.sleep(seconds);
         } catch (InterruptedException e) {

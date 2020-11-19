@@ -9,11 +9,13 @@ import storage.MediaStorage;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 public class Simultation3DeletionThread extends Thread {
 
     private MediaAdmin mediaAdmin;
     private MediaStorage mediaStorage;
+    private final Random rand = new Random(); //instance of random class
 
     public Simultation3DeletionThread(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
         this.mediaAdmin = mediaAdmin;
@@ -27,7 +29,7 @@ public class Simultation3DeletionThread extends Thread {
             if (mediaContentList.size() == 0) {
                 continue;
             }
-            int deletionCount = (int) (Math.random() * mediaContentList.size());
+            int deletionCount = rand.nextInt(mediaContentList.size() + 1);
             if (deletionCount == 0) {
                 continue;
             }
