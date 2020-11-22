@@ -158,7 +158,7 @@ public class MediaLibraryController implements MediaController {
         @Override
         public void onInputEvent(InputEvent event) {
             if (event.getText() == null) {
-                mediaView.displayError("Not a vaild input");
+                mediaView.displayError("Not a valid input");
                 return;
             }
 

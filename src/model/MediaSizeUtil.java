@@ -3,7 +3,7 @@ package model;
 import java.math.BigDecimal;
 import java.time.Duration;
 
-public interface MedisSizeUtil {
+public interface MediaSizeUtil {
 
     /**
      * Estimate for media size based on bitrate and length

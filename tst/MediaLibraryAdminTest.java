@@ -182,7 +182,7 @@ class MediaLibraryAdminTest {
         when(uploaderCRUD.get(uploaderName)).thenReturn(Optional.of(uploader));
 
         mediaAdmin.deleteUploader(uploader);
-        verify(uploaderCRUD).delete(uploader);
+        verify(uploaderCRUD).deleteById(uploader.getName());
     }
 
     @Test
@@ -193,7 +193,7 @@ class MediaLibraryAdminTest {
         when(interactiveVideo.getSize()).thenReturn(new BigDecimal(10));
         when(mediaCRUD.get(interactiveVideoAddress)).thenReturn(Optional.of(interactiveVideo));
         mediaAdmin.deleteMedia(interactiveVideo);
-        verify(mediaCRUD).delete(interactiveVideo);
+        verify(mediaCRUD).deleteById(interactiveVideo.getAddress());
 
         String licensedAudioVideoAddress = "licensedAudioVideoAddress";
         LicensedAudioVideo licensedAudioVideo = mock(LicensedAudioVideo.class);
@@ -201,7 +201,7 @@ class MediaLibraryAdminTest {
         when(mediaCRUD.get(licensedAudioVideoAddress)).thenReturn(Optional.of(licensedAudioVideo));
         when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(10));
         mediaAdmin.deleteMedia(licensedAudioVideo);
-        verify(mediaCRUD).delete(licensedAudioVideo);
+        verify(mediaCRUD).deleteById(licensedAudioVideo.getAddress());
     }
 
     @Test

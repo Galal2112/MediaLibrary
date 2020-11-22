@@ -50,13 +50,12 @@ public class MediaLibraryAdmin implements MediaAdmin {
         // Set address
         media.setAddress(getAddress(media));
 
-        MediaStorage.sharedInstance.addMediaInStorage(media);
-
         // set date
         media.setUploadDate(new Date());
 
         // save media content
         mediaContentCRUD.create(media);
+        MediaStorage.sharedInstance.addMediaInStorage(media);
 
         if (businessLogicObserver != null) businessLogicObserver.didUpload(media);
     }
@@ -115,33 +114,23 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     @Override
     public synchronized void deleteUploader(Uploader uploader) throws IllegalArgumentException {
-        if (uploaderCRUD.get(uploader.getName()).isPresent()) {
-            uploaderCRUD.delete(uploader);
-            if (businessLogicObserver != null) businessLogicObserver.didDeleteUploaderWithName(uploader.getName());
-        } else {
-            throw new IllegalArgumentException("Uploader name doesn't exist");
-
-        }
+        deleteUploaderByName(uploader.getName());
     }
 
     @Override
     public synchronized <T extends MediaContent & Uploadable> void deleteMedia(T media) throws IllegalArgumentException {
-        if (mediaContentCRUD.get(media.getAddress()).isPresent()) {
-            MediaStorage.sharedInstance.deletedMediaFromStorage(media);
-            mediaContentCRUD.delete(media);
-            if (businessLogicObserver != null) businessLogicObserver.didDeleteMediaAtAddress(media.getAddress());
-        }
+        deleteMediaByAddress(media.getAddress());
     }
 
     @Override
     public synchronized void deleteMediaByAddress(String address) throws IllegalArgumentException {
-
-        if (mediaContentCRUD.get(address).isPresent()) {
-            MediaStorage.sharedInstance.deleteMediaByAddress(address);
+            Optional<MediaContent> mediaContentOptional =  mediaContentCRUD.get(address);
+        if (mediaContentOptional.isPresent()) {
+            MediaStorage.sharedInstance.deletedMediaFromStorage(mediaContentOptional.get());
             mediaContentCRUD.deleteById(address);
             if (businessLogicObserver != null) businessLogicObserver.didDeleteMediaAtAddress(address);
         } else {
-            throw new IllegalArgumentException("Invalid Address");
+            throw new IllegalArgumentException("Media doesn't exist");
         }
     }
 

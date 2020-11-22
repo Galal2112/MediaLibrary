@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface MediaAdmin {
 
     void createUploader(Uploader uploader) throws IllegalArgumentException;
-
+    //can i create interface extends MediaContent & Uploadable and use it instead??
     <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException, InsufficientStorageException;
 
     Map<Uploader, Integer> listProducersAndUploadsCount();

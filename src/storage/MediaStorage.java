@@ -5,7 +5,6 @@ import observer.Observer;
 import observer.Subject;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -14,14 +13,13 @@ public class MediaStorage implements Subject {
 
 
     private final Lock lock = new ReentrantLock();
-    // what is difference between deque and queue?
+    // what is difference between deque and queue? TODO
     private final ConcurrentLinkedQueue<Observer> observerList = new ConcurrentLinkedQueue<>();
 
     //10 TB
     private final BigDecimal diskSize = BigDecimal.valueOf(1024.0 * 1024.0 * 10);
 
     private BigDecimal availableMediaStorageInMB;
-    private final HashMap<String, MediaContent> hardDisk = new HashMap<>();
 
     public final static MediaStorage sharedInstance = new MediaStorage();
 
@@ -39,7 +37,6 @@ public class MediaStorage implements Subject {
             if (availableMediaStorageInMB.compareTo(mediaContent.getSize()) < 0) {
                 throw new InsufficientStorageException();
             } else {
-                hardDisk.put(mediaContent.getAddress(), mediaContent);
                 availableMediaStorageInMB = availableMediaStorageInMB.subtract(mediaContent.getSize());
                 notifyObserver();
             }
@@ -51,20 +48,11 @@ public class MediaStorage implements Subject {
     public void deletedMediaFromStorage(MediaContent mediaContent) {
         this.lock.lock();
         try {
-            hardDisk.remove(mediaContent.getAddress());
             availableMediaStorageInMB = availableMediaStorageInMB.add(mediaContent.getSize());
             notifyObserver();
         } finally {
             this.lock.unlock();
         }
-    }
-
-    public void deleteMediaByAddress(String address) throws IllegalArgumentException {
-        MediaContent media = hardDisk.get(address);
-        if (media == null) {
-            throw new IllegalArgumentException("Invalid address");
-        }
-        deletedMediaFromStorage(media);
     }
 
     public BigDecimal getAvailableMediaStorageInMB() {

@@ -12,7 +12,7 @@ public class BusinessLogicObserverImpl implements BusinessLogicObserver {
 
     @Override
     public synchronized void uploaderAlreadyRegistered(String name) {
-        System.out.println("Logger: Failed to create uploader, \"\" already registered");
+        System.out.println("Logger: Failed to create uploader, \"already registered\" ");
     }
 
     @Override

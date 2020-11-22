@@ -32,7 +32,7 @@ public class InteractiveVideoImpl implements InteractiveVideo {
         this.encoding = encoding;
         this.bitrate = bitrate;
         this.length = length;
-        this.size = MedisSizeUtil.getMediaSize(bitrate, length);
+        this.size = MediaSizeUtil.getMediaSize(bitrate, length);
         this.uploader = uploader;
     }
 
