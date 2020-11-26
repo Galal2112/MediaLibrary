@@ -55,6 +55,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
         // save media content
         mediaContentCRUD.create(media);
+
         MediaStorage.sharedInstance.addMediaInStorage(media);
 
         if (businessLogicObserver != null) businessLogicObserver.didUpload(media);

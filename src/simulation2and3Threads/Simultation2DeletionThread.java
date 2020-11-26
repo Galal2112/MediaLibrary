@@ -10,8 +10,8 @@ import java.util.List;
 
 public class Simultation2DeletionThread extends Thread {
 
-    private MediaAdmin mediaAdmin;
-    private MediaStorage mediaStorage;
+    private final MediaAdmin mediaAdmin;
+    private final MediaStorage mediaStorage;
 
     public Simultation2DeletionThread(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
         this.mediaAdmin = mediaAdmin;

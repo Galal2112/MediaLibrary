@@ -13,8 +13,8 @@ import java.util.Random;
 
 public class Simultation3DeletionThread extends Thread {
 
-    private MediaAdmin mediaAdmin;
-    private MediaStorage mediaStorage;
+    private final MediaAdmin mediaAdmin;
+    private final MediaStorage mediaStorage;
     private final Random rand = new Random(); //instance of random class
 
     public Simultation3DeletionThread(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
