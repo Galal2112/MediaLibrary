@@ -13,6 +13,7 @@ public interface CRUD<T> {
 
     void delete(T t);
 
+   // get by ID
     Optional<T> get(String id);
 
     void deleteById(String id);

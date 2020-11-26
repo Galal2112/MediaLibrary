@@ -2,51 +2,49 @@ package businessLogic;
 
 import crud.CRUD;
 import mediaDB.*;
+import storage.InsufficientStorageException;
+import storage.MediaStorage;
 
-import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MediaLibraryAdmin implements MediaAdmin {
 
-    // 1 Gigabyte storage
-    public static final BigDecimal availableStorage = new BigDecimal(1024 * 1024 * 1024);
-
     private final CRUD<Uploader> uploaderCRUD;
-    private final CRUD<InteractiveVideo> interactiveVideoCRUD;
-    private final CRUD<LicensedAudioVideo> licensedAudioVideoCRUD;
+    private final CRUD<MediaContent> mediaContentCRUD;
+    private volatile BusinessLogicObserver businessLogicObserver;
 
-    public MediaLibraryAdmin(CRUD<Uploader> uploaderCRUD, CRUD<InteractiveVideo> interactiveVideoCRUD,
-                             CRUD<LicensedAudioVideo> licensedAudioVideoCRUD) {
+    public MediaLibraryAdmin(CRUD<Uploader> uploaderCRUD, CRUD<MediaContent> mediaContentCRUD) {
         this.uploaderCRUD = uploaderCRUD;
-        this.interactiveVideoCRUD = interactiveVideoCRUD;
-        this.licensedAudioVideoCRUD = licensedAudioVideoCRUD;
+        this.mediaContentCRUD = mediaContentCRUD;
+    }
+
+    public synchronized void registerObserver(BusinessLogicObserver serverObserver) {
+        this.businessLogicObserver = serverObserver;
+    }
+
+    public synchronized void unregisterObserver() {
+        this.businessLogicObserver = null;
     }
 
     @Override
-    public void createUploader(Uploader uploader) {
+    public synchronized void createUploader(Uploader uploader) throws IllegalArgumentException {
         if (!uploaderCRUD.get(uploader.getName()).isPresent()) {
             uploaderCRUD.create(uploader);
+            if (businessLogicObserver != null) businessLogicObserver.didCreateUploader(uploader.getName());
         } else {
+            if (businessLogicObserver != null) businessLogicObserver.uploaderAlreadyRegistered(uploader.getName());
             throw new IllegalArgumentException("Username is taken");
         }
     }
 
     @Override
-    public <T extends MediaContent & Uploadable> void upload(T media) {
-
-        if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
-            throw new IllegalArgumentException("Unsupported media type");
-        }
+    public synchronized <T extends MediaContent & Uploadable>  void upload(T media) throws IllegalArgumentException, InsufficientStorageException {
 
         // check producer exists
         Optional<Uploader> optionalUploader = uploaderCRUD.get(media.getUploader().getName());
         if (!optionalUploader.isPresent()) {
             throw new IllegalArgumentException("Producer does not exist");
-        }
-
-        // check size
-        if (availableStorage.compareTo(media.getSize()) < 0) {
-            throw new IllegalArgumentException("Insufficient storage");
         }
 
         // Set address
@@ -56,95 +54,116 @@ public class MediaLibraryAdmin implements MediaAdmin {
         media.setUploadDate(new Date());
 
         // save media content
-        if (media instanceof InteractiveVideo) {
-            interactiveVideoCRUD.create((InteractiveVideo) media);
-        } else {
-            licensedAudioVideoCRUD.create((LicensedAudioVideo) media);
-        }
+        mediaContentCRUD.create(media);
+        MediaStorage.sharedInstance.addMediaInStorage(media);
+
+        if (businessLogicObserver != null) businessLogicObserver.didUpload(media);
     }
 
     @Override
-    public Map<Uploader, Integer> listProducersAndUploadsCount() {
+    public synchronized Map<Uploader, Integer> listProducersAndUploadsCount() {
         List<Uploader> producers = uploaderCRUD.getAll();
         HashMap<Uploader, Integer> producerUploadCount = new HashMap<>();
         producers.forEach(producer -> producerUploadCount.put(producer, 0));
-        List<Uploadable> uploadsList = new LinkedList<>();
-        uploadsList.addAll(interactiveVideoCRUD.getAll());
-        uploadsList.addAll(licensedAudioVideoCRUD.getAll());
+        List<Uploadable> uploadsList = mediaContentCRUD.getAll().stream().map(media -> (Uploadable) media)
+                .collect(Collectors.toList());
         uploadsList.forEach(media -> {
             int count = producerUploadCount.get(media.getUploader());
             producerUploadCount.put(media.getUploader(), count + 1);
         });
+        if (businessLogicObserver != null) businessLogicObserver.didListProducersAndUploadsCount();
         return producerUploadCount;
     }
 
     @Override
-    // return interactiveVideo or lincensedAudioVideo
-    public <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) {
+    public synchronized <T extends MediaContent & Uploadable> List<?> listMedia(Class<T> type) throws IllegalArgumentException {
         List<MediaContent> result = new LinkedList<>();
         if (type == null) {
-            result.addAll(interactiveVideoCRUD.getAll());
-            result.addAll(licensedAudioVideoCRUD.getAll());
-        } else if (type == InteractiveVideo.class) {
-            result.addAll(interactiveVideoCRUD.getAll());
-        } else if (type == LicensedAudioVideo.class) {
-            result.addAll(licensedAudioVideoCRUD.getAll());
+            result.addAll(mediaContentCRUD.getAll());
         } else {
-            throw new IllegalArgumentException("Unsupported media type");
+            // Get media data based on type using isInstance
+            result.addAll(mediaContentCRUD.getAll().stream().filter(type :: isInstance).collect(Collectors.toList()));
         }
 
         // update access count
         for (MediaContent content : result) {
             content.setAccessCount(content.getAccessCount() + 1);
-            //update acessCount in the DBx
-            if (content instanceof InteractiveVideo) {
-                interactiveVideoCRUD.update((InteractiveVideo) content);
-            } else {
-                licensedAudioVideoCRUD.update((LicensedAudioVideo) content);
-            }
+            //update acessCount in the DB
+            mediaContentCRUD.update(content);
         }
+        if (businessLogicObserver != null) businessLogicObserver.didListMedia(result.size());
         return result;
     }
 
     @Override
-    public List<Tag> getAllTags() {
+    public synchronized List<Tag> getAllTags() {
+        if (businessLogicObserver != null) businessLogicObserver.didListTags();
         return Arrays.asList(Tag.values());
     }
 
     @Override
-    public void deleteUploaderByName(String name) {
-        uploaderCRUD.deleteById(name);
-    }
-
-    @Override
-    public void deleteUploader(Uploader uploader) {
-        uploaderCRUD.delete(uploader);
-    }
-
-    @Override
-    public <T extends MediaContent & Uploadable> void deleteMedia(T media) {
-        if (!(media instanceof InteractiveVideo) && !(media instanceof LicensedAudioVideo)) {
-            throw new IllegalArgumentException("Unsupported media type");
-        }
-
-        if (media instanceof InteractiveVideo) {
-            interactiveVideoCRUD.delete((InteractiveVideo) media);
+    public synchronized void deleteUploaderByName(String name) throws IllegalArgumentException {
+        if (uploaderCRUD.get(name).isPresent()) {
+            uploaderCRUD.deleteById(name);
+            if (businessLogicObserver != null) businessLogicObserver.didDeleteUploaderWithName(name);
         } else {
-            licensedAudioVideoCRUD.delete((LicensedAudioVideo) media);
+            throw new IllegalArgumentException("Uploader name doesn't exist");
+        }
+
+    }
+
+    @Override
+    public synchronized void deleteUploader(Uploader uploader) throws IllegalArgumentException {
+        deleteUploaderByName(uploader.getName());
+    }
+
+    @Override
+    public synchronized <T extends MediaContent & Uploadable> void deleteMedia(T media) throws IllegalArgumentException {
+        deleteMediaByAddress(media.getAddress());
+    }
+
+    @Override
+    public synchronized void deleteMediaByAddress(String address) throws IllegalArgumentException {
+            Optional<MediaContent> mediaContentOptional =  mediaContentCRUD.get(address);
+        if (mediaContentOptional.isPresent()) {
+            MediaStorage.sharedInstance.deletedMediaFromStorage(mediaContentOptional.get());
+            mediaContentCRUD.deleteById(address);
+            if (businessLogicObserver != null) businessLogicObserver.didDeleteMediaAtAddress(address);
+        } else {
+            throw new IllegalArgumentException("Media doesn't exist");
         }
     }
 
     @Override
-    public void deleteMediaByAddress(String address) {
-        // if address belongs to InteractiveVideo ... delete
-        interactiveVideoCRUD.deleteById(address);
+    public Optional<Uploader> getUploader(String name) {
+        Optional<Uploader> uploaderOptional = uploaderCRUD.get(name);
+        if (businessLogicObserver != null) {
+            if (uploaderOptional.isPresent()) {
+                businessLogicObserver.didRetrieveUploader(name);
+            } else {
+                businessLogicObserver.requestedUploaderNotFount(name);
+            }
+        }
+        return uploaderOptional;
+    }
 
-        // if address belongs to InteractiveVideo ... delete
-        licensedAudioVideoCRUD.deleteById(address);
+    @Override
+    public Optional<MediaContent> retrieveMediaByAddress(String address) {
+        Optional<MediaContent> media = mediaContentCRUD.get(address);
+        media.ifPresent(mediaContent -> mediaContent.setAccessCount(mediaContent.getAccessCount() + 1));
+        if (businessLogicObserver != null) {
+            if (media.isPresent()) {
+                businessLogicObserver.didRetrieveMediaAtAddress(address);
+            } else {
+                businessLogicObserver.mediaNotFoundAtAddress(address);
+            }
+        }
+        return media;
     }
 
     private String getAddress(Object o) {
-        return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
+        return o.getClass().getSimpleName() + '@' + Integer.toHexString(o.hashCode());
     }
+
 
 }

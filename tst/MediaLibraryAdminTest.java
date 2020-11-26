@@ -1,9 +1,10 @@
-package businessLogic;
-
-import crud.InteractiveVideoCRUD;
-import crud.LicensedAudioVideoCRUD;
+import businessLogic.MediaAdmin;
+import businessLogic.MediaLibraryAdmin;
+import crud.MediaCRUD;
 import crud.UploaderCRUD;
 import mediaDB.*;
+import storage.InsufficientStorageException;
+import storage.MediaStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,17 +17,15 @@ import static org.mockito.Mockito.*;
 
 class MediaLibraryAdminTest {
 
-    MediaAdmin mediaAdmin;
-    InteractiveVideoCRUD interactiveVideoCRUD;
-    LicensedAudioVideoCRUD licensedAudioVideoCRUD;
-    UploaderCRUD uploaderCRUD;
+    private MediaAdmin mediaAdmin;
+    private MediaCRUD mediaCRUD;
+    private UploaderCRUD uploaderCRUD;
 
     @BeforeEach
     void setUp() {
-        interactiveVideoCRUD = Mockito.mock(InteractiveVideoCRUD.class);
-        licensedAudioVideoCRUD = Mockito.mock(LicensedAudioVideoCRUD.class);
+        mediaCRUD = Mockito.mock(MediaCRUD.class);
         uploaderCRUD = Mockito.mock(UploaderCRUD.class);
-        mediaAdmin = new MediaLibraryAdmin(uploaderCRUD, interactiveVideoCRUD, licensedAudioVideoCRUD);
+        mediaAdmin = new MediaLibraryAdmin(uploaderCRUD, mediaCRUD);
     }
 
     @Test
@@ -48,10 +47,6 @@ class MediaLibraryAdminTest {
 
     @Test
     void upload() {
-        // Verify only InteractiveVideo and LicensedAudioVideo supported
-        LicensedVideo licensedVideo = mock(LicensedVideo.class);
-        assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedVideo));
-
         String uploaderName = "TestUploader";
         Uploader uploader = Mockito.mock(Uploader.class);
         when(uploader.getName()).thenReturn(uploaderName);
@@ -63,17 +58,22 @@ class MediaLibraryAdminTest {
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 
         // Test insufficient storage
-        when(licensedAudioVideo.getSize()).thenReturn(MediaLibraryAdmin.availableStorage.add(new BigDecimal(1)));
+        BigDecimal storage = MediaStorage.sharedInstance.getAvailableMediaStorageInMB();
+        when(licensedAudioVideo.getSize()).thenReturn(storage.add(new BigDecimal(1)));
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 
         // Test upload
         when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(4 * 1024));
         when(uploaderCRUD.get(uploaderName)).thenReturn(Optional.of(uploader));
-        mediaAdmin.upload(licensedAudioVideo);
+        try {
+            mediaAdmin.upload(licensedAudioVideo);
+        } catch (InsufficientStorageException e) {
+            fail(e.getMessage());
+        }
         // verify set address and upload date
         verify(licensedAudioVideo).setAddress(any());
         verify(licensedAudioVideo).setUploadDate(any());
-        verify(licensedAudioVideoCRUD).create(licensedAudioVideo);
+        verify(mediaCRUD).create(licensedAudioVideo);
     }
 
     @Test
@@ -91,7 +91,7 @@ class MediaLibraryAdminTest {
             when(uploader.getName()).thenReturn(name);
             uploaders.add(uploader);
             if (i == 0) {
-                // fitst uploader has no videos
+                // set first uploader videos count to zero
                 expectedCounts.put(name, 0);
                 continue;
             }
@@ -108,11 +108,16 @@ class MediaLibraryAdminTest {
             }
         }
         when(uploaderCRUD.getAll()).thenReturn(uploaders);
-        when(interactiveVideoCRUD.getAll()).thenReturn(interactiveVideos);
-        when(licensedAudioVideoCRUD.getAll()).thenReturn(audioVideos);
+        List<MediaContent> allMedia = new LinkedList<>();
+        allMedia.addAll(interactiveVideos);
+        allMedia.addAll(audioVideos);
+        when(mediaCRUD.getAll()).thenReturn(allMedia);
 
         // Test get uploader and counts
         Map<Uploader, Integer> uploaderCounts = mediaAdmin.listProducersAndUploadsCount();
+        verify(uploaderCRUD).getAll();
+        verify(mediaCRUD).getAll();
+
         Set<Uploader> resultUploaders = uploaderCounts.keySet();
         // check result has all the producers
         assertEquals(resultUploaders.size(), producersCount);
@@ -126,21 +131,24 @@ class MediaLibraryAdminTest {
     void listMedia() {
         List<InteractiveVideo> interactiveVideos = new ArrayList<>();
         interactiveVideos.add(mock(InteractiveVideo.class));
-        when(interactiveVideoCRUD.getAll()).thenReturn(interactiveVideos);
 
         List<LicensedAudioVideo> audioVideos = new ArrayList<>();
         audioVideos.add(mock(LicensedAudioVideo.class));
         audioVideos.add(mock(LicensedAudioVideo.class));
-        when(licensedAudioVideoCRUD.getAll()).thenReturn(audioVideos);
+
+        List<MediaContent> allMedia = new LinkedList<>();
+        allMedia.addAll(interactiveVideos);
+        allMedia.addAll(audioVideos);
+        when(mediaCRUD.getAll()).thenReturn(allMedia);
 
         // Test result size
         assertEquals(mediaAdmin.listMedia(InteractiveVideo.class).size(), interactiveVideos.size());
         verify(interactiveVideos.get(0)).setAccessCount(1);
-        verify(interactiveVideoCRUD).update(interactiveVideos.get(0));
+        verify(mediaCRUD).update(interactiveVideos.get(0));
 
         assertEquals(mediaAdmin.listMedia(LicensedAudioVideo.class).size(), audioVideos.size());
         verify(audioVideos.get(0)).setAccessCount(1);
-        verify(licensedAudioVideoCRUD).update(audioVideos.get(0));
+        verify(mediaCRUD).update(audioVideos.get(0));
 
         assertEquals(mediaAdmin.listMedia(null).size(), interactiveVideos.size() + audioVideos.size());
 
@@ -159,6 +167,9 @@ class MediaLibraryAdminTest {
     @Test
     void deleteUploaderByName() {
         String uploaderName = "DeletedUploader";
+        Uploader uploader = Mockito.mock(Uploader.class);
+        when(uploaderCRUD.get(uploaderName)).thenReturn(Optional.of(uploader));
+        mediaAdmin.createUploader(uploader);
         mediaAdmin.deleteUploaderByName(uploaderName);
         verify(uploaderCRUD).deleteById(uploaderName);
     }
@@ -168,27 +179,49 @@ class MediaLibraryAdminTest {
         String uploaderName = "DeletedUploader";
         Uploader uploader = Mockito.mock(Uploader.class);
         when(uploader.getName()).thenReturn(uploaderName);
+        when(uploaderCRUD.get(uploaderName)).thenReturn(Optional.of(uploader));
 
         mediaAdmin.deleteUploader(uploader);
-        verify(uploaderCRUD).delete(uploader);
+        verify(uploaderCRUD).deleteById(uploader.getName());
     }
 
     @Test
     void deleteMedia() {
+        String interactiveVideoAddress = "interactiveVideoAddress";
         InteractiveVideo interactiveVideo = mock(InteractiveVideo.class);
+        when(interactiveVideo.getAddress()).thenReturn(interactiveVideoAddress);
+        when(interactiveVideo.getSize()).thenReturn(new BigDecimal(10));
+        when(mediaCRUD.get(interactiveVideoAddress)).thenReturn(Optional.of(interactiveVideo));
         mediaAdmin.deleteMedia(interactiveVideo);
-        verify(interactiveVideoCRUD).delete(interactiveVideo);
+        verify(mediaCRUD).deleteById(interactiveVideo.getAddress());
 
+        String licensedAudioVideoAddress = "licensedAudioVideoAddress";
         LicensedAudioVideo licensedAudioVideo = mock(LicensedAudioVideo.class);
+        when(licensedAudioVideo.getAddress()).thenReturn(licensedAudioVideoAddress);
+        when(mediaCRUD.get(licensedAudioVideoAddress)).thenReturn(Optional.of(licensedAudioVideo));
+        when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(10));
         mediaAdmin.deleteMedia(licensedAudioVideo);
-        verify(licensedAudioVideoCRUD).delete(licensedAudioVideo);
+        verify(mediaCRUD).deleteById(licensedAudioVideo.getAddress());
     }
 
     @Test
     void deleteMediaByAddress() {
         String deletedAddress = "test address";
+
+        Uploader uploader = Mockito.mock(Uploader.class);
+        when(uploaderCRUD.get(any())).thenReturn(Optional.of(uploader));
+        LicensedAudioVideo licensedAudioVideo = mock(LicensedAudioVideo.class);
+        when(mediaCRUD.get(deletedAddress)).thenReturn(Optional.of(licensedAudioVideo));
+        when(licensedAudioVideo.getSize()).thenReturn(new BigDecimal(10));
+        when(licensedAudioVideo.getAddress()).thenReturn(deletedAddress);
+        when(licensedAudioVideo.getUploader()).thenReturn(uploader);
+        try {
+            mediaAdmin.upload(licensedAudioVideo);
+        } catch (InsufficientStorageException e) {
+            fail(e.getMessage());
+        }
+
         mediaAdmin.deleteMediaByAddress(deletedAddress);
-        verify(interactiveVideoCRUD).deleteById(deletedAddress);
-        verify(licensedAudioVideoCRUD).deleteById(deletedAddress);
+        verify(mediaCRUD).deleteById(deletedAddress);
     }
 }

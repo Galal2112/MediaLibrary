@@ -1,48 +1,90 @@
 package crud;
 
 import mediaDB.MediaContent;
-import mediaDB.Uploadable;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class MediaCRUD<T extends MediaContent & Uploadable> implements CRUD<T> {
+public class MediaCRUD implements CRUD<MediaContent> {
+    private final Lock lock = new ReentrantLock();
+    private static final LinkedList<MediaContent> mediaList = new LinkedList<>();
 
-    private MediaDatabase database = MediaDatabase.current;
-    private Class<T> type;
+    @Override
+    public List<MediaContent> getAll() {
+        this.lock.lock();
 
-    public MediaCRUD(Class<T> type) {
-        this.type = type;
+        try {
+            LinkedList<MediaContent> resultList = new LinkedList<>();
+            mediaList.forEach((media) -> resultList.add((MediaContent) media.copy()));
+            return resultList;
+
+        } finally {
+            this.lock.unlock();
+        }
     }
 
     @Override
-    public List<T> getAll() {
-        return new LinkedList<>(database.getAll(type));
+    public void create(MediaContent media) {
+
+        this.lock.lock();
+
+        try {
+            mediaList.add((MediaContent) media.copy());
+        } finally {
+            this.lock.unlock();
+        }
     }
 
     @Override
-    public void create(T media) {
-        database.insert(media);
+    public void update(MediaContent media) {
+        this.lock.lock();
+
+        try {
+            Iterator<MediaContent> it = mediaList.iterator();
+            int index = 0;
+            while (it.hasNext()) {
+                if (it.next().getAddress().equals(media.getAddress())) {
+                    mediaList.set(index, (MediaContent) media.copy());
+                    break;
+                }
+                index++;
+            }
+        } finally {
+            this.lock.unlock();
+        }
+
     }
 
     @Override
-    public void update(T media) {
-       database.update(media);
+    public Optional<MediaContent> get(String address) {
+        this.lock.lock();
+
+        try {
+            Optional<MediaContent> mediaContentOptional = mediaList.stream().filter(v -> v.getAddress().equals(address)).findFirst();
+            return mediaContentOptional.map(mediaContent -> (MediaContent) mediaContent.copy());
+        } finally {
+            this.lock.unlock();
+        }
     }
 
     @Override
-    public Optional<T> get(String address) {
-        return getAll().stream().filter(v -> v.getAddress().equals(address)).findFirst();
+    public void delete(MediaContent media) {
+        deleteById(media.getAddress());
     }
 
-    @Override
-    public void delete(T media) {
-        getAll().removeIf( v -> v.getAddress().equals(media.getAddress()));
-    }
     @Override
     public void deleteById(String address) {
-        getAll().removeIf(v -> v.getAddress().equals(address));
-    }
+        this.lock.lock();
 
+        try {
+            mediaList.removeIf(v -> v.getAddress().equals(address));
+
+        } finally {
+            this.lock.unlock();
+        }
+    }
 }
