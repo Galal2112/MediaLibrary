@@ -25,28 +25,29 @@ public class Simultation3DeletionThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            List<?> mediaContentList = mediaAdmin.listMedia(null);
-            if (mediaContentList.size() == 0) {
-                continue;
-            }
-            int deletionCount = rand.nextInt(mediaContentList.size() + 1);
-            if (deletionCount == 0) {
-                continue;
-            }
-            System.out.println(Thread.currentThread().getName() + " will delete " + deletionCount + " media files");
-            // sort descending based on access count
-            Collections.sort(mediaContentList, Comparator.comparingLong(video -> ((MediaContent) video).getAccessCount()));
-            for (int i = 0; i < deletionCount; i++) {
-                MediaContent media = (MediaContent) mediaContentList.get(i);
-                if (media instanceof Video) {
-                    mediaAdmin.deleteMedia((Video) media);
-                } else if (media instanceof Audio) {
-                    mediaAdmin.deleteMedia((Audio) media);
+            synchronized (mediaStorage) {
+                List<?> mediaContentList = mediaAdmin.listMedia(null);
+                if (mediaContentList.size() == 0) {
+                    continue;
+                }
+                int deletionCount = rand.nextInt(mediaContentList.size() + 1);
+                if (deletionCount == 0) {
+                    continue;
+                }
+                System.out.println(Thread.currentThread().getName() + " will delete " + deletionCount + " media files");
+                // sort descending based on access count
+                Collections.sort(mediaContentList, Comparator.comparingLong(video -> ((MediaContent) video).getAccessCount()));
+                for (int i = 0; i < deletionCount; i++) {
+                    MediaContent media = (MediaContent) mediaContentList.get(i);
+                    if (media instanceof Video) {
+                        mediaAdmin.deleteMedia((Video) media);
+                    } else if (media instanceof Audio) {
+                        mediaAdmin.deleteMedia((Audio) media);
+                    }
+
+                    System.out.println(Thread.currentThread().getName() + " deleted media of size: " + media.getSize());
                 }
 
-                System.out.println(Thread.currentThread().getName() + " deleted media of size: " + media.getSize());
-            }
-            synchronized (mediaStorage) {
                 mediaStorage.notifyAll();
                 System.out.println(currentThread().getName() + " notify all threads after the deletion of media");
             }

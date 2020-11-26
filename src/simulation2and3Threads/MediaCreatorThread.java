@@ -22,24 +22,25 @@ public class MediaCreatorThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            try {
-                Video randomVideo = RandomGenerator.getRandomMedia();
+            synchronized (mediaStorage) {
                 try {
-                    createUploaderIfNotExist(randomVideo.getUploader());
-                    mediaAdmin.upload(randomVideo);
-                    printMedia(randomVideo);
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                } catch (InsufficientStorageException e) {
-                    // No space available
-                    System.out.println(getName() + " did receive insufficient storage message");
-                    synchronized (mediaStorage) {
+                    Video randomVideo = RandomGenerator.getRandomMedia();
+                    try {
+                        createUploaderIfNotExist(randomVideo.getUploader());
+                        mediaAdmin.upload(randomVideo);
+                        printMedia(randomVideo);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (InsufficientStorageException e) {
+                        // No space available
+                        System.out.println(getName() + " did receive insufficient storage message");
+
                         mediaStorage.wait();
                         System.out.println(getName() + " moved to waiting state \"Insufficient Storage\"");
                     }
+                } catch (InterruptedException ie) {
+                    System.out.println(Thread.currentThread().getName() + " was interrupted");
                 }
-            } catch (InterruptedException ie) {
-                System.out.println(Thread.currentThread().getName() + " was interrupted");
             }
         }
     }
