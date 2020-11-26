@@ -21,6 +21,9 @@
 19. 19.Simulation 3
 20. 20.alle Tests sind deterministisch
 
+    //can i create interface extends MediaContent & Uploadable and use it instead??
+    //delete uploader = delete uploader + his videos
+   //     //  Lock statt Monitor .... what is Monitor??
 
 
 * For simplicity I am using LinkedList to simulate database table.
