@@ -5,10 +5,7 @@ import events.ExitEventListener;
 import events.InputEvent;
 import events.InputEventHandler;
 import events.InputEventListener;
-import mediaDB.InteractiveVideo;
-import mediaDB.LicensedAudioVideo;
-import mediaDB.Tag;
-import mediaDB.Uploader;
+import mediaDB.*;
 import model.InteractiveVideoImpl;
 import model.LicensedAudioVideoImpl;
 import model.Producer;
@@ -204,16 +201,16 @@ public class MediaLibraryController implements MediaController {
             long[] accessCount = new long[mediaList.size()];
             for (int i = 0; i < mediaList.size(); i++) {
                 Object media = mediaList.get(i);
-                if (media instanceof InteractiveVideo) {
-                    InteractiveVideo interactiveVideo = (InteractiveVideo) media;
-                    retrievalAddress[i] = interactiveVideo.getAddress();
-                    uploadDate[i] = interactiveVideo.getUploadDate();
-                    accessCount[i] = interactiveVideo.getAccessCount();
-                } else if (media instanceof LicensedAudioVideo) {
-                    LicensedAudioVideo licensedAudioVideo = (LicensedAudioVideo) media;
-                    retrievalAddress[i] = licensedAudioVideo.getAddress();
-                    uploadDate[i] = licensedAudioVideo.getUploadDate();
-                    accessCount[i] = licensedAudioVideo.getAccessCount();
+                if (media instanceof Audio) {
+                    Audio audio = (Audio) media;
+                    retrievalAddress[i] = audio.getAddress();
+                    uploadDate[i] = audio.getUploadDate();
+                    accessCount[i] = audio.getAccessCount();
+                } else if (media instanceof Video) {
+                    Video video = (Video) media;
+                    retrievalAddress[i] = video.getAddress();
+                    uploadDate[i] = video.getUploadDate();
+                    accessCount[i] = video.getAccessCount();
                 }
             }
             mediaView.displayMedia(retrievalAddress, uploadDate, accessCount);

@@ -31,5 +31,6 @@
     <orderEntry type="library" name="junit-jupiter-engine-5.7.0" level="project" />
     <orderEntry type="library" name="junit-jupiter-migrationsupport-5.7.0" level="project" />
     <orderEntry type="library" name="junit-jupiter-params-5.7.0" level="project" />
+    <orderEntry type="library" name="JavaFx" level="project" />
   </component>
 </module>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+
+
+<HBox fx:id="hbox" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="600.0" spacing="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="producer" />
+      <Label fx:id="address" />
+      <Label fx:id="date" />
+      <Label fx:id="accessCount" />
+   </children>
+   <opaqueInsets>
+      <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+   </opaqueInsets>
+   <padding>
+      <Insets left="16.0" right="16.0" />
+   </padding>
+</HBox>
