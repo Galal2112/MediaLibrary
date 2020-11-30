@@ -23,6 +23,7 @@ public final class MediaItemWithProperties {
             this.dateProperty.set("undefined");
         }
         this.addressProperty.set(media.getAddress());
+        this.accessCountProperty.set(media.getAccessCount());
     }
 
     public StringProperty producerProperty() {return this.producerProperty;}
