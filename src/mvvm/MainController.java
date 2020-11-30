@@ -6,10 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import mediaDB.InteractiveVideo;
 import mediaDB.LicensedAudioVideo;
@@ -39,6 +36,8 @@ public class MainController implements Initializable {
     @FXML private TableColumn<ProducerAndUploadsCount, String> allProducersColumn;
     @FXML private TableColumn<ProducerAndUploadsCount, String> uploadsCountColumn;
     @FXML private ComboBox<String> typebox;
+    @FXML private Button deleteMediaButton;
+    @FXML private Button deleteUploaderButton;
 
     private ObservableList<MediaItemWithProperties> mediaObservableList;
     private ObservableList<ProducerAndUploadsCount> producersObservableList;
@@ -64,12 +63,14 @@ public class MainController implements Initializable {
         this.accessCountColumn.setCellValueFactory(cellData -> cellData.getValue().accessCountProperty().asObject());
         this.mediaTableView.setItems(mediaObservableList);
         this.mediaTableView.setRowFactory(tableview -> new MediaListCell());
+        this.mediaTableView.getSelectionModel().selectedItemProperty().addListener((component, oldValue, newValue) -> deleteMediaButton.setVisible(newValue != null));
 
         this.allProducersColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.uploadsCountColumn.setCellValueFactory(new PropertyValueFactory<>("uploadsCount"));
         this.producerTableView.setItems(producersObservableList);
+        this.producerTableView.getSelectionModel().selectedItemProperty().addListener((component, oldValue, newValue) -> deleteUploaderButton.setVisible(newValue != null));
 
-        typebox.valueProperty().addListener((composant, oldValue, newValue) -> {
+        typebox.valueProperty().addListener((component, oldValue, newValue) -> {
             selectedType = newValue;
             refreshMediaList();
         } );
@@ -78,6 +79,30 @@ public class MainController implements Initializable {
     public synchronized void uploadMedia(ActionEvent actionEvent) {
         String creationCommand = createMediaTextField.getText();
         handleCreateEvent(creationCommand);
+    }
+
+    public synchronized void deleteUploader() {
+        ProducerAndUploadsCount producerAndUploadsCount = producerTableView.getSelectionModel().selectedItemProperty().getValue();
+        if (producerAndUploadsCount != null) {
+            try {
+                mediaAdmin.deleteUploaderByName(producerAndUploadsCount.getName());
+                refreshMediaList();
+            } catch (IllegalArgumentException e) {
+                displayError(e.getMessage());
+            }
+        }
+    }
+
+    public synchronized void deleteMedia() {
+        MediaItemWithProperties mediaItemWithProperties = mediaTableView.getSelectionModel().selectedItemProperty().getValue();
+        if (mediaItemWithProperties != null) {
+            try {
+                mediaAdmin.deleteMediaByAddress(mediaItemWithProperties.getAddress());
+                refreshMediaList();
+            } catch (IllegalArgumentException e) {
+                displayError(e.getMessage());
+            }
+        }
     }
 
     private void handleCreateEvent(String inputText) {

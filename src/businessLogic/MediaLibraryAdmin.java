@@ -1,7 +1,10 @@
 package businessLogic;
 
 import crud.CRUD;
-import mediaDB.*;
+import mediaDB.MediaContent;
+import mediaDB.Tag;
+import mediaDB.Uploadable;
+import mediaDB.Uploader;
 import storage.InsufficientStorageException;
 import storage.MediaStorage;
 
@@ -106,6 +109,10 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public synchronized void deleteUploaderByName(String name) throws IllegalArgumentException {
         if (uploaderCRUD.get(name).isPresent()) {
             uploaderCRUD.deleteById(name);
+            List<MediaContent> uploaderMediaList = mediaContentCRUD.getAll().stream().filter(m -> ((Uploadable) m).getUploader().getName().equals(name)).collect(Collectors.toList());
+            for (MediaContent mediaContent : uploaderMediaList) {
+                mediaContentCRUD.deleteById(mediaContent.getAddress());
+            }
             if (businessLogicObserver != null) businessLogicObserver.didDeleteUploaderWithName(name);
         } else {
             throw new IllegalArgumentException("Uploader name doesn't exist");

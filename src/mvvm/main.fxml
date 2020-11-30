@@ -55,8 +55,8 @@
             </HBox>
             <HBox prefHeight="37.0" prefWidth="902.0" spacing="20.0">
                <children>
-                  <TextField prefHeight="26.0" prefWidth="779.0" promptText="Please Enter Producer or media Adress to Delete" />
-                  <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="80.0" text="Delete" />
+                   <Button fx:id="deleteUploaderButton" onAction="#deleteUploader" visible="false" mnemonicParsing="false" prefHeight="26.0" prefWidth="200" text="Delete selected Uploader" />
+                   <Button fx:id="deleteMediaButton" onAction="#deleteMedia" visible="false" mnemonicParsing="false" prefHeight="26.0" prefWidth="200" text="Delete selected Media" />
                </children>
             </HBox>
             <HBox prefHeight="29.0" prefWidth="967.0" spacing="20.0">
