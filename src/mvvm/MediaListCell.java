@@ -15,7 +15,9 @@ import java.util.List;
 
 public class MediaListCell extends TableRow<MediaItemWithProperties> {
 
-    public MediaListCell() {
+    private OnMediaDragEndedListener onMediaDragEndedListener;
+    public MediaListCell(OnMediaDragEndedListener onMediaDragEndedListener) {
+        this.onMediaDragEndedListener = onMediaDragEndedListener;
         TableRow<MediaItemWithProperties> thisCell = this;
 
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -80,6 +82,7 @@ public class MediaListCell extends TableRow<MediaItemWithProperties> {
                 String tempAddress = previousItem.getAddress();
                 previousItem.setAddress(newItem.getAddress());
                 newItem.setAddress(tempAddress);
+                if (onMediaDragEndedListener != null) onMediaDragEndedListener.onDrageEnded(previousItem, newItem);
                 List<MediaItemWithProperties> itemscopy = new ArrayList<>(getTableView().getItems());
                 getTableView().getItems().setAll(itemscopy);
 

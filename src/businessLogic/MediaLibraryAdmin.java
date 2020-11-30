@@ -169,8 +169,14 @@ public class MediaLibraryAdmin implements MediaAdmin {
         return media;
     }
 
+    @Override
+    public <T extends MediaContent & Uploadable> void update(T media) {
+        mediaContentCRUD.update(media);
+    }
+
+    private static int address = 0;
     private String getAddress(Object o) {
-        return o.getClass().getSimpleName() + '@' + Integer.toHexString(o.hashCode());
+        return address++ + "@" + o.getClass().getSimpleName();
     }
 
 

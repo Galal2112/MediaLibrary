@@ -1,6 +1,7 @@
 package mvvm;
 
 import businessLogic.MediaAdmin;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -8,9 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import mediaDB.InteractiveVideo;
-import mediaDB.LicensedAudioVideo;
-import mediaDB.Tag;
+import mediaDB.*;
 import model.InteractiveVideoImpl;
 import model.LicensedAudioVideoImpl;
 import model.Producer;
@@ -47,6 +46,8 @@ public class MainController implements Initializable {
     private TableColumn<MediaItemWithProperties, String> mediaSortColumn = null;
     private TableColumn.SortType mediaSortType = null;
     private String selectedType;
+    private SimpleBooleanProperty isDeleteMediaVisible = new SimpleBooleanProperty();
+    private SimpleBooleanProperty isDeleteUploaderVisible = new SimpleBooleanProperty();
 
     public MainController()  {
         mediaAdmin = MediaAdminFactory.getMediaAdminInstance();
@@ -62,18 +63,32 @@ public class MainController implements Initializable {
         this.dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
         this.accessCountColumn.setCellValueFactory(cellData -> cellData.getValue().accessCountProperty().asObject());
         this.mediaTableView.setItems(mediaObservableList);
-        this.mediaTableView.setRowFactory(tableview -> new MediaListCell());
-        this.mediaTableView.getSelectionModel().selectedItemProperty().addListener((component, oldValue, newValue) -> deleteMediaButton.setVisible(newValue != null));
+        this.mediaTableView.setRowFactory(tableview -> new MediaListCell(this::onDrageEnded));
+        this.mediaTableView.getSelectionModel().selectedItemProperty().addListener((component, oldValue, newValue) -> isDeleteMediaVisible.set(newValue != null));
 
         this.allProducersColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.uploadsCountColumn.setCellValueFactory(new PropertyValueFactory<>("uploadsCount"));
         this.producerTableView.setItems(producersObservableList);
-        this.producerTableView.getSelectionModel().selectedItemProperty().addListener((component, oldValue, newValue) -> deleteUploaderButton.setVisible(newValue != null));
+        this.producerTableView.getSelectionModel().selectedItemProperty().addListener((component, oldValue, newValue) -> isDeleteUploaderVisible.set(newValue != null));
+
+        this.deleteMediaButton.visibleProperty().bind(isDeleteMediaVisible);
+        this.deleteUploaderButton.visibleProperty().bind(isDeleteUploaderVisible);
 
         typebox.valueProperty().addListener((component, oldValue, newValue) -> {
             selectedType = newValue;
             refreshMediaList();
         } );
+    }
+
+    private void onDrageEnded(MediaItemWithProperties previousMedia, MediaItemWithProperties newMedia) {
+        MediaContent previousMediaContent = (MediaContent) previousMedia.getMedia();
+        MediaContent newMediaContent = (MediaContent) newMedia.getMedia();
+        String prevAddress = previousMediaContent.getAddress();
+        String newAddress = newMediaContent.getAddress();
+        previousMediaContent.setAddress(newAddress);
+        newMediaContent.setAddress(prevAddress);
+        updateMediaInDB(previousMediaContent);
+        updateMediaInDB(newMediaContent);
     }
 
     public synchronized void uploadMedia(ActionEvent actionEvent) {
@@ -222,6 +237,16 @@ public class MainController implements Initializable {
             tableView.getSortOrder().add(column);
             column.setSortType(sortType);
             column.setSortable(true); // This performs a sort
+        }
+    }
+
+    private void updateMediaInDB(MediaContent mediaContent) {
+        if (mediaContent instanceof Audio) {
+            Audio audio = (Audio) mediaContent;
+            mediaAdmin.update(audio);
+        } else if (mediaContent instanceof Video) {
+            Video video = (Video) mediaContent;
+            mediaAdmin.update(video);
         }
     }
 

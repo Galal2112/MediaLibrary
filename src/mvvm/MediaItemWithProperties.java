@@ -14,8 +14,10 @@ public final class MediaItemWithProperties {
     private final StringProperty addressProperty = new SimpleStringProperty();
     private final StringProperty dateProperty = new SimpleStringProperty();
     private final SimpleLongProperty accessCountProperty = new SimpleLongProperty();
+    private Object media;
 
     public MediaItemWithProperties(Object media) {
+        this.media = media;
         if (media instanceof Audio) {
             bindData((Audio) media);
         } else if (media instanceof Video) {
@@ -26,6 +28,10 @@ public final class MediaItemWithProperties {
             this.addressProperty.set("undefined");
             this.accessCountProperty.set(0);
         }
+    }
+
+    public Object getMedia() {
+        return media;
     }
 
     public StringProperty producerProperty() {return this.producerProperty;}

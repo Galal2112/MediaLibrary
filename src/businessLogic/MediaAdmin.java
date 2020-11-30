@@ -33,4 +33,6 @@ public interface MediaAdmin {
     Optional<Uploader> getUploader(String name);
 
    Optional<MediaContent> retrieveMediaByAddress(String address);
+
+    <T extends MediaContent & Uploadable> void update(T media);
 }
