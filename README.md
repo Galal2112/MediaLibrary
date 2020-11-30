@@ -58,3 +58,4 @@ Storage 25 GB
 * https://www.techyourchance.com/thread-safe-observer-design-pattern-in-java
 * https://stackoverflow.com/questions/20412445/how-to-create-a-reorder-able-tableview-in-javafx
 * https://stackoverflow.com/questions/37440987/javafx-drag-view-for-transparent-png-image
+* https://stackoverflow.com/questions/11096353/javafx-re-sorting-a-column-in-a-tableview

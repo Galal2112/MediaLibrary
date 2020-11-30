@@ -9,6 +9,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import mediaDB.InteractiveVideo;
 import mediaDB.LicensedAudioVideo;
 import mediaDB.Tag;
@@ -27,21 +28,29 @@ import java.util.stream.Collectors;
 
 public class MainController implements Initializable {
 
-    @FXML private TableView<MediaItemWithProperties> tableview;
+    @FXML private TableView<ProducerAndUploadsCount> producerTableView;
+    @FXML private TableView<MediaItemWithProperties> mediaTableView;
     @FXML private TableColumn<MediaItemWithProperties, String> producerColumn;
     @FXML private TableColumn<MediaItemWithProperties, String> addressColumn;
     @FXML private TableColumn<MediaItemWithProperties, String> dateColumn;
     @FXML private TableColumn<MediaItemWithProperties, Long> accessCountColumn;
     @FXML private TextField createMediaTextField;
+    @FXML private TableColumn<ProducerAndUploadsCount, String> allProducersColumn;
+    @FXML private TableColumn<ProducerAndUploadsCount, String> uploadsCountColumn;
 
     private ObservableList<MediaItemWithProperties> mediaObservableList;
+    private ObservableList<ProducerAndUploadsCount> producersObservableList;
     private final MediaAdmin mediaAdmin;
+    private TableColumn<ProducerAndUploadsCount, String> producersSortColumn = null;
+    private TableColumn.SortType producerSortType = null;
+    private TableColumn<MediaItemWithProperties, String> mediaSortColumn = null;
+    private TableColumn.SortType mediaSortType = null;
 
     public MainController()  {
         mediaAdmin = MediaAdminFactory.getMediaAdminInstance();
-
         mediaObservableList = FXCollections.observableArrayList();
-        mediaObservableList.addAll(mediaAdmin.listMedia(null).stream().map(MediaItemWithProperties::new).collect(Collectors.toList()));
+        producersObservableList = FXCollections.observableArrayList();
+        refreshMediaList();
     }
 
     @Override
@@ -50,8 +59,12 @@ public class MainController implements Initializable {
         this.addressColumn.setCellValueFactory(cellData -> cellData.getValue().addressProperty());
         this.dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
         this.accessCountColumn.setCellValueFactory(cellData -> cellData.getValue().accessCountProperty().asObject());
-        this.tableview.setItems(mediaObservableList);
-        this.tableview.setRowFactory(tableview -> new MediaListCell());
+        this.mediaTableView.setItems(mediaObservableList);
+        this.mediaTableView.setRowFactory(tableview -> new MediaListCell());
+
+        this.allProducersColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        this.uploadsCountColumn.setCellValueFactory(new PropertyValueFactory<>("uploadsCount"));
+        this.producerTableView.setItems(producersObservableList);
     }
 
     public synchronized void uploadMedia(ActionEvent actionEvent) {
@@ -93,7 +106,7 @@ public class MainController implements Initializable {
                         videoEncoding, bitrate, duration, producer);
                 interactiveVideo.setTags(tags);
                 mediaAdmin.upload(interactiveVideo);
-                mediaObservableList.add(new MediaItemWithProperties(interactiveVideo));
+                onVideoUploaded(interactiveVideo.getAddress());
             } else if (isLicensedAudioVideo(mediaType)) {
                 String audioEncoding = parsedString[8];
                 int samplingRate = Integer.parseInt(parsedString[9]);
@@ -102,7 +115,7 @@ public class MainController implements Initializable {
                         audioEncoding, holder, bitrate, duration, producer);
                 licensedAudioVideo.setTags(tags);
                 mediaAdmin.upload(licensedAudioVideo);
-                mediaObservableList.add(new MediaItemWithProperties(licensedAudioVideo));
+                onVideoUploaded(licensedAudioVideo.getAddress());
             } else {
                 displayError("Unsupported Media type");
             }
@@ -125,13 +138,45 @@ public class MainController implements Initializable {
         Producer producer = new Producer(text);
         try {
             mediaAdmin.createUploader(producer);
+            refreshMediaList();
         } catch (IllegalArgumentException e) {
             displayError(e.getMessage());
         }
     }
 
     private void displayError(String error) {
+        // TODO: Display error
+    }
 
+    private void onVideoUploaded(String address) {
+        // TODO: Handle success
+        refreshMediaList();
+    }
+
+    private void refreshMediaList() {
+        if (mediaTableView != null && mediaTableView.getSortOrder().size() > 0) {
+            mediaSortColumn = (TableColumn<MediaItemWithProperties, String>) mediaTableView.getSortOrder().get(0);
+            mediaSortType = mediaSortColumn.getSortType();
+        }
+        mediaObservableList.clear();
+        mediaObservableList.addAll(mediaAdmin.listMedia(null).stream().map(MediaItemWithProperties::new).collect(Collectors.toList()));
+        if (mediaSortColumn != null) {
+            mediaTableView.getSortOrder().add(mediaSortColumn);
+            mediaSortColumn.setSortType(mediaSortType);
+            mediaSortColumn.setSortable(true); // This performs a sort
+        }
+
+        if (producerTableView != null && producerTableView.getSortOrder().size() > 0) {
+            producersSortColumn = (TableColumn<ProducerAndUploadsCount, String>) producerTableView.getSortOrder().get(0);
+            producerSortType = producersSortColumn.getSortType();
+        }
+        producersObservableList.clear();
+        producersObservableList.addAll(mediaAdmin.listProducersAndUploadsCount().entrySet().stream().map(e -> new ProducerAndUploadsCount(e.getKey().getName(), e.getValue())).collect(Collectors.toList()));
+        if (producersSortColumn != null) {
+            producerTableView.getSortOrder().add(producersSortColumn);
+            producersSortColumn.setSortType(producerSortType);
+            producersSortColumn.setSortable(true); // This performs a sort
+        }
     }
 
 }
