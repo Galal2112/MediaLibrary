@@ -46,5 +46,6 @@ public class MainController implements Initializable {
         this.dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
         this.accessCountColumn.setCellValueFactory(cellData -> cellData.getValue().accessCountProperty().asObject());
         this.tableview.setItems(mediaObservableList);
+        this.tableview.setRowFactory(tableview -> new MediaListCell());
     }
 }

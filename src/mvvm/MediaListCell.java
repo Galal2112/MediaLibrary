@@ -1,39 +1,22 @@
 package mvvm;
 
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.TableRow;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.HBox;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MediaListCell extends ListCell<MediaItemWithProperties> {
-
-    private FXMLLoader mLLoader;
-    @FXML
-    private Label producer;
-    @FXML
-    private Label address;
-    @FXML
-    private Label date;
-    @FXML
-    private Label accessCount;
-    @FXML
-    private HBox hbox;
+public class MediaListCell extends TableRow<MediaItemWithProperties> {
 
     public MediaListCell() {
-        ListCell thisCell = this;
+        TableRow thisCell = this;
 
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         setAlignment(Pos.CENTER);
@@ -86,7 +69,7 @@ public class MediaListCell extends ListCell<MediaItemWithProperties> {
             boolean success = false;
 
             if (db.hasString()) {
-                ObservableList<MediaItemWithProperties> items = getListView().getItems();
+                ObservableList<MediaItemWithProperties> items = getTableView().getItems();
                 MediaItemWithProperties previousItem = items.stream().filter(item -> item.getAddress()
                         .equals(db.getString())).findFirst().get();
                 MediaItemWithProperties newItem = getItem();
@@ -97,8 +80,8 @@ public class MediaListCell extends ListCell<MediaItemWithProperties> {
                 String tempAddress = previousItem.getAddress();
                 previousItem.setAddress(newItem.getAddress());
                 newItem.setAddress(tempAddress);
-                List<MediaItemWithProperties> itemscopy = new ArrayList<>(getListView().getItems());
-                getListView().getItems().setAll(itemscopy);
+                List<MediaItemWithProperties> itemscopy = new ArrayList<>(getTableView().getItems());
+                getTableView().getItems().setAll(itemscopy);
 
                 success = true;
             }
@@ -108,36 +91,5 @@ public class MediaListCell extends ListCell<MediaItemWithProperties> {
         });
 
         setOnDragDone(DragEvent::consume);
-    }
-
-    @Override
-    protected void updateItem(MediaItemWithProperties item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if(empty || item == null) {
-            setText(null);
-            setGraphic(null);
-            return;
-        }
-
-        if (mLLoader == null) {
-            mLLoader = new FXMLLoader(getClass().getResource("media_cell.fxml"));
-            mLLoader.setController(this);
-
-            try {
-                mLLoader.load();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        producer.textProperty().bind(item.producerProperty());
-        date.textProperty().bind(item.dateProperty());
-        accessCount.textProperty().bind(item.accessCountProperty().asString());
-        address.textProperty().bind(item.addressProperty());
-
-        setText(null);
-        setGraphic(hbox);
     }
 }
