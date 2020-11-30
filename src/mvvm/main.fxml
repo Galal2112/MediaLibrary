@@ -11,7 +11,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="652.0" prefWidth="914.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mvvm.MainController">
    <children>
-      <Button layoutX="712.0" layoutY="450.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="80.0" text="Create" />
+      <Button  onAction="#uploadMedia" layoutX="712.0" layoutY="450.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="80.0" text="Create" />
       <TableView fx:id="tableview" editable="true" layoutY="1.0" prefHeight="363.0" prefWidth="787.0">
         <columns>
           <TableColumn fx:id="producerColumn" prefWidth="181.0" text="Produzent   ↑↓" />
@@ -26,7 +26,7 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <TextField layoutX="13.0" layoutY="408.0" prefHeight="26.0" prefWidth="779.0" promptText="Please Enter Media to create" />
+      <TextField fx:id="createMediaTextField" layoutX="13.0" layoutY="408.0" prefHeight="26.0" prefWidth="779.0" promptText="Please Enter Media to create" />
       <TextField layoutX="14.0" layoutY="491.0" prefHeight="26.0" prefWidth="779.0" promptText="Please Enter Producer Or media Adress to Delete" />
       <ButtonBar layoutX="304.0" layoutY="557.0" prefHeight="40.0" prefWidth="200.0" />
       <Button layoutX="712.0" layoutY="531.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="80.0" text="Delete" />

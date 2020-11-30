@@ -3,8 +3,10 @@ package mvvm;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import mediaDB.Audio;
 import mediaDB.MediaContent;
 import mediaDB.Uploadable;
+import mediaDB.Video;
 
 public final class MediaItemWithProperties {
 
@@ -13,17 +15,17 @@ public final class MediaItemWithProperties {
     private final StringProperty dateProperty = new SimpleStringProperty();
     private final SimpleLongProperty accessCountProperty = new SimpleLongProperty();
 
-    public MediaItemWithProperties(MediaContent media) {
-        if (media instanceof Uploadable) {
-            Uploadable uploadable = (Uploadable) media;
-            this.producerProperty.set(uploadable.getUploader().getName());
-            this.dateProperty.set(uploadable.getUploadDate().toString());
+    public MediaItemWithProperties(Object media) {
+        if (media instanceof Audio) {
+            bindData((Audio) media);
+        } else if (media instanceof Video) {
+            bindData((Video) media);
         } else {
             this.producerProperty.set("undefined");
             this.dateProperty.set("undefined");
+            this.addressProperty.set("undefined");
+            this.accessCountProperty.set(0);
         }
-        this.addressProperty.set(media.getAddress());
-        this.accessCountProperty.set(media.getAccessCount());
     }
 
     public StringProperty producerProperty() {return this.producerProperty;}
@@ -54,5 +56,12 @@ public final class MediaItemWithProperties {
     }
     public void setAccessCount(Long value){
         this.accessCountProperty.set(value);
+    }
+
+    private <T extends MediaContent & Uploadable> void bindData(T media) {
+        this.producerProperty.set(media.getUploader().getName());
+        this.dateProperty.set(media.getUploadDate().toString());
+        this.addressProperty.set(media.getAddress());
+        this.accessCountProperty.set(media.getAccessCount());
     }
 }

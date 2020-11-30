@@ -56,3 +56,5 @@ Storage 25 GB
 * Mockito: https://www.youtube.com/watch?v=HsQ9OwKA79s
 * https://www.geeksforgeeks.org/mvc-design-pattern/
 * https://www.techyourchance.com/thread-safe-observer-design-pattern-in-java
+* https://stackoverflow.com/questions/20412445/how-to-create-a-reorder-able-tableview-in-javafx
+* https://stackoverflow.com/questions/37440987/javafx-drag-view-for-transparent-png-image

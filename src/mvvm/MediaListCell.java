@@ -16,7 +16,7 @@ import java.util.List;
 public class MediaListCell extends TableRow<MediaItemWithProperties> {
 
     public MediaListCell() {
-        TableRow thisCell = this;
+        TableRow<MediaItemWithProperties> thisCell = this;
 
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         setAlignment(Pos.CENTER);
