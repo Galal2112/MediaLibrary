@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -37,6 +38,7 @@ public class MainController implements Initializable {
     @FXML private TextField createMediaTextField;
     @FXML private TableColumn<ProducerAndUploadsCount, String> allProducersColumn;
     @FXML private TableColumn<ProducerAndUploadsCount, String> uploadsCountColumn;
+    @FXML private ComboBox<String> typebox;
 
     private ObservableList<MediaItemWithProperties> mediaObservableList;
     private ObservableList<ProducerAndUploadsCount> producersObservableList;
@@ -45,6 +47,7 @@ public class MainController implements Initializable {
     private TableColumn.SortType producerSortType = null;
     private TableColumn<MediaItemWithProperties, String> mediaSortColumn = null;
     private TableColumn.SortType mediaSortType = null;
+    private String selectedType;
 
     public MainController()  {
         mediaAdmin = MediaAdminFactory.getMediaAdminInstance();
@@ -65,6 +68,11 @@ public class MainController implements Initializable {
         this.allProducersColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.uploadsCountColumn.setCellValueFactory(new PropertyValueFactory<>("uploadsCount"));
         this.producerTableView.setItems(producersObservableList);
+
+        typebox.valueProperty().addListener((composant, oldValue, newValue) -> {
+            selectedType = newValue;
+            refreshMediaList();
+        } );
     }
 
     public synchronized void uploadMedia(ActionEvent actionEvent) {
@@ -159,12 +167,8 @@ public class MainController implements Initializable {
             mediaSortType = mediaSortColumn.getSortType();
         }
         mediaObservableList.clear();
-        mediaObservableList.addAll(mediaAdmin.listMedia(null).stream().map(MediaItemWithProperties::new).collect(Collectors.toList()));
-        if (mediaSortColumn != null) {
-            mediaTableView.getSortOrder().add(mediaSortColumn);
-            mediaSortColumn.setSortType(mediaSortType);
-            mediaSortColumn.setSortable(true); // This performs a sort
-        }
+        mediaObservableList.addAll(getMediaBasedOnType());
+        sortTableOnColumn(mediaTableView, mediaSortColumn, mediaSortType);
 
         if (producerTableView != null && producerTableView.getSortOrder().size() > 0) {
             producersSortColumn = (TableColumn<ProducerAndUploadsCount, String>) producerTableView.getSortOrder().get(0);
@@ -172,10 +176,27 @@ public class MainController implements Initializable {
         }
         producersObservableList.clear();
         producersObservableList.addAll(mediaAdmin.listProducersAndUploadsCount().entrySet().stream().map(e -> new ProducerAndUploadsCount(e.getKey().getName(), e.getValue())).collect(Collectors.toList()));
-        if (producersSortColumn != null) {
-            producerTableView.getSortOrder().add(producersSortColumn);
-            producersSortColumn.setSortType(producerSortType);
-            producersSortColumn.setSortable(true); // This performs a sort
+        sortTableOnColumn(producerTableView, producersSortColumn, producerSortType);
+    }
+
+    private List<MediaItemWithProperties> getMediaBasedOnType() {
+        List<?> media = new ArrayList<>();
+        if (selectedType == null || selectedType.equals("All")) {
+            media = mediaAdmin.listMedia(null);
+        } else if (isInteractiveVideo(selectedType)) {
+            media = mediaAdmin.listMedia(InteractiveVideo.class);
+        } else if (isLicensedAudioVideo(selectedType)) {
+            media = mediaAdmin.listMedia(LicensedAudioVideo.class);
+        }
+
+        return media.stream().map(MediaItemWithProperties::new).collect(Collectors.toList());
+    }
+
+    private void sortTableOnColumn(TableView tableView, TableColumn column, TableColumn.SortType sortType) {
+        if (column != null) {
+            tableView.getSortOrder().add(column);
+            column.setSortType(sortType);
+            column.setSortable(true); // This performs a sort
         }
     }
 

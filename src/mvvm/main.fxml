@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="960.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mvvm.MainController">
    <children>
       <VBox layoutX="-8.0" layoutY="-2.0" prefHeight="964.0" prefWidth="1290.0" spacing="40.0">
@@ -40,7 +34,15 @@
                   <VBox prefHeight="200.0" prefWidth="180.0" spacing="12.0">
                      <children>
                         <Label text="Display Filter" />
-                        <ChoiceBox prefWidth="150.0" />
+                        <ComboBox fx:id="typebox" prefWidth="150.0" promptText="Content Type:">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="All"/>
+                                    <String fx:value="InteractiveVideo"/>
+                                    <String fx:value="LicensedAudioVideo"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
                      </children>
                      <padding>
                         <Insets left="10.0" top="100.0" />
