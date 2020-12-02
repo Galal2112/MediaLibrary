@@ -32,6 +32,7 @@ public class MainController implements Initializable {
     @FXML private TableColumn<MediaItemWithProperties, String> dateColumn;
     @FXML private TableColumn<MediaItemWithProperties, Long> accessCountColumn;
     @FXML private TextField createMediaTextField;
+    @FXML private TextField deleteMediaTextField;
     @FXML private TableColumn<ProducerAndUploadsCount, String> allProducersColumn;
     @FXML private TableColumn<ProducerAndUploadsCount, String> uploadsCountColumn;
     @FXML private ComboBox<String> typebox;
@@ -91,6 +92,23 @@ public class MainController implements Initializable {
         updateMediaInDB(newMediaContent);
     }
 
+    public synchronized void deleteMedia(ActionEvent actionEvent) {
+        String deleteCommand = deleteMediaTextField.getText();
+        try {
+            mediaAdmin.deleteUploaderByName(deleteCommand);
+            deleteMediaTextField.setText("");
+            refreshMediaList();
+        } catch (IllegalArgumentException e) {
+            try {
+                mediaAdmin.deleteMediaByAddress(deleteCommand);
+                deleteMediaTextField.setText("");
+                refreshMediaList();
+            } catch (IllegalArgumentException u) {
+                displayError("Invalid Input");
+            }
+        }
+    }
+
     public synchronized void uploadMedia(ActionEvent actionEvent) {
         String creationCommand = createMediaTextField.getText();
         handleCreateEvent(creationCommand);
@@ -108,7 +126,7 @@ public class MainController implements Initializable {
         }
     }
 
-    public synchronized void deleteMedia() {
+    public synchronized void deleteSelectedMedia(ActionEvent actionEvent) {
         MediaItemWithProperties mediaItemWithProperties = mediaTableView.getSelectionModel().selectedItemProperty().getValue();
         if (mediaItemWithProperties != null) {
             try {
@@ -186,6 +204,7 @@ public class MainController implements Initializable {
         Producer producer = new Producer(text);
         try {
             mediaAdmin.createUploader(producer);
+            createMediaTextField.setText("");
             refreshMediaList();
         } catch (IllegalArgumentException e) {
             displayError(e.getMessage());
@@ -193,12 +212,12 @@ public class MainController implements Initializable {
     }
 
     private void displayError(String error) {
-        // TODO: Display error
+        new Alert(Alert.AlertType.ERROR, error).show();
     }
 
     private void onVideoUploaded(String address) {
-        // TODO: Handle success
         refreshMediaList();
+        createMediaTextField.setText("");
     }
 
     private void refreshMediaList() {
