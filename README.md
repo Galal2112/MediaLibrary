@@ -8,22 +8,17 @@
 5. kompilierbar
 6. main-Methoden nur im default package
 7. ausführbar
-8. Simulation 1
-10. 10.Trennung zwischen Test- und Produktiv-Code
-11. 11.JUnit5 als Testframework
-12. 12.Mockito als Mock/Spy-framework
-13. 13.keine Verwendung von Thread.sleep bzw. nur mit 0-Werten
-14. 14.ändernde Aktionen der threads produzieren Ausgaben auf der Konsole
-15. 15.Änderungen an der Geschäftslogik produzieren Ausgaben auf der Konsole
-16. 16.Trennung zwischen Verwaltungs- und Simulationslogik
-17. 17.Simulation 2
-18. 18.mindestens je ein Test für alle in der Simulation verwendeten Methoden die auf die Geschäftslogik zugreifen
-19. 19.Simulation 3
-20. 20.alle Tests sind deterministisch
-
-    //can i create interface extends MediaContent & Uploadable and use it instead??
-    //delete uploader = delete uploader + his videos
-   //     //  Lock statt Monitor .... what is Monitor??
+8. Einfügen, Auflisten und Löschen von Mediadateien in der GUI
+9. Trennung zwischen Test- und Produktiv-Code
+10. JUnit5 als Testframework
+11. Mockito als Mock/Spy-framework
+12. Geschäfts und Darstellungslogik getrennt
+13. View und Model synchronisiert
+14. sortierbare Darstellung der Mediadateien mit Adresse, Anzahl der Abrufe
+und Produzent
+15. skalierbare Darstellung
+16. data binding verwendet
+17. Änderung der Adresse mittels drag&drop
 
 
 * For simplicity I am using LinkedList to simulate database table.
