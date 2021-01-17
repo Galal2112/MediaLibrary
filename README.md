@@ -15,7 +15,7 @@
 12. Geschäfts und Darstellungslogik getrennt
 13. View und Model synchronisiert
 14. sortierbare Darstellung der Mediadateien mit Adresse, Anzahl der Abrufe
-und Produzent
+    und Produzent
 15. skalierbare Darstellung
 16. data binding verwendet
 17. Änderung der Adresse mittels drag&drop
@@ -27,23 +27,6 @@ und Produzent
 * Only two media types are supported (InteractiveVideo, LicensedAudioVideo)
 * Access count is increased with each list request.
 
--------
-For video address generation I used the following:
-```java
-private String getAddress(Object o) {
-   return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
-}
-```
--------
-Storage available is 10 TB, implement is inside model -> MediaStorage
-```java
-private final BigDecimal diskSize = BigDecimal.valueOf(1024.0 * 1024.0 * 10);
-
-
-```
-
-VideoSize = ((bitrate(Mb/s)/8) * length(seconds)) / 1024 * 1024 MB;
-Storage 25 GB
 -----
 #### References
 * Dao pattern in java: https://www.baeldung.com/java-dao-pattern
