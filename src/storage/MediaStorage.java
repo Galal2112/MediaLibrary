@@ -19,7 +19,7 @@ public class MediaStorage implements Subject {
     private BigDecimal availableMediaStorageInMB;
 
     public MediaStorage(long diskSize) {
-        this.diskSize = BigDecimal.valueOf(diskSize * 1000);
+        this.diskSize = BigDecimal.valueOf(diskSize);
         availableMediaStorageInMB = this.diskSize;
     }
 

@@ -13,7 +13,7 @@ public class Main {
 
         Console console = new Console();
         long diskSizeGB = console.readLongFromStdin("Enter Disk size in gigabyte:");
-        MediaStorage mediaStorage = new MediaStorage(diskSizeGB * 1024);
+        MediaStorage mediaStorage = new MediaStorage(diskSizeGB * 1000);
         //Observer
         MediaStorageObserver observer = new MediaStorageObserver(mediaStorage);
 
