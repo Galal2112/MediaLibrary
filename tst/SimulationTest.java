@@ -1,8 +1,10 @@
 import businessLogic.MediaAdmin;
 import mediaDB.InteractiveVideo;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import storage.InsufficientStorageException;
+import storage.MediaStorage;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +14,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class SimulationTest {
+    private MediaStorage mediaStorage;
+
+    @BeforeEach
+    void setup() {
+        this.mediaStorage = new MediaStorage(10 * 1024);
+    }
 
     @Test
     void testSimulation1() throws InsufficientStorageException {
@@ -19,7 +27,7 @@ public class SimulationTest {
         InteractiveVideo interactiveVideo = Mockito.mock(InteractiveVideo.class);
         List<InteractiveVideo> interactiveVideos = Collections.singletonList(interactiveVideo);
         when(mediaAdmin.listMedia(null)).thenReturn((List) interactiveVideos);
-        MainSimulation1.startSimulation(mediaAdmin);
+        MainSimulation1.startSimulation(mediaAdmin, mediaStorage);
         sleep(2);
         verify(mediaAdmin, atLeastOnce()).getUploader(any());
         verify(mediaAdmin, atLeastOnce()).createUploader(any());
@@ -39,7 +47,7 @@ public class SimulationTest {
         when(interactiveVideo.getAddress()).thenReturn(videoAddress);
         List<InteractiveVideo> interactiveVideos = Collections.singletonList(interactiveVideo);
         when(mediaAdmin.listMedia(null)).thenReturn((List) interactiveVideos);
-        MainSimulation2.startSimulation(mediaAdmin);
+        MainSimulation2.startSimulation(mediaAdmin, mediaStorage);
         sleep(3);
         verify(mediaAdmin, atLeastOnce()).getUploader(any());
         verify(mediaAdmin, atLeastOnce()).createUploader(any());
@@ -59,7 +67,7 @@ public class SimulationTest {
         when(interactiveVideo.getAddress()).thenReturn(videoAddress);
         List<InteractiveVideo> interactiveVideos = Collections.singletonList(interactiveVideo);
         when(mediaAdmin.listMedia(null)).thenReturn((List) interactiveVideos);
-        MainSimulation3.startSimulation(mediaAdmin);
+        MainSimulation3.startSimulation(mediaAdmin, mediaStorage);
         sleep(3);
         verify(mediaAdmin, atLeastOnce()).getUploader(any());
         verify(mediaAdmin, atLeastOnce()).createUploader(any());

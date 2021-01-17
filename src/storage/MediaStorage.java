@@ -11,22 +11,16 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class MediaStorage implements Subject {
 
-
     private final Lock lock = new ReentrantLock();
     // what is difference between deque and queue? TODO
     private final ConcurrentLinkedQueue<Observer> observerList = new ConcurrentLinkedQueue<>();
 
-    //10 TB
-    private final BigDecimal diskSize = BigDecimal.valueOf(1024.0 * 1024.0 * 10);
-
+    private final BigDecimal diskSize;
     private BigDecimal availableMediaStorageInMB;
 
-    public final static MediaStorage sharedInstance = new MediaStorage();
-
-
-    private MediaStorage() {
-        //10 TB
-        availableMediaStorageInMB = diskSize;
+    public MediaStorage(long diskSize) {
+        this.diskSize = BigDecimal.valueOf(diskSize * 1000);
+        availableMediaStorageInMB = this.diskSize;
     }
 
     public void addMediaInStorage(MediaContent mediaContent) throws InsufficientStorageException {

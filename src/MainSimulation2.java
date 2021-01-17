@@ -10,15 +10,15 @@ public final class MainSimulation2 {
     private MainSimulation2() {
     }
 
-    public static void startSimulation(MediaAdmin mediaAdmin) {
-        new MediaCreatorThread(mediaAdmin, MediaStorage.sharedInstance).start();
+    public static void startSimulation(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
+        new MediaCreatorThread(mediaAdmin, mediaStorage).start();
         new MediaRetrievalThread(mediaAdmin).start();
-        new Simultation2DeletionThread(mediaAdmin, MediaStorage.sharedInstance).start();
+        new Simultation2DeletionThread(mediaAdmin, mediaStorage).start();
     }
 
     public static void main(String[] args) {
-
-        MediaAdmin mediaAdmin = MediaAdminFactory.getMediaAdminInstance();
-        startSimulation(mediaAdmin);
+        MediaStorage mediaStorage = new MediaStorage(10 * 1024);
+        MediaAdmin mediaAdmin = MediaAdminFactory.getMediaAdminInstance(mediaStorage);
+        startSimulation(mediaAdmin, mediaStorage);
     }
 }

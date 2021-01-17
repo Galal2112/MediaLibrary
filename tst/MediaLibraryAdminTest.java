@@ -17,15 +17,17 @@ import static org.mockito.Mockito.*;
 
 class MediaLibraryAdminTest {
 
+    private MediaStorage mediaStorage;
     private MediaAdmin mediaAdmin;
     private MediaCRUD mediaCRUD;
     private UploaderCRUD uploaderCRUD;
 
     @BeforeEach
     void setUp() {
+        mediaStorage = new MediaStorage(10 * 1024);
         mediaCRUD = Mockito.mock(MediaCRUD.class);
         uploaderCRUD = Mockito.mock(UploaderCRUD.class);
-        mediaAdmin = new MediaLibraryAdmin(uploaderCRUD, mediaCRUD);
+        mediaAdmin = new MediaLibraryAdmin(mediaStorage, uploaderCRUD, mediaCRUD);
     }
 
     @Test
@@ -58,7 +60,7 @@ class MediaLibraryAdminTest {
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 
         // Test insufficient storage
-        BigDecimal storage = MediaStorage.sharedInstance.getAvailableMediaStorageInMB();
+        BigDecimal storage = mediaStorage.getAvailableMediaStorageInMB();
         when(licensedAudioVideo.getSize()).thenReturn(storage.add(new BigDecimal(1)));
         assertThrows(IllegalArgumentException.class, () -> mediaAdmin.upload(licensedAudioVideo));
 

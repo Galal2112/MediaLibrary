@@ -14,6 +14,7 @@ import model.InteractiveVideoImpl;
 import model.LicensedAudioVideoImpl;
 import model.Producer;
 import storage.InsufficientStorageException;
+import storage.MediaStorage;
 import util.MediaAdminFactory;
 
 import java.net.URL;
@@ -50,8 +51,8 @@ public class MainController implements Initializable {
     private SimpleBooleanProperty isDeleteMediaVisible = new SimpleBooleanProperty();
     private SimpleBooleanProperty isDeleteUploaderVisible = new SimpleBooleanProperty();
 
-    public MainController()  {
-        mediaAdmin = MediaAdminFactory.getMediaAdminInstance();
+    public MainController(MediaStorage mediaStorage)  {
+        mediaAdmin = MediaAdminFactory.getMediaAdminInstance(mediaStorage);
         mediaObservableList = FXCollections.observableArrayList();
         producersObservableList = FXCollections.observableArrayList();
         refreshMediaList();

@@ -16,4 +16,13 @@ public class Console {
             return readStringFromStdin(text);
         }
     }
+
+    public Long readLongFromStdin(String text) {
+        try {
+            System.out.print(text);
+            return Long.parseLong(reader.readLine());
+        } catch (IOException | NumberFormatException e) {
+            return readLongFromStdin(text);
+        }
+    }
 }

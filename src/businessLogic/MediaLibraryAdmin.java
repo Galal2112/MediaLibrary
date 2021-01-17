@@ -16,8 +16,10 @@ public class MediaLibraryAdmin implements MediaAdmin {
     private final CRUD<Uploader> uploaderCRUD;
     private final CRUD<MediaContent> mediaContentCRUD;
     private volatile BusinessLogicObserver businessLogicObserver;
+    private MediaStorage mediaStorage;
 
-    public MediaLibraryAdmin(CRUD<Uploader> uploaderCRUD, CRUD<MediaContent> mediaContentCRUD) {
+    public MediaLibraryAdmin(MediaStorage mediaStorage, CRUD<Uploader> uploaderCRUD, CRUD<MediaContent> mediaContentCRUD) {
+        this.mediaStorage = mediaStorage;
         this.uploaderCRUD = uploaderCRUD;
         this.mediaContentCRUD = mediaContentCRUD;
     }
@@ -59,7 +61,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         // save media content
         mediaContentCRUD.create(media);
 
-        MediaStorage.sharedInstance.addMediaInStorage(media);
+        mediaStorage.addMediaInStorage(media);
 
         if (businessLogicObserver != null) businessLogicObserver.didUpload(media);
     }
@@ -134,7 +136,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public synchronized void deleteMediaByAddress(String address) throws IllegalArgumentException {
             Optional<MediaContent> mediaContentOptional =  mediaContentCRUD.get(address);
         if (mediaContentOptional.isPresent()) {
-            MediaStorage.sharedInstance.deletedMediaFromStorage(mediaContentOptional.get());
+            mediaStorage.deletedMediaFromStorage(mediaContentOptional.get());
             mediaContentCRUD.deleteById(address);
             if (businessLogicObserver != null) businessLogicObserver.didDeleteMediaAtAddress(address);
         } else {

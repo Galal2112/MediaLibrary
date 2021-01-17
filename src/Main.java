@@ -10,16 +10,19 @@ import observer.MediaStorageObserver;
 
 public class Main {
     public static void main(String[] args) {
+
+        Console console = new Console();
+        long diskSizeGB = console.readLongFromStdin("Enter Disk size in gigabyte:");
+        MediaStorage mediaStorage = new MediaStorage(diskSizeGB * 1024);
         //Observer
-        MediaStorageObserver observer = new MediaStorageObserver(MediaStorage.sharedInstance);
+        MediaStorageObserver observer = new MediaStorageObserver(mediaStorage);
 
         // create media admin
         CRUD<MediaContent> mediaCRUD = new MediaCRUD();
         UploaderCRUD uploaderCRUD = new UploaderCRUD();
-        MediaAdmin mediaAdmin = new MediaLibraryAdmin(uploaderCRUD, mediaCRUD);
+        MediaAdmin mediaAdmin = new MediaLibraryAdmin(mediaStorage, uploaderCRUD, mediaCRUD);
 
         // create view
-        Console console = new Console();
         MediaView view = new CliMediaView(console);
 
         // create controller

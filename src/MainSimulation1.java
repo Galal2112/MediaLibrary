@@ -9,13 +9,14 @@ public final class MainSimulation1 {
     private MainSimulation1() {
     }
 
-    public static void startSimulation(MediaAdmin mediaAdmin) {
-        new MediaCreatorObserverThread(mediaAdmin, MediaStorage.sharedInstance).start();
+    public static void startSimulation(MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
+        new MediaCreatorObserverThread(mediaAdmin, mediaStorage).start();
         new MediaListAndRandomDeleteThread(mediaAdmin).start();
     }
 
     public static void main(String[] args) {
-        MediaAdmin mediaAdmin = MediaAdminFactory.getMediaAdminInstance();
-        startSimulation(mediaAdmin);
+        MediaStorage mediaStorage = new MediaStorage(10 * 1024);
+        MediaAdmin mediaAdmin = MediaAdminFactory.getMediaAdminInstance(mediaStorage);
+        startSimulation(mediaAdmin, mediaStorage);
     }
 }
