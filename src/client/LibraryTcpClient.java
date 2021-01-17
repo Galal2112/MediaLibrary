@@ -26,6 +26,11 @@ public class LibraryTcpClient {
 
             while (true) {
                 String input = console.readStringFromStdin(">> ");
+                if (input.equals("exit")) {
+                    socket.close();
+
+                    return;
+                }
                 out.writeUTF(input);
                 String response = in.readUTF();
                 System.out.println(response);

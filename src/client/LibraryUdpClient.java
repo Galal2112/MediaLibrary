@@ -49,6 +49,7 @@ public class LibraryUdpClient {
             if (input.equals("exit")) {
                 dos.writeChar('S');
                 dos.writeInt(sessionId);
+                return;
             } else {
                 dos.writeChar('N');
                 dos.writeInt(sessionId);

@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class UdpServerSession extends ServerSession {
 
-    private byte[] inBuffer = new byte[1024];
     int sessionId;
 
     public UdpServerSession(MediaAdmin mediaAdmin) {
