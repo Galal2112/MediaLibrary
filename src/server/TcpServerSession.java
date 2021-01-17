@@ -21,7 +21,8 @@ public class TcpServerSession extends ServerSession implements Runnable {
             try (DataInputStream in = new DataInputStream(socket.getInputStream())) {
                 System.out.println("client@" + socket.getInetAddress() + ":" + socket.getPort() + " connected");
                 do {
-                    executeSession(in, out);
+                    String response = executeSession(in);
+                    out.writeUTF(response);
                 } while (true);
             } catch (IOException e) {
                 e.printStackTrace();

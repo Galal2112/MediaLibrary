@@ -9,7 +9,6 @@ import mvc.Command;
 import storage.InsufficientStorageException;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
@@ -25,50 +24,50 @@ public abstract class ServerSession {
         this.mediaAdmin = mediaAdmin;
     }
 
-    void executeSession(DataInputStream in, DataOutputStream out) throws IOException {
+    String executeSession(DataInputStream in) throws IOException {
         String command = in.readUTF();
+        System.out.println("Command: " + command);
         if (command.isEmpty()) {
-            out.writeUTF("Not a valid input");
-            return;
+            return "Not a valid input";
         }
 
         if (currentCommand == null || command.startsWith(":")) {
             Optional<Command> commandOptional = commandList.stream().filter(c -> c.getKey().equals(command)).findFirst();
             if (commandOptional.isPresent()) {
                 currentCommand = commandOptional.get();
-                out.writeUTF("Mode changed to " + command);
+                return "Mode changed to " + command;
             } else {
-                out.writeUTF("Please insert a valid command");
+                return "Please insert a valid command";
             }
         } else if (currentCommand == Command.CREATE) {
-            handleCreateCommand(command, out);
+            return handleCreateCommand(command);
         } else if (currentCommand == Command.VIEW) {
             if (command.equalsIgnoreCase("uploader")) {
-                viewUploaders(out);
+                return viewUploaders();
             } else if (command.toLowerCase().startsWith("content")) {
-                viewContent(command, out);
+                return viewContent(command);
             }
-        } else  if (currentCommand == Command.DELETE) {
+        } else if (currentCommand == Command.DELETE) {
             try {
                 mediaAdmin.deleteUploaderByName(command);
-                out.writeUTF("Producer deleted successfully");
+                return "Producer deleted successfully";
             } catch (IllegalArgumentException e) {
                 try {
                     mediaAdmin.deleteMediaByAddress(command);
-                    out.writeUTF("Media deleted successfully");
+                    return "Media deleted successfully";
                 } catch (IllegalArgumentException u) {
-                    out.writeUTF("Invalid Input");
+                    return "Invalid Input";
                 }
             }
         }
+        return "Invalid command";
     }
 
-    private void handleCreateCommand(String command, DataOutputStream out) throws IOException {
+    private String handleCreateCommand(String command) {
         String[] parsedString = command.split(" ");
 
         if (parsedString.length == 1) {
-            createProducer(command, out);
-            return;
+            return createProducer(command);
         }
         try {
             String mediaType = parsedString[0];
@@ -96,7 +95,7 @@ public abstract class ServerSession {
                         videoEncoding, bitrate, duration, producer);
                 interactiveVideo.setTags(tags);
                 mediaAdmin.upload(interactiveVideo);
-                out.writeUTF("Media uploaded successfully");
+                return "Media uploaded successfully";
             } else if (isLicensedAudioVideo(mediaType)) {
                 String audioEncoding = parsedString[8];
                 int samplingRate = Integer.parseInt(parsedString[9]);
@@ -105,32 +104,31 @@ public abstract class ServerSession {
                         audioEncoding, holder, bitrate, duration, producer);
                 licensedAudioVideo.setTags(tags);
                 mediaAdmin.upload(licensedAudioVideo);
-                out.writeUTF("Media uploaded successfully");
+                return "Media uploaded successfully";
             } else {
-                out.writeUTF("Unsupported Media type");
+                return "Unsupported Media type";
             }
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            out.writeUTF("Invalid insert command");
+            return "Invalid insert command";
         } catch (IllegalArgumentException | InsufficientStorageException e) {
-            out.writeUTF(e.getMessage());
+            return e.getMessage();
         }
     }
 
-    private void createProducer(String text, DataOutputStream out) throws IOException {
+    private String createProducer(String text) {
         Producer producer = new Producer(text);
         try {
             mediaAdmin.createUploader(producer);
-            out.writeUTF("Producer created successfully");
+            return "Producer created successfully";
         } catch (IllegalArgumentException e) {
-            out.writeUTF(e.getMessage());
+            return e.getMessage();
         }
     }
 
-    private void viewUploaders(DataOutputStream out) throws IOException {
+    private String viewUploaders() {
         Map<Uploader, Integer> uploadersAndCounts = mediaAdmin.listProducersAndUploadsCount();
         if (uploadersAndCounts.size() == 0) {
-            out.writeUTF("No registered uploader");
-            return;
+            return "No registered uploader";
         }
 
         String response = "";
@@ -138,10 +136,10 @@ public abstract class ServerSession {
             response += uploader.getName() + ", " + uploadersAndCounts.get(uploader);
             response += "\n";
         }
-        out.writeUTF(response);
+        return response;
     }
 
-    private void viewContent(String command, DataOutputStream out) throws IOException {
+    private String viewContent(String command) {
         String[] split = command.split(" ");
         List<?> mediaList;
         if (split.length == 1) {
@@ -153,8 +151,7 @@ public abstract class ServerSession {
             } else if (isLicensedAudioVideo(type)) {
                 mediaList = mediaAdmin.listMedia(LicensedAudioVideo.class);
             } else {
-                out.writeUTF("Unsupported Media type");
-                return;
+                return "Unsupported Media type";
             }
         }
 
@@ -170,8 +167,7 @@ public abstract class ServerSession {
             }
             response += "\n";
         }
-        out.writeUTF(response);
-
+        return response;
     }
 
     private boolean isInteractiveVideo(String mediaType) {
