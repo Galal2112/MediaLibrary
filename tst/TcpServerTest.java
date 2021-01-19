@@ -69,6 +69,66 @@ public class TcpServerTest {
         }
     }
 
+    @Test
+    void list() throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
+        dos = new DataOutputStream(bos);
+        dos.writeUTF(":c");
+        dos.writeUTF("Produzent1");
+        dos.writeUTF("InteractiveVideo Produzent1 Lifestyle,News 5000 3600 DWT 640 480 Abstimmung");
+        dos.writeUTF(":r");
+        dos.writeUTF("content");
+        dos.writeUTF("exit");
+        when(socket.getInputStream()).thenReturn(new ByteArrayInputStream(bos.toByteArray()));
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream(1024);
+        when(socket.getOutputStream()).thenReturn(outStream);
+
+        when(serverSocket.isClosed()).thenAnswer(new Answer<>() {
+            int count = 0;
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                if (count++ == 0) {
+                    return false;
+                }
+                return true;
+            }
+        });
+        MediaAdmin mediaAdmin = Mockito.mock(MediaAdmin.class);
+        new LibraryTcpServer(serverSocket, mediaAdmin).start();
+        sleep(1);
+        verify(mediaAdmin).listMedia(null);
+    }
+
+    @Test
+    void delete() throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
+        dos = new DataOutputStream(bos);
+        dos.writeUTF(":c");
+        dos.writeUTF("Produzent1");
+        dos.writeUTF("InteractiveVideo Produzent1 Lifestyle,News 5000 3600 DWT 640 480 Abstimmung");
+        dos.writeUTF(":d");
+        dos.writeUTF("Produzent1");
+        dos.writeUTF("exit");
+        when(socket.getInputStream()).thenReturn(new ByteArrayInputStream(bos.toByteArray()));
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream(1024);
+        when(socket.getOutputStream()).thenReturn(outStream);
+
+        when(serverSocket.isClosed()).thenAnswer(new Answer<>() {
+            int count = 0;
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                if (count++ == 0) {
+                    return false;
+                }
+                return true;
+            }
+        });
+        MediaAdmin mediaAdmin = Mockito.mock(MediaAdmin.class);
+        new LibraryTcpServer(serverSocket, mediaAdmin).start();
+        sleep(1);
+        verify(mediaAdmin).deleteUploaderByName(any());
+    }
+
     private void sleep(int seconds) {
         try {
             TimeUnit.SECONDS.sleep(seconds);
