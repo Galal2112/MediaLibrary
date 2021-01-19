@@ -26,6 +26,9 @@ public abstract class ServerSession {
 
     String executeSession(DataInputStream in) throws IOException {
         String command = in.readUTF();
+        if (command.equals("exit")) {
+            return null;
+        }
         System.out.println("Command: " + command);
         if (command.isEmpty()) {
             return "Not a valid input";

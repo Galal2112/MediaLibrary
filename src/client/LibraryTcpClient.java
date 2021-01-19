@@ -26,14 +26,14 @@ public class LibraryTcpClient {
 
             while (true) {
                 String input = console.readStringFromStdin(">> ");
+                out.writeUTF(input);
                 if (input.equals("exit")) {
                     socket.close();
-
                     return;
+                } else {
+                    String response = in.readUTF();
+                    System.out.println(response);
                 }
-                out.writeUTF(input);
-                String response = in.readUTF();
-                System.out.println(response);
             }
         } catch (IOException e) {
             e.printStackTrace();
