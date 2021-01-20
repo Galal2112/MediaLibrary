@@ -44,7 +44,7 @@ public class LibraryUdpClient {
         while (true) {
             String input = console.readStringFromStdin(">> ");
             int bytes = input.getBytes().length + Integer.BYTES + 1;
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(input.getBytes().length + Integer.BYTES + 1);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(bytes);
             DataOutputStream dos = new DataOutputStream(bos);
             if (input.equals("exit")) {
                 dos.writeChar('S');

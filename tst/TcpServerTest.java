@@ -37,7 +37,7 @@ public class TcpServerTest {
     }
 
     @Test
-    void insert() throws IOException {
+    void testInsert() throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
         dos = new DataOutputStream(bos);
         dos.writeUTF(":c");
@@ -70,7 +70,7 @@ public class TcpServerTest {
     }
 
     @Test
-    void list() throws IOException {
+    void testList() throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
         dos = new DataOutputStream(bos);
         dos.writeUTF(":c");
@@ -100,7 +100,7 @@ public class TcpServerTest {
     }
 
     @Test
-    void delete() throws IOException {
+    void testDelete() throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
         dos = new DataOutputStream(bos);
         dos.writeUTF(":c");
