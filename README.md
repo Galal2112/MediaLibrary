@@ -8,17 +8,15 @@
 5. kompilierbar
 6. main-Methoden nur im default package
 7. ausführbar
-8. Einfügen, Auflisten und Löschen von Mediadateien in der GUI
+8. saubere Trennung zwischen Oberfläche (Client) und Geschäftslogik (Server)
 9. Trennung zwischen Test- und Produktiv-Code
 10. JUnit5 als Testframework
 11. Mockito als Mock/Spy-framework
-12. Geschäfts und Darstellungslogik getrennt
-13. View und Model synchronisiert
-14. sortierbare Darstellung der Mediadateien mit Adresse, Anzahl der Abrufe
-    und Produzent
-15. skalierbare Darstellung
-16. data binding verwendet
-17. Änderung der Adresse mittels drag&drop
+12. keine leeren Test
+13. Client-Server-Verbindung über TCP oder UDP
+14. je ein Stellvertreter-Test für Einfügen, Auflisten und Löschen pro Server
+15. Implementierung von Client und Server für TCP und UDP
+16. Unterstützung mehrerer Clients pro Server (TCP oder UDP)
 
 
 * For simplicity I am using LinkedList to simulate database table.
