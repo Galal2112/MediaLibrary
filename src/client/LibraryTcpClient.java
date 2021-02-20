@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class LibraryTcpClient {
     private final ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(Command.CREATE, Command.DELETE,
-            Command.VIEW));
+            Command.VIEW, Command.PRESISTENCE_MODE));
 
     public void run() {
         Console console = new Console();

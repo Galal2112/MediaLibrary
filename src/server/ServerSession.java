@@ -20,7 +20,7 @@ public abstract class ServerSession {
     final MediaAdmin mediaAdmin;
     private Command currentCommand = null;
     private final ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(Command.CREATE, Command.DELETE,
-            Command.VIEW));
+            Command.VIEW, Command.PRESISTENCE_MODE));
 
     ServerSession(MediaAdmin mediaAdmin) {
         this.mediaAdmin = mediaAdmin;
@@ -64,6 +64,8 @@ public abstract class ServerSession {
                     return "Invalid Input";
                 }
             }
+        } else if (currentCommand == Command.PRESISTENCE_MODE) {
+            return handlePresistenceCommand(command);
         }
         return "Invalid command";
     }
@@ -137,5 +139,63 @@ public abstract class ServerSession {
             response += "\n";
         }
         return response;
+    }
+
+    private String handlePresistenceCommand(String command) {
+        switch (command) {
+            case "saveJOS":
+                try {
+                    mediaAdmin.saveJOS();
+                    return "JOS file is Saved";
+                } catch (IOException e) {
+                    return e.getMessage();
+                }
+            case "loadJOS":
+                try {
+                    mediaAdmin.loadJOS();
+                    return "JOS file is Loaded";
+                } catch (IOException e) {
+                    return "File not Found, No data is saved";
+                }
+            case "saveJBP":
+                mediaAdmin.saveJBP();
+                return "JBP file is saved";
+            case "loadJBP":
+                try {
+                    mediaAdmin.loadJBP();
+                    return "JBP file is Loaded";
+                } catch (IOException e) {
+                    return "File not Found, No data is saved";
+                }
+            default:
+                if (command.startsWith("save")) {
+                    String[] split = command.split(" ");
+                    if (split.length == 1) {
+                        return "Please Enter a valid Address";
+                    } else {
+                        try {
+                            mediaAdmin.save(split[1]);
+                            return "Saved successfully";
+                        } catch (IllegalArgumentException e) {
+                            return e.getMessage();
+                        }
+                    }
+
+                } else if (command.startsWith("load")) {
+                    String[] split = command.split(" ");
+                    if (split.length == 1) {
+                        return "Please Enter a valid Address";
+                    } else {
+                        try {
+                            mediaAdmin.load(split[1]);
+                            return "Loaded successfully";
+                        } catch (InsufficientStorageException | IllegalArgumentException e) {
+                            return e.getMessage();
+                        }
+                    }
+                } else {
+                    return "no match";
+                }
+        }
     }
 }
