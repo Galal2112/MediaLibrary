@@ -1,6 +1,8 @@
 package mediaDB;
 
-public interface Uploader {
+import java.io.Serializable;
+
+public interface Uploader extends Serializable {
     String getName();
     void setName(String name);
     Uploader copy();

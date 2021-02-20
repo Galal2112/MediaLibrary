@@ -1,0 +1,250 @@
+package businessLogic;
+
+import mediaDB.*;
+import model.*;
+
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public final class PresistencyManager {
+    private PresistencyManager() {
+    }
+
+    public static void saveMediaUsingJBP(XMLEncoder encoder, List<MediaContent> mediaList) throws IOException {
+        encoder.setPersistenceDelegate(BigDecimal.class, encoder.getPersistenceDelegate(Double.class));
+        encoder.writeObject(mediaList);
+    }
+
+    public static List<MediaContent> loadMediaUsingJBP(XMLDecoder decoder) throws ClassNotFoundException, IOException {
+        return (LinkedList<MediaContent>) decoder.readObject();
+    }
+
+    public static void saveUploadersUsingJBP(XMLEncoder encoder, List<Uploader> uploaders) throws IOException {
+        encoder.writeObject(uploaders);
+    }
+
+    public static List<Uploader> loadUploaderUsingJBP(XMLDecoder decoder) throws IOException, ClassNotFoundException {
+        return (LinkedList<Uploader>) decoder.readObject();
+    }
+
+    public static <T extends Serializable> void saveJOS(ObjectOutput objectOutput, List<T> items) throws IOException {
+        objectOutput.writeObject(items);
+    }
+
+    public static <T extends Serializable> List<T> loadJOS(ObjectInput objectInput) throws ClassNotFoundException, IOException {
+        return (List<T>) objectInput.readObject();
+    }
+
+    public static void saveLicensedVideo(RandomAccessFile randomAccessFile, long seekPos, LicensedVideoImpl licensedVideo) throws IOException {
+        saveVideo(randomAccessFile, seekPos, licensedVideo, LicensedVideoImpl.class);
+        randomAccessFile.writeUTF(licensedVideo.getHolder());
+    }
+
+    public static void saveLicensedAudio(RandomAccessFile randomAccessFile, long seekPos, LicensedAudioImpl licensedAudio) throws IOException {
+        saveAudio(randomAccessFile, seekPos, licensedAudio, LicensedAudioImpl.class);
+        randomAccessFile.writeUTF(licensedAudio.getHolder());
+    }
+
+    public static void saveAudioVideo(RandomAccessFile randomAccessFile, long seekPos, AudioVideoImpl audioVideo) throws IOException {
+        saveAudio(randomAccessFile, seekPos, audioVideo, AudioVideoImpl.class);
+        randomAccessFile.writeInt(audioVideo.getWidth());
+        randomAccessFile.writeInt(audioVideo.getHeight());
+    }
+
+    public static void saveAudio(RandomAccessFile randomAccessFile, long seekPos, AudioImpl audio) throws IOException {
+        saveAudio(randomAccessFile, seekPos, audio, AudioImpl.class);
+    }
+
+    public static void saveVideo(RandomAccessFile randomAccessFile, long seekPos, VideoImpl video) throws IOException {
+        saveVideo(randomAccessFile, seekPos, video, VideoImpl.class);
+    }
+
+    public static void saveInteractiveVideo(RandomAccessFile randomAccessFile, long seekPos, InteractiveVideoImpl interactiveVideo) throws IOException {
+        saveVideo(randomAccessFile, seekPos, interactiveVideo, InteractiveVideoImpl.class);
+        randomAccessFile.writeUTF(interactiveVideo.getType());
+    }
+
+    public static void saveLicensedAudioVideo(RandomAccessFile randomAccessFile, long seekPos, LicensedAudioVideoImpl licensedAudioVideo) throws IOException {
+        saveAudio(randomAccessFile, seekPos, licensedAudioVideo, LicensedAudioVideoImpl.class);
+        randomAccessFile.writeInt(licensedAudioVideo.getWidth());
+        randomAccessFile.writeInt(licensedAudioVideo.getHeight());
+        randomAccessFile.writeUTF(licensedAudioVideo.getHolder());
+    }
+
+    public static InteractiveVideoImpl loadInteractiveVideo(RandomAccessFile randomAccessFile) throws IOException {
+        InteractiveVideoImpl interactiveVideo = new InteractiveVideoImpl();
+        interactiveVideo.setWidth(randomAccessFile.readInt());
+        interactiveVideo.setHeight(randomAccessFile.readInt());
+        interactiveVideo.setEncoding(randomAccessFile.readUTF());
+        interactiveVideo.setBitrate(randomAccessFile.readLong());
+        interactiveVideo.setLength(randomAccessFile.readLong());
+        interactiveVideo.setSize(new BigDecimal(randomAccessFile.readDouble()));
+        interactiveVideo.setAddress(randomAccessFile.readUTF());
+        interactiveVideo.setAccessCount(randomAccessFile.readLong());
+        interactiveVideo.setUploader(new Producer(randomAccessFile.readUTF()));
+        interactiveVideo.setTags(tagsFromString(randomAccessFile.readUTF()));
+        interactiveVideo.setUploadDate(new Date(randomAccessFile.readLong()));
+        interactiveVideo.setType(randomAccessFile.readUTF());
+        return interactiveVideo;
+    }
+
+    public static LicensedVideoImpl loadLicensedVideo(RandomAccessFile randomAccessFile) throws IOException {
+        LicensedVideoImpl licensedVideo = new LicensedVideoImpl();
+        licensedVideo.setWidth(randomAccessFile.readInt());
+        licensedVideo.setHeight(randomAccessFile.readInt());
+        licensedVideo.setEncoding(randomAccessFile.readUTF());
+        licensedVideo.setBitrate(randomAccessFile.readLong());
+        licensedVideo.setLength(randomAccessFile.readLong());
+        licensedVideo.setSize(new BigDecimal(randomAccessFile.readDouble()));
+        licensedVideo.setAddress(randomAccessFile.readUTF());
+        licensedVideo.setAccessCount(randomAccessFile.readLong());
+        licensedVideo.setUploader(new Producer(randomAccessFile.readUTF()));
+        licensedVideo.setTags(tagsFromString(randomAccessFile.readUTF()));
+        licensedVideo.setUploadDate(new Date(randomAccessFile.readLong()));
+        licensedVideo.setHolder(randomAccessFile.readUTF());
+        return licensedVideo;
+    }
+
+    public static LicensedAudioImpl loadLicensedAudio(RandomAccessFile randomAccessFile) throws IOException {
+        LicensedAudioImpl licensedAudio = new LicensedAudioImpl();
+        licensedAudio.setSamplingRate(randomAccessFile.readInt());
+        licensedAudio.setEncoding(randomAccessFile.readUTF());
+        licensedAudio.setBitrate(randomAccessFile.readLong());
+        licensedAudio.setLength(randomAccessFile.readLong());
+        licensedAudio.setSize(new BigDecimal(randomAccessFile.readDouble()));
+        licensedAudio.setAddress(randomAccessFile.readUTF());
+        licensedAudio.setAccessCount(randomAccessFile.readLong());
+        licensedAudio.setUploader(new Producer(randomAccessFile.readUTF()));
+        licensedAudio.setTags(tagsFromString(randomAccessFile.readUTF()));
+        licensedAudio.setUploadDate(new Date(randomAccessFile.readLong()));
+        licensedAudio.setHolder(randomAccessFile.readUTF());
+        return licensedAudio;
+    }
+
+    public static AudioVideoImpl loadAudioVideo(RandomAccessFile randomAccessFile) throws IOException {
+        AudioVideoImpl audioVideo = new AudioVideoImpl();
+        audioVideo.setSamplingRate(randomAccessFile.readInt());
+        audioVideo.setEncoding(randomAccessFile.readUTF());
+        audioVideo.setBitrate(randomAccessFile.readLong());
+        audioVideo.setLength(randomAccessFile.readLong());
+        audioVideo.setSize(new BigDecimal(randomAccessFile.readDouble()));
+        audioVideo.setAddress(randomAccessFile.readUTF());
+        audioVideo.setAccessCount(randomAccessFile.readLong());
+        audioVideo.setUploader(new Producer(randomAccessFile.readUTF()));
+        audioVideo.setTags(tagsFromString(randomAccessFile.readUTF()));
+        audioVideo.setUploadDate(new Date(randomAccessFile.readLong()));
+        audioVideo.setWidth(randomAccessFile.readInt());
+        audioVideo.setHeight(randomAccessFile.readInt());
+        return audioVideo;
+    }
+
+    public static AudioImpl loadAudio(RandomAccessFile randomAccessFile) throws IOException {
+        AudioImpl audio = new AudioImpl();
+        audio.setSamplingRate(randomAccessFile.readInt());
+        audio.setEncoding(randomAccessFile.readUTF());
+        audio.setBitrate(randomAccessFile.readLong());
+        audio.setLength(randomAccessFile.readLong());
+        audio.setSize(new BigDecimal(randomAccessFile.readDouble()));
+        audio.setAddress(randomAccessFile.readUTF());
+        audio.setAccessCount(randomAccessFile.readLong());
+        audio.setUploader(new Producer(randomAccessFile.readUTF()));
+        audio.setTags(tagsFromString(randomAccessFile.readUTF()));
+        audio.setUploadDate(new Date(randomAccessFile.readLong()));
+        return audio;
+    }
+
+    public static VideoImpl loadVideo(RandomAccessFile randomAccessFile) throws IOException {
+        VideoImpl video = new VideoImpl();
+        video.setWidth(randomAccessFile.readInt());
+        video.setHeight(randomAccessFile.readInt());
+        video.setEncoding(randomAccessFile.readUTF());
+        video.setBitrate(randomAccessFile.readLong());
+        video.setLength(randomAccessFile.readLong());
+        video.setSize(new BigDecimal(randomAccessFile.readDouble()));
+        video.setAddress(randomAccessFile.readUTF());
+        video.setAccessCount(randomAccessFile.readLong());
+        video.setUploader(new Producer(randomAccessFile.readUTF()));
+        video.setTags(tagsFromString(randomAccessFile.readUTF()));
+        video.setUploadDate(new Date(randomAccessFile.readLong()));
+        return video;
+    }
+
+    public static LicensedAudioVideoImpl loadLicensedAudioVideo(RandomAccessFile randomAccessFile) throws IOException {
+        LicensedAudioVideoImpl licensedAudioVideo = new LicensedAudioVideoImpl();
+        licensedAudioVideo.setSamplingRate(randomAccessFile.readInt());
+        licensedAudioVideo.setEncoding(randomAccessFile.readUTF());
+        licensedAudioVideo.setBitrate(randomAccessFile.readLong());
+        licensedAudioVideo.setLength(randomAccessFile.readLong());
+        licensedAudioVideo.setSize(new BigDecimal(randomAccessFile.readDouble()));
+        licensedAudioVideo.setAddress(randomAccessFile.readUTF());
+        licensedAudioVideo.setAccessCount(randomAccessFile.readLong());
+        licensedAudioVideo.setUploader(new Producer(randomAccessFile.readUTF()));
+        licensedAudioVideo.setTags(tagsFromString(randomAccessFile.readUTF()));
+        licensedAudioVideo.setUploadDate(new Date(randomAccessFile.readLong()));
+        licensedAudioVideo.setWidth(randomAccessFile.readInt());
+        licensedAudioVideo.setHeight(randomAccessFile.readInt());
+        licensedAudioVideo.setHolder(randomAccessFile.readUTF());
+
+        return licensedAudioVideo;
+    }
+
+    private static String tagsToString(Collection<Tag> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return ",";
+        }
+        String[] tagsArr = tags.stream().map(Enum::toString).collect(Collectors.toList()).toArray(new String[tags.size()]);
+        return String.join(",", tagsArr);
+    }
+
+    private static List<Tag> tagsFromString(String tagsString) {
+        if (tagsString == null) {
+            return new ArrayList<>();
+        }
+        String[] inputTags = tagsString.split(",");
+        List<Tag> tags = new ArrayList<>();
+        for (String inputTag : inputTags) {
+            try {
+                tags.add(Tag.valueOf(inputTag));
+            } catch (IllegalArgumentException e) {
+                // Non existing tags
+            }
+        }
+
+        return tags;
+    }
+
+    private static <T extends Video> void saveVideo(RandomAccessFile randomAccessFile, long seekPos, VideoImpl video, Class<T> clazz) throws IOException {
+        randomAccessFile.seek(seekPos);
+        randomAccessFile.writeUTF(clazz.getSimpleName());
+        randomAccessFile.writeInt(video.getWidth());
+        randomAccessFile.writeInt(video.getHeight());
+        randomAccessFile.writeUTF(video.getEncoding());
+        randomAccessFile.writeLong(video.getBitrate());
+        randomAccessFile.writeLong(video.getLength());
+        randomAccessFile.writeDouble(video.getSize().doubleValue());
+        randomAccessFile.writeUTF(video.getAddress());
+        randomAccessFile.writeLong(video.getAccessCount());
+        randomAccessFile.writeUTF(video.getUploader().getName());
+        randomAccessFile.writeUTF(tagsToString(video.getTags()));
+        randomAccessFile.writeLong(video.getUploadDate().getTime());
+    }
+
+    private static <T extends Audio> void saveAudio(RandomAccessFile randomAccessFile, long seekPos, AudioImpl audio, Class<T> clazz) throws IOException {
+        randomAccessFile.seek(seekPos);
+        randomAccessFile.writeUTF(clazz.getSimpleName());
+        randomAccessFile.writeInt(audio.getSamplingRate());
+        randomAccessFile.writeUTF(audio.getEncoding());
+        randomAccessFile.writeLong(audio.getBitrate());
+        randomAccessFile.writeLong(audio.getLength());
+        randomAccessFile.writeDouble(audio.getSize().doubleValue());
+        randomAccessFile.writeUTF(audio.getAddress());
+        randomAccessFile.writeLong(audio.getAccessCount());
+        randomAccessFile.writeUTF(audio.getUploader().getName());
+        randomAccessFile.writeUTF(tagsToString(audio.getTags()));
+        randomAccessFile.writeLong(audio.getUploadDate().getTime());
+    }
+}

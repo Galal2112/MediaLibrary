@@ -4,7 +4,6 @@ import mediaDB.Tag;
 import mediaDB.UploadableMediaContent;
 import model.*;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +26,7 @@ public final class MediaParser {
             }
 
             long bitrate = Long.parseLong(parsedString[3]);
-            long durationInSeconds = Long.parseLong(parsedString[4]);
-            Duration duration = Duration.ofSeconds(durationInSeconds);
+            long duration = Long.parseLong(parsedString[4]);
 
             if (isVideo(mediaType)) {
                 String encoding = parsedString[5];

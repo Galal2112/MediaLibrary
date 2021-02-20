@@ -1,6 +1,6 @@
 package util;
 
-import mediaDB.*;
+import mediaDB.UploadableMediaContent;
 import model.*;
 
 public final class MediaUtil {

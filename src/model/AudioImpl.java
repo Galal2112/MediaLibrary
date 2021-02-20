@@ -1,17 +1,18 @@
 package model;
 
-import mediaDB.*;
+import mediaDB.Audio;
+import mediaDB.Tag;
+import mediaDB.Uploader;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Date;
 
 public class AudioImpl implements Audio {
     private int samplingRate;
     private String encoding;
-    private Long bitrate;
-    private Duration length;
+    private long bitrate;
+    private long length;
     private BigDecimal size;
     private String address;
     private Collection<Tag> tags;
@@ -19,7 +20,9 @@ public class AudioImpl implements Audio {
     private Uploader uploader;
     private Date uploadDate;
 
-    public AudioImpl(int samplingRate, String encoding, Long bitrate, Duration length,
+    public AudioImpl() {}
+
+    public AudioImpl(int samplingRate, String encoding, long bitrate, long length,
                                   Uploader uploader, Collection<Tag> tags) {
         this.samplingRate = samplingRate;
         this.encoding = encoding;
@@ -52,7 +55,7 @@ public class AudioImpl implements Audio {
     }
 
     @Override
-    public Duration getLength() {
+    public long getLength() {
         return length;
     }
 
@@ -104,6 +107,26 @@ public class AudioImpl implements Audio {
     @Override
     public void setUploadDate(Date date) {
         this.uploadDate = date;
+    }
+
+    public void setSamplingRate(int samplingRate) {
+        this.samplingRate = samplingRate;
+    }
+
+    public void setBitrate(long bitrate) {
+        this.bitrate = bitrate;
+    }
+
+    public void setLength(long length) {
+        this.length = length;
+    }
+
+    public void setSize(BigDecimal size) {
+        this.size = size;
+    }
+
+    public void setUploader(Uploader uploader) {
+        this.uploader = uploader;
     }
 
     @Override

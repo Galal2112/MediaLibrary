@@ -6,6 +6,7 @@ import mediaDB.Uploadable;
 import mediaDB.Uploader;
 import storage.InsufficientStorageException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,4 +36,16 @@ public interface MediaAdmin {
    Optional<MediaContent> retrieveMediaByAddress(String address);
 
     <T extends MediaContent & Uploadable> void update(T media);
+
+    void saveJOS() throws IOException;
+
+    void loadJOS() throws IOException;
+
+    void saveJBP();
+
+    void loadJBP() throws IOException;
+
+    void save(String retrivalAddress) throws IllegalArgumentException;
+
+    MediaContent load(String retrivalAddress) throws IllegalArgumentException, InsufficientStorageException;
 }

@@ -1,11 +1,10 @@
 package util;
 
-import mediaDB.*;
+import mediaDB.Video;
 import model.InteractiveVideoImpl;
 import model.LicensedAudioVideoImpl;
 import model.Producer;
 
-import java.time.Duration;
 import java.util.ArrayList;
 
 public final class RandomGenerator {
@@ -32,13 +31,13 @@ public final class RandomGenerator {
 
         if (random == 1) {
             return new InteractiveVideoImpl("Interactive", width, height,
-                    availableEncodings[encodingIndex], bitrate, Duration.ofSeconds(lengthSeconds),
+                    availableEncodings[encodingIndex], bitrate, lengthSeconds,
                     availableUploaders[uploaderIndex], new ArrayList<>());
         } else {
             int samplingRate = getBoundedRandomNumber(8000) * 8;
             int holderIndex = getBoundedRandomNumber(availableHolders.length) - 1;
             return new LicensedAudioVideoImpl(width, height, samplingRate, availableEncodings[encodingIndex],
-                    availableHolders[holderIndex], bitrate, Duration.ofSeconds(lengthSeconds),
+                    availableHolders[holderIndex], bitrate, lengthSeconds,
                     availableUploaders[uploaderIndex], new ArrayList<>());
         }
     }

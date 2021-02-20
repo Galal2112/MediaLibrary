@@ -49,6 +49,16 @@ public class MediaStorage implements Subject {
         }
     }
 
+    public void clear() {
+        this.lock.lock();
+        try {
+            availableMediaStorageInMB = diskSize;
+            notifyObserver();
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
     public BigDecimal getAvailableMediaStorageInMB() {
         this.lock.lock();
         try {

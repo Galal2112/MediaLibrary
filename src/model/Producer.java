@@ -7,6 +7,8 @@ import java.util.Objects;
 public class Producer implements Uploader {
     private String name;
 
+    public Producer() {}
+
     public Producer(String name) {
         this.name = name;
     }

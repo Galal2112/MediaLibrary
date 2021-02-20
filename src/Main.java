@@ -4,15 +4,15 @@ import crud.CRUD;
 import crud.MediaCRUD;
 import crud.UploaderCRUD;
 import mediaDB.MediaContent;
-import storage.MediaStorage;
 import mvc.*;
 import observer.MediaStorageObserver;
+import storage.MediaStorage;
 
 public class Main {
     public static void main(String[] args) {
 
         Console console = new Console();
-        long diskSizeGB = console.readLongFromStdin("Enter Disk size in gigabyte:");
+        long diskSizeGB = console.readLongFromStdin("Enter Disk size in gigabyte: ");
         MediaStorage mediaStorage = new MediaStorage(diskSizeGB * 1000);
         //Observer
         MediaStorageObserver observer = new MediaStorageObserver(mediaStorage);
@@ -28,6 +28,5 @@ public class Main {
         // create controller
         MediaController controller = new MediaLibraryController(view, mediaAdmin);
         controller.start();
-
     }
 }

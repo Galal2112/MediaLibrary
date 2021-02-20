@@ -1,6 +1,9 @@
 import businessLogic.MediaAdmin;
 import mediaDB.LicensedAudioVideo;
-import mvc.*;
+import mvc.CliMediaView;
+import mvc.Console;
+import mvc.MediaLibraryController;
+import mvc.MediaView;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import storage.InsufficientStorageException;

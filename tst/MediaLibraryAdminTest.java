@@ -3,11 +3,11 @@ import businessLogic.MediaLibraryAdmin;
 import crud.MediaCRUD;
 import crud.UploaderCRUD;
 import mediaDB.*;
-import storage.InsufficientStorageException;
-import storage.MediaStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import storage.InsufficientStorageException;
+import storage.MediaStorage;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -144,11 +144,11 @@ class MediaLibraryAdminTest {
         when(mediaCRUD.getAll()).thenReturn(allMedia);
 
         // Test result size
-        assertEquals(mediaAdmin.listMedia(InteractiveVideo.class).size(), interactiveVideos.size());
+        assertEquals(mediaAdmin.listMedia(mock(InteractiveVideo.class).getClass()).size(), interactiveVideos.size());
         verify(interactiveVideos.get(0)).setAccessCount(1);
         verify(mediaCRUD).update(interactiveVideos.get(0));
 
-        assertEquals(mediaAdmin.listMedia(LicensedAudioVideo.class).size(), audioVideos.size());
+        assertEquals(mediaAdmin.listMedia(mock(LicensedAudioVideo.class).getClass()).size(), audioVideos.size());
         verify(audioVideos.get(0)).setAccessCount(1);
         verify(mediaCRUD).update(audioVideos.get(0));
 

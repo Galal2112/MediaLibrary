@@ -4,7 +4,6 @@ import mediaDB.AudioVideo;
 import mediaDB.Tag;
 import mediaDB.Uploader;
 
-import java.time.Duration;
 import java.util.Collection;
 
 public class AudioVideoImpl extends AudioImpl implements AudioVideo {
@@ -12,8 +11,12 @@ public class AudioVideoImpl extends AudioImpl implements AudioVideo {
     private int width;
     private int height;
 
+    public AudioVideoImpl() {
+        super();
+    }
+
     public AudioVideoImpl(int width, int height,
-                          int samplingRate, String encoding, Long bitrate, Duration length,
+                          int samplingRate, String encoding, Long bitrate, long length,
                           Uploader uploader, Collection<Tag> tags) {
         super(samplingRate, encoding, bitrate, length, uploader, tags);
         this.width = width;
@@ -28,6 +31,14 @@ public class AudioVideoImpl extends AudioImpl implements AudioVideo {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     @Override

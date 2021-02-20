@@ -1,7 +1,6 @@
 package model;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 
 public interface MediaSizeUtil {
 
@@ -12,7 +11,7 @@ public interface MediaSizeUtil {
      * @param length Media duration
      * @return estimated size in MB
      */
-     static BigDecimal getMediaSize(long bitrate, Duration length) {
-         return new BigDecimal( bitrate * length.getSeconds() / 8).divide(new BigDecimal(1024));
+     static BigDecimal getMediaSize(long bitrate, long length) {
+         return new BigDecimal( bitrate * length / 8).divide(new BigDecimal(1024));
     }
 }

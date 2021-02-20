@@ -5,12 +5,16 @@ import events.ExitEventListener;
 import events.InputEvent;
 import events.InputEventHandler;
 import events.InputEventListener;
-import mediaDB.*;
+import mediaDB.Audio;
+import mediaDB.UploadableMediaContent;
+import mediaDB.Uploader;
+import mediaDB.Video;
 import model.Producer;
 import storage.InsufficientStorageException;
 import util.MediaParser;
 import util.MediaUtil;
 
+import java.io.IOException;
 import java.util.*;
 
 public class MediaLibraryController implements MediaController {
@@ -18,7 +22,7 @@ public class MediaLibraryController implements MediaController {
     private final MediaView mediaView;
     private final MediaAdmin mediaAdmin;
     private final ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(Command.CREATE, Command.DELETE,
-            Command.VIEW));
+            Command.VIEW, Command.PRESISTENCE_MODE));
     private Command currentCommand = null;
 
     public MediaLibraryController(MediaView mediaView, MediaAdmin mediaAdmin) {
@@ -31,6 +35,7 @@ public class MediaLibraryController implements MediaController {
         handler.add(new CreateInputListener());
         handler.add(new ViewInputListener());
         handler.add(new DeleteInputListener());
+        handler.add(new PresistenceIputListener());
         mediaView.setHandler(handler);
     }
 
@@ -191,6 +196,83 @@ public class MediaLibraryController implements MediaController {
                         mediaView.displayError("Invalid Input");
                     }
                 }
+            }
+        }
+    }
+
+    class PresistenceIputListener implements InputEventListener {
+        @Override
+        public void onInputEvent(InputEvent event) {
+            if (event.getText() == null) {
+                mediaView.displayError("Not a valid input");
+                return;
+            }
+            if (currentCommand != null && !event.getText().startsWith(":") && currentCommand == Command.PRESISTENCE_MODE) {
+                handlePresistenceEvent(event);
+            }
+        }
+
+        private void handlePresistenceEvent(InputEvent event) {
+
+            switch (event.getText()) {
+                case "saveJOS":
+                    try {
+                        mediaAdmin.saveJOS();
+                        mediaView.displayMessage("JOS file is Saved");
+
+                    } catch (IOException e) {
+                        mediaView.displayError(e.getMessage());
+                    }
+                    break;
+                case "loadJOS":
+                    try {
+                        mediaAdmin.loadJOS();
+                        mediaView.displayMessage("JOS file is Loaded");
+
+                    } catch (IOException e) {
+                        mediaView.displayError("File not Found, No data is saved");
+                    }
+                    break;
+                case "saveJBP":
+                    mediaAdmin.saveJBP();
+                    mediaView.displayMessage("JBP file is saved");
+
+                    break;
+                case "loadJBP":
+                    try {
+                        mediaAdmin.loadJBP();
+                        mediaView.displayMessage("JBP file is Loaded");
+                    } catch (IOException e) {
+                        mediaView.displayError("File not Found, No data is saved");
+                    }
+                    break;
+                default:
+                    if (event.getText().startsWith("save")) {
+                        String[] split = event.getText().split(" ");
+                        if (split.length == 1) {
+                            System.out.print("Please Enter a valid Address");
+                        } else {
+                            try {
+                                mediaAdmin.save(split[1]);
+                            } catch (IllegalArgumentException e) {
+                                mediaView.displayError(e.getMessage());
+                            }
+                        }
+
+                    } else if (event.getText().startsWith("load")) {
+                        String[] split = event.getText().split(" ");
+                        if (split.length == 1) {
+                            System.out.print("Please Enter a valid Address");
+                        } else {
+                            try {
+                                mediaAdmin.load(split[1]);
+                            } catch (InsufficientStorageException | IllegalArgumentException e) {
+                                mediaView.displayError(e.getMessage());
+                            }
+                        }
+                    } else {
+                        System.out.println("no match");
+                    }
             }
         }
     }

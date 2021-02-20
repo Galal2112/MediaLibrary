@@ -1,9 +1,10 @@
 package model;
 
-import mediaDB.*;
+import mediaDB.Tag;
+import mediaDB.Uploader;
+import mediaDB.Video;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Date;
 
@@ -12,7 +13,7 @@ public class VideoImpl implements Video {
     private int height;
     private String encoding;
     private long bitrate;
-    private Duration length;
+    private long length;
     private BigDecimal size;
     private String address;
     private Collection<Tag> tags;
@@ -20,8 +21,10 @@ public class VideoImpl implements Video {
     private Uploader uploader;
     private Date uploadDate;
 
+    public VideoImpl() {}
+
     public VideoImpl(int width, int height, String encoding,
-                                long bitrate, Duration length, Uploader uploader, Collection<Tag> tags) {
+                                long bitrate, long length, Uploader uploader, Collection<Tag> tags) {
         this.width = width;
         this.height = height;
         this.encoding = encoding;
@@ -53,7 +56,7 @@ public class VideoImpl implements Video {
     }
 
     @Override
-    public Duration getLength() {
+    public long getLength() {
         return length;
     }
 
@@ -109,6 +112,30 @@ public class VideoImpl implements Video {
 
     public void setEncoding(String encoding) {
         this.encoding = encoding;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setBitrate(long bitrate) {
+        this.bitrate = bitrate;
+    }
+
+    public void setLength(long length) {
+        this.length = length;
+    }
+
+    public void setSize(BigDecimal size) {
+        this.size = size;
+    }
+
+    public void setUploader(Uploader uploader) {
+        this.uploader = uploader;
     }
 
     @Override

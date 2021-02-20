@@ -4,14 +4,15 @@ import mediaDB.LicensedAudio;
 import mediaDB.Tag;
 import mediaDB.Uploader;
 
-import java.time.Duration;
 import java.util.Collection;
 
 public class LicensedAudioImpl extends AudioImpl implements LicensedAudio {
 
     private String holder;
 
-    public LicensedAudioImpl(String holder, int samplingRate, String encoding, Long bitrate, Duration length, Uploader uploader, Collection<Tag> tags) {
+    public LicensedAudioImpl() {}
+
+    public LicensedAudioImpl(String holder, int samplingRate, String encoding, Long bitrate, long length, Uploader uploader, Collection<Tag> tags) {
         super(samplingRate, encoding, bitrate, length, uploader, tags);
         this.holder = holder;
     }
@@ -19,6 +20,10 @@ public class LicensedAudioImpl extends AudioImpl implements LicensedAudio {
     @Override
     public String getHolder() {
         return holder;
+    }
+
+    public void setHolder(String holder) {
+        this.holder = holder;
     }
 
     @Override

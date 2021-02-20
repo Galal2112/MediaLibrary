@@ -1,7 +1,10 @@
 package server;
 
 import businessLogic.MediaAdmin;
-import mediaDB.*;
+import mediaDB.Audio;
+import mediaDB.UploadableMediaContent;
+import mediaDB.Uploader;
+import mediaDB.Video;
 import model.Producer;
 import mvc.Command;
 import storage.InsufficientStorageException;

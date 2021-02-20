@@ -1,7 +1,10 @@
 package crud;
 
+import businessLogic.PresistencyHelper;
 import mediaDB.MediaContent;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +13,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MediaCRUD implements CRUD<MediaContent> {
+    private static final String serMediaFileName = "media.ser";
+    private static final String xmlMediaFileName = "media.xml";
+
     private final Lock lock = new ReentrantLock();
     private static final LinkedList<MediaContent> mediaList = new LinkedList<>();
 
@@ -86,5 +92,27 @@ public class MediaCRUD implements CRUD<MediaContent> {
         } finally {
             this.lock.unlock();
         }
+    }
+
+    @Override
+    public void saveJOS() throws IOException, FileNotFoundException {
+        PresistencyHelper.saveJOS(mediaList, serMediaFileName);
+    }
+
+    @Override
+    public void loadJOS() throws IOException, ClassNotFoundException, FileNotFoundException {
+        mediaList.clear();
+        mediaList.addAll(PresistencyHelper.loadJOS(serMediaFileName));
+    }
+
+    @Override
+    public void saveJBP() throws IOException, FileNotFoundException {
+        PresistencyHelper.saveMediaUsingJBP(xmlMediaFileName, mediaList);
+    }
+
+    @Override
+    public void loadJBP() throws IOException, ClassNotFoundException, FileNotFoundException {
+        mediaList.clear();
+        mediaList.addAll(PresistencyHelper.loadMediaUsingJBP(xmlMediaFileName));
     }
 }

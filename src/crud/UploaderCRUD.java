@@ -1,7 +1,10 @@
 package crud;
 
+import businessLogic.PresistencyHelper;
 import mediaDB.Uploader;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +13,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class UploaderCRUD implements CRUD<Uploader> {
+    private static final String serUploadersFileName = "uploaders.ser";
+    private static final String xmlUploadersFileName = "uploaders.xml";
 
     //  Lock statt Monitor .... what is Monitor??
     private final Lock lock = new ReentrantLock();
@@ -84,5 +89,27 @@ public class UploaderCRUD implements CRUD<Uploader> {
         } finally {
             this.lock.unlock();
         }
+    }
+
+    @Override
+    public void saveJOS() throws IOException, FileNotFoundException {
+        PresistencyHelper.saveJOS(uploaders, serUploadersFileName);
+    }
+
+    @Override
+    public void loadJOS() throws IOException, ClassNotFoundException, FileNotFoundException {
+        uploaders.clear();
+        uploaders.addAll(PresistencyHelper.loadJOS(serUploadersFileName));
+    }
+
+    @Override
+    public void saveJBP() throws IOException, FileNotFoundException {
+        PresistencyHelper.saveUploadersUsingJBP(xmlUploadersFileName, uploaders);
+    }
+
+    @Override
+    public void loadJBP() throws IOException, ClassNotFoundException, FileNotFoundException {
+        uploaders.clear();
+        uploaders.addAll(PresistencyHelper.loadUploaderUsingJBP(xmlUploadersFileName));
     }
 }
