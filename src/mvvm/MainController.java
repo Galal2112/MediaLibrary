@@ -20,6 +20,7 @@ import util.MediaAdminFactory;
 import util.MediaParser;
 import util.MediaUtil;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,8 @@ public class MainController implements Initializable {
     @FXML private ComboBox<String> typebox;
     @FXML private Button deleteMediaButton;
     @FXML private Button deleteUploaderButton;
+    @FXML private TextField saveMediaAddressTextField;
+    @FXML private TextField loadMediaAddressTextField;
 
     private ObservableList<MediaItemWithProperties> mediaObservableList;
     private ObservableList<ProducerAndUploadsCount> producersObservableList;
@@ -54,7 +57,8 @@ public class MainController implements Initializable {
     private SimpleBooleanProperty isDeleteUploaderVisible = new SimpleBooleanProperty();
 
     public MainController()  {
-        mediaAdmin = MediaAdminFactory.getMediaAdminInstance(new MediaStorage(1024));
+        MediaStorage storage = new MediaStorage(10 * 1000);
+        mediaAdmin = MediaAdminFactory.getMediaAdminInstance(storage);
         mediaObservableList = FXCollections.observableArrayList();
         producersObservableList = FXCollections.observableArrayList();
         refreshMediaList();
@@ -68,7 +72,12 @@ public class MainController implements Initializable {
         this.accessCountColumn.setCellValueFactory(cellData -> cellData.getValue().accessCountProperty().asObject());
         this.mediaTableView.setItems(mediaObservableList);
         this.mediaTableView.setRowFactory(tableview -> new MediaListCell(this::onDrageEnded));
-        this.mediaTableView.getSelectionModel().selectedItemProperty().addListener((component, oldValue, newValue) -> isDeleteMediaVisible.set(newValue != null));
+        this.mediaTableView.getSelectionModel().selectedItemProperty().addListener((component, oldValue, newValue) -> {
+            isDeleteMediaVisible.set(newValue != null);
+            if (newValue != null) {
+                saveMediaAddressTextField.setText(newValue.getAddress());
+            }
+        });
 
         this.allProducersColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         this.uploadsCountColumn.setCellValueFactory(new PropertyValueFactory<>("uploadsCount"));
@@ -141,6 +150,59 @@ public class MainController implements Initializable {
         }
     }
 
+    public synchronized void loadJOS(ActionEvent actionEvent) {
+        try {
+            mediaAdmin.loadJOS();
+            refreshMediaList();
+            displaySuccess("JOS Loaded");
+        } catch (IOException e) {
+            displayError("File not Found, No data is saved");
+        }
+    }
+
+    public synchronized void saveJOS(ActionEvent actionEvent) {
+        try {
+            mediaAdmin.saveJOS();
+            displaySuccess("JOS Saved");
+        } catch (IOException e) {
+            displayError(e.getMessage());
+        }
+    }
+
+    public synchronized void loadJBP(ActionEvent actionEvent) {
+        try {
+            mediaAdmin.loadJBP();
+            refreshMediaList();
+            displaySuccess("JBP Loaded");
+        } catch (IOException e) {
+            displayError("File not Found, No data is saved");
+        }
+    }
+    public synchronized void saveJBP(ActionEvent actionEvent) {
+        mediaAdmin.saveJBP();
+        displaySuccess("JBP Saved");
+    }
+
+    public synchronized void loadMediaByAddress(ActionEvent actionEvent) {
+        String loadAddress = loadMediaAddressTextField.getText();
+        try {
+            mediaAdmin.load(loadAddress);
+            refreshMediaList();
+        } catch (InsufficientStorageException | IllegalArgumentException e) {
+            displayError(e.getMessage());
+        }
+    }
+
+    public synchronized void saveMediaByAddress(ActionEvent actionEvent) {
+        String saveAddress = saveMediaAddressTextField.getText();
+        try {
+            mediaAdmin.save(saveAddress);
+            displaySuccess("Saved");
+        } catch (IllegalArgumentException e) {
+            displayError(e.getMessage());
+        }
+    }
+
     private void handleCreateEvent(String inputText) {
         String[] parsedString = inputText.split(" ");
 
@@ -148,7 +210,6 @@ public class MainController implements Initializable {
             createProducer(inputText);
             return;
         }
-
         try {
             UploadableMediaContent mediaContent = MediaParser.parseMedia(inputText);
             mediaAdmin.upload(mediaContent);
@@ -171,6 +232,10 @@ public class MainController implements Initializable {
 
     private void displayError(String error) {
         new Alert(Alert.AlertType.ERROR, error).show();
+    }
+
+    private void displaySuccess(String message) {
+        new Alert(Alert.AlertType.INFORMATION, message).show();
     }
 
     private void onMediaUploaded(String address) {

@@ -6,6 +6,7 @@ import mediaDB.Uploader;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class PresistencyHelper {
@@ -19,7 +20,8 @@ public final class PresistencyHelper {
 
     public static <T extends Serializable> List<T> loadJOS(String fileName) throws FileNotFoundException, ClassNotFoundException, IOException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName));
-        return PresistencyManager.loadJOS(ois);
+        List<T> result = PresistencyManager.loadJOS(ois);
+        return result == null ? new ArrayList<>() : result;
     }
 
     public static void saveMediaUsingJBP(String xmlFileName, List<MediaContent> mediaList) throws IOException, FileNotFoundException {

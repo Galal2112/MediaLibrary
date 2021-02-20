@@ -100,9 +100,13 @@ public class MediaCRUD implements CRUD<MediaContent> {
     }
 
     @Override
-    public void loadJOS() throws IOException, ClassNotFoundException, FileNotFoundException {
+    public void loadJOS() throws IOException, ClassNotFoundException {
         mediaList.clear();
-        mediaList.addAll(PresistencyHelper.loadJOS(serMediaFileName));
+        try {
+            mediaList.addAll(PresistencyHelper.loadJOS(serMediaFileName));
+        } catch (FileNotFoundException e) {
+
+        }
     }
 
     @Override

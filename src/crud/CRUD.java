@@ -22,7 +22,7 @@ public interface CRUD<T> {
 
     void saveJOS() throws IOException, FileNotFoundException;
 
-    void loadJOS() throws IOException, ClassNotFoundException, FileNotFoundException;
+    void loadJOS() throws IOException, ClassNotFoundException;
 
     void saveJBP() throws IOException, FileNotFoundException;
 

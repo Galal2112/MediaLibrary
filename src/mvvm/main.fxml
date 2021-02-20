@@ -1,76 +1,169 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import java.lang.String?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1024.0" prefWidth="1480.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mvvm.MainController">
    <children>
-      <VBox layoutX="-8.0" layoutY="-2.0" prefHeight="964.0" prefWidth="1290.0" spacing="40.0">
-         <children>
-            <HBox spacing="30.0">
+      <ScrollPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="0.0">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="1024.0" prefWidth="1420.0">
                <children>
-                  <TableView fx:id="producerTableView" editable="true" prefHeight="200.0" prefWidth="350.0">
-                    <columns>
-                      <TableColumn fx:id="allProducersColumn" prefWidth="203.77906036376953" text="Alle Produzenten  ↑↓" />
-                      <TableColumn fx:id="uploadsCountColumn" prefWidth="146.22093200683594" text="Uploads Count ↑↓" />
-                    </columns>
-                     <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                     </columnResizePolicy>
-                  </TableView>
-                  <TableView fx:id="mediaTableView" editable="true" prefHeight="402.0" prefWidth="681.0">
-                    <columns>
-                      <TableColumn fx:id="producerColumn" prefWidth="109.87846183776855" text="Produzent   ↑↓" />
-                      <TableColumn fx:id="addressColumn" minWidth="0.0" prefWidth="177.12156677246094" text="Adress  ↑↓" />
-                        <TableColumn fx:id="dateColumn" prefWidth="129.17672729492188" text="Date   ↑↓" />
-                        <TableColumn fx:id="accessCountColumn" prefWidth="117.50274658203125" text="Access count  ↑↓" />
-                    </columns>
-                     <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                     </columnResizePolicy>
-                  </TableView>
-                  <VBox prefHeight="200.0" prefWidth="180.0" spacing="12.0">
+                  <VBox prefHeight="1019.0" prefWidth="1407.0" spacing="40.0">
                      <children>
-                        <Label text="Display Filter" />
-                        <ComboBox fx:id="typebox" prefWidth="150.0" promptText="Content Type:">
-                            <items>
-                                <FXCollections fx:factory="observableArrayList">
-                                    <String fx:value="All" />
-                                    <String fx:value="InteractiveVideo" />
-                                    <String fx:value="LicensedAudioVideo" />
-                                </FXCollections>
-                            </items>
-                        </ComboBox>
-                         <Button fx:id="deleteMediaButton" mnemonicParsing="false" onAction="#deleteSelectedMedia" prefHeight="26.0" prefWidth="200" text="Delete selected Media" />
-                         <Button fx:id="deleteUploaderButton" mnemonicParsing="false" onAction="#deleteUploader" prefHeight="26.0" prefWidth="200" text="Delete selected Uploader" />
+                        <HBox spacing="30.0">
+                           <children>
+                              <TableView fx:id="producerTableView" editable="true" prefHeight="200.0" prefWidth="350.0">
+                                <columns>
+                                  <TableColumn fx:id="allProducersColumn" prefWidth="203.77906036376953" text="Alle Produzenten  ↑↓" />
+                                  <TableColumn fx:id="uploadsCountColumn" prefWidth="146.22093200683594" text="Uploads Count ↑↓" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                                 <opaqueInsets>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </padding>
+                              </TableView>
+                              <TableView fx:id="mediaTableView" editable="true" prefHeight="402.0" prefWidth="681.0">
+                                <columns>
+                                  <TableColumn fx:id="producerColumn" prefWidth="109.87846183776855" text="Produzent   ↑↓" />
+                                  <TableColumn fx:id="addressColumn" minWidth="0.0" prefWidth="177.12156677246094" text="Adress  ↑↓" />
+                                    <TableColumn fx:id="dateColumn" prefWidth="129.17672729492188" text="Date   ↑↓" />
+                                    <TableColumn fx:id="accessCountColumn" prefWidth="117.50274658203125" text="Access count  ↑↓" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                                 <padding>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </padding>
+                              </TableView>
+                              <VBox prefHeight="200.0" prefWidth="180.0" spacing="12.0">
+                                 <children>
+                                    <Label text="Display Filter" />
+                                    <ComboBox fx:id="typebox" prefWidth="150.0" promptText="Content Type:">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="All" />
+                                                <String fx:value="InteractiveVideo" />
+                                                <String fx:value="LicensedAudioVideo" />
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                     <Button fx:id="deleteMediaButton" mnemonicParsing="false" onAction="#deleteSelectedMedia" prefHeight="26.0" prefWidth="200" text="Delete selected Media" />
+                                     <Button fx:id="deleteUploaderButton" mnemonicParsing="false" onAction="#deleteUploader" prefHeight="26.0" prefWidth="200" text="Delete selected Uploader" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="100.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                           </padding>
+                        </HBox>
+                        <HBox prefHeight="37.0" prefWidth="650.0" spacing="20.0">
+                           <children>
+                              <TextField fx:id="createMediaTextField" prefHeight="26.0" prefWidth="600.0" promptText="Please Enter Media to create" />
+                              <Button mnemonicParsing="false" onAction="#uploadMedia" prefHeight="26.0" prefWidth="80.0" text="Create" />
+                           </children>
+                           <padding>
+                              <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                           </padding>
+                        </HBox>
+                        <HBox layoutX="35.0" layoutY="545.0" prefHeight="29.0" prefWidth="650.0" spacing="20.0">
+                           <children>
+                              <TextField fx:id="deleteMediaTextField" prefHeight="26.0" prefWidth="600.0" promptText="Please Enter media address  or uploader name or select data to delete" />
+                              <Button mnemonicParsing="false" onAction="#deleteMedia" prefHeight="26.0" prefWidth="80.0" text="Delete" />
+                           </children>
+                           <padding>
+                              <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                           </padding>
+                        </HBox>
+                        <VBox prefHeight="150.0" prefWidth="100.0">
+                           <children>
+                              <HBox prefHeight="50.0" prefWidth="200.0">
+                                 <children>
+                                    <Button mnemonicParsing="false" onAction="#saveJOS" text="SaveJOS">
+                                       <HBox.margin>
+                                          <Insets left="100.0" right="70.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                    <Button mnemonicParsing="false" onAction="#loadJOS" text="LoadJOS">
+                                       <HBox.margin>
+                                          <Insets right="70.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                    <Button mnemonicParsing="false" onAction="#saveJBP" text="SaveJBP">
+                                       <HBox.margin>
+                                          <Insets right="70.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                    <Button mnemonicParsing="false" onAction="#loadJBP" text="LoadJBP">
+                                       <HBox.margin>
+                                          <Insets right="70.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox prefHeight="37.0" prefWidth="650.0" spacing="20.0">
+                                 <children>
+                                    <TextField fx:id="saveMediaAddressTextField" prefHeight="26.0" prefWidth="600.0" promptText="Please Enter Media Address to save" />
+                                    <Button mnemonicParsing="false" onAction="#saveMediaByAddress" prefHeight="26.0" prefWidth="80.0" text="Save" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="30.0" />
+                                 </VBox.margin>
+                                 <padding>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox prefHeight="29.0" prefWidth="650.0" spacing="20.0">
+                                 <children>
+                                    <TextField fx:id="loadMediaAddressTextField" prefHeight="26.0" prefWidth="600.0" promptText="Please Enter Media Address to load" />
+                                    <Button mnemonicParsing="false" onAction="#loadMediaByAddress" prefHeight="26.0" prefWidth="80.0" text="Load" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                 </padding>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                           </padding>
+                        </VBox>
                      </children>
                      <padding>
-                        <Insets left="10.0" top="100.0" />
+                        <Insets left="25.0" />
                      </padding>
+                     <opaqueInsets>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </opaqueInsets>
                   </VBox>
                </children>
                <padding>
-                  <Insets top="16.0" />
+                  <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                </padding>
-            </HBox>
-            <HBox prefHeight="37.0" prefWidth="902.0" spacing="20.0">
-               <children>
-                  <TextField fx:id="createMediaTextField" prefHeight="26.0" prefWidth="779.0" promptText="Please Enter Media to create" />
-                  <Button mnemonicParsing="false" onAction="#uploadMedia" prefHeight="26.0" prefWidth="80.0" text="Create" />
-               </children>
-            </HBox>
-            <HBox layoutX="35.0" layoutY="545.0" prefHeight="29.0" prefWidth="967.0" spacing="20.0">
-               <children>
-                  <TextField fx:id="deleteMediaTextField" prefHeight="26.0" prefWidth="779.0" promptText="Please Enter media address  or uploader name or select data to delete" />
-                  <Button mnemonicParsing="false" onAction="#deleteMedia" prefHeight="26.0" prefWidth="80.0" text="Delete" />
-               </children>
-            </HBox>
-         </children>
-         <padding>
-            <Insets left="25.0" />
-         </padding>
-      </VBox>
+            </AnchorPane>
+        </content>
+      </ScrollPane>
    </children>
 </AnchorPane>

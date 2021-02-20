@@ -97,9 +97,13 @@ public class UploaderCRUD implements CRUD<Uploader> {
     }
 
     @Override
-    public void loadJOS() throws IOException, ClassNotFoundException, FileNotFoundException {
+    public void loadJOS() throws IOException, ClassNotFoundException {
         uploaders.clear();
-        uploaders.addAll(PresistencyHelper.loadJOS(serUploadersFileName));
+        try {
+            uploaders.addAll(PresistencyHelper.loadJOS(serUploadersFileName));
+        } catch (FileNotFoundException e) {
+
+        }
     }
 
     @Override
