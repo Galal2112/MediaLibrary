@@ -6,6 +6,7 @@ import model.LicensedAudioVideoImpl;
 import model.Producer;
 
 import java.time.Duration;
+import java.util.ArrayList;
 
 public final class RandomGenerator {
     private RandomGenerator() {}
@@ -32,13 +33,13 @@ public final class RandomGenerator {
         if (random == 1) {
             return new InteractiveVideoImpl("Interactive", width, height,
                     availableEncodings[encodingIndex], bitrate, Duration.ofSeconds(lengthSeconds),
-                    availableUploaders[uploaderIndex]);
+                    availableUploaders[uploaderIndex], new ArrayList<>());
         } else {
             int samplingRate = getBoundedRandomNumber(8000) * 8;
             int holderIndex = getBoundedRandomNumber(availableHolders.length) - 1;
-            return new LicensedAudioVideoImpl(samplingRate, width, height, availableEncodings[encodingIndex],
+            return new LicensedAudioVideoImpl(width, height, samplingRate, availableEncodings[encodingIndex],
                     availableHolders[holderIndex], bitrate, Duration.ofSeconds(lengthSeconds),
-                    availableUploaders[uploaderIndex]);
+                    availableUploaders[uploaderIndex], new ArrayList<>());
         }
     }
 

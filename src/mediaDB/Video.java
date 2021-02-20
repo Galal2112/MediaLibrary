@@ -1,6 +1,6 @@
 package mediaDB;
 
-public interface Video extends MediaContent,Uploadable{
+public interface Video extends UploadableMediaContent {
     int getWidth();
     int getHeight();
     String getEncoding();

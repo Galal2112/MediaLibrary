@@ -10,15 +10,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import mediaDB.*;
-import model.InteractiveVideoImpl;
-import model.LicensedAudioVideoImpl;
 import model.Producer;
 import storage.InsufficientStorageException;
 import storage.MediaStorage;
 import util.MediaAdminFactory;
+import util.MediaParser;
+import util.MediaUtil;
 
 import java.net.URL;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -51,8 +50,8 @@ public class MainController implements Initializable {
     private SimpleBooleanProperty isDeleteMediaVisible = new SimpleBooleanProperty();
     private SimpleBooleanProperty isDeleteUploaderVisible = new SimpleBooleanProperty();
 
-    public MainController(MediaStorage mediaStorage)  {
-        mediaAdmin = MediaAdminFactory.getMediaAdminInstance(mediaStorage);
+    public MainController()  {
+        mediaAdmin = MediaAdminFactory.getMediaAdminInstance(new MediaStorage(1024));
         mediaObservableList = FXCollections.observableArrayList();
         producersObservableList = FXCollections.observableArrayList();
         refreshMediaList();
@@ -148,57 +147,12 @@ public class MainController implements Initializable {
         }
 
         try {
-            String mediaType = parsedString[0];
-            Producer producer = new Producer(parsedString[1]);
-            String[] inputTags = parsedString[2].split(",");
-            List<Tag> tags = new ArrayList<>();
-            for (String inputTag : inputTags) {
-                try {
-                    tags.add(Tag.valueOf(inputTag));
-                } catch (IllegalArgumentException e) {
-                    // Non existing tags
-                }
-            }
-
-            long bitrate = Long.parseLong(parsedString[3]);
-            long durationInSeconds = Long.parseLong(parsedString[4]);
-            Duration duration = Duration.ofSeconds(durationInSeconds);
-
-            String videoEncoding = parsedString[5];
-            int height = Integer.parseInt(parsedString[6]);
-            int width = Integer.parseInt(parsedString[7]);
-
-            if (isInteractiveVideo(mediaType)) {
-                InteractiveVideo interactiveVideo = new InteractiveVideoImpl(mediaType, width, height,
-                        videoEncoding, bitrate, duration, producer);
-                interactiveVideo.setTags(tags);
-                mediaAdmin.upload(interactiveVideo);
-                onVideoUploaded(interactiveVideo.getAddress());
-            } else if (isLicensedAudioVideo(mediaType)) {
-                String audioEncoding = parsedString[8];
-                int samplingRate = Integer.parseInt(parsedString[9]);
-                String holder = parsedString[10];
-                LicensedAudioVideo licensedAudioVideo = new LicensedAudioVideoImpl(samplingRate, width, height,
-                        audioEncoding, holder, bitrate, duration, producer);
-                licensedAudioVideo.setTags(tags);
-                mediaAdmin.upload(licensedAudioVideo);
-                onVideoUploaded(licensedAudioVideo.getAddress());
-            } else {
-                displayError("Unsupported Media type");
-            }
-        } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            displayError("Invalid insert command");
+            UploadableMediaContent mediaContent = MediaParser.parseMedia(inputText);
+            mediaAdmin.upload(mediaContent);
+            onMediaUploaded(mediaContent.getAddress());
         } catch (IllegalArgumentException | InsufficientStorageException e) {
             displayError(e.getMessage());
         }
-    }
-
-    private boolean isInteractiveVideo(String mediaType) {
-        return mediaType.equals("InteractiveVideo");
-    }
-
-    private boolean isLicensedAudioVideo(String mediaType) {
-        return mediaType.equals("LicensedAudioVideo");
     }
 
     private void createProducer(String text) {
@@ -216,7 +170,7 @@ public class MainController implements Initializable {
         new Alert(Alert.AlertType.ERROR, error).show();
     }
 
-    private void onVideoUploaded(String address) {
+    private void onMediaUploaded(String address) {
         refreshMediaList();
         createMediaTextField.setText("");
     }
@@ -243,12 +197,12 @@ public class MainController implements Initializable {
         List<?> media = new ArrayList<>();
         if (selectedType == null || selectedType.equals("All")) {
             media = mediaAdmin.listMedia(null);
-        } else if (isInteractiveVideo(selectedType)) {
-            media = mediaAdmin.listMedia(InteractiveVideo.class);
-        } else if (isLicensedAudioVideo(selectedType)) {
-            media = mediaAdmin.listMedia(LicensedAudioVideo.class);
+        } else {
+            Class<? extends UploadableMediaContent> cls = MediaUtil.getMediaClass(selectedType);
+            if (cls != null) {
+                media = mediaAdmin.listMedia(cls);
+            }
         }
-
         return media.stream().map(MediaItemWithProperties::new).collect(Collectors.toList());
     }
 

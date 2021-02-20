@@ -1,9 +1,9 @@
 package observer;
 
-import businessLogic.BusinessLogicObserver;
+import businessLogic.Logger;
 import mediaDB.MediaContent;
 
-public class BusinessLogicObserverImpl implements BusinessLogicObserver {
+public class ConsoleLogger implements Logger {
 
     @Override
     public synchronized void didCreateUploader(String name) {

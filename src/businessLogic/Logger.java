@@ -2,7 +2,7 @@ package businessLogic;
 
 import mediaDB.MediaContent;
 
-public interface BusinessLogicObserver {
+public interface Logger {
 
     void didCreateUploader(String name);
 

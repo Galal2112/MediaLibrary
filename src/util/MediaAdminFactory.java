@@ -6,7 +6,7 @@ import crud.CRUD;
 import crud.MediaCRUD;
 import crud.UploaderCRUD;
 import mediaDB.MediaContent;
-import observer.BusinessLogicObserverImpl;
+import observer.ConsoleLogger;
 import storage.MediaStorage;
 
 public final class MediaAdminFactory {
@@ -18,7 +18,7 @@ public final class MediaAdminFactory {
         CRUD<MediaContent> mediaCRUD = new MediaCRUD();
         UploaderCRUD uploaderCRUD = new UploaderCRUD();
         MediaLibraryAdmin mediaAdmin = new MediaLibraryAdmin(mediaStorage, uploaderCRUD, mediaCRUD);
-        mediaAdmin.registerObserver(new BusinessLogicObserverImpl());
+        mediaAdmin.setLogger(new ConsoleLogger());
         return mediaAdmin;
     }
 }

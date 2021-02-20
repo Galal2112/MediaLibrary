@@ -15,7 +15,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     private final CRUD<Uploader> uploaderCRUD;
     private final CRUD<MediaContent> mediaContentCRUD;
-    private volatile BusinessLogicObserver businessLogicObserver;
+    private volatile Logger logger;
     private MediaStorage mediaStorage;
 
     public MediaLibraryAdmin(MediaStorage mediaStorage, CRUD<Uploader> uploaderCRUD, CRUD<MediaContent> mediaContentCRUD) {
@@ -24,21 +24,21 @@ public class MediaLibraryAdmin implements MediaAdmin {
         this.mediaContentCRUD = mediaContentCRUD;
     }
 
-    public synchronized void registerObserver(BusinessLogicObserver serverObserver) {
-        this.businessLogicObserver = serverObserver;
+    public synchronized void setLogger(Logger logger) {
+        this.logger = logger;
     }
 
-    public synchronized void unregisterObserver() {
-        this.businessLogicObserver = null;
+    public synchronized void stopLogger() {
+        this.logger = null;
     }
 
     @Override
     public synchronized void createUploader(Uploader uploader) throws IllegalArgumentException {
         if (!uploaderCRUD.get(uploader.getName()).isPresent()) {
             uploaderCRUD.create(uploader);
-            if (businessLogicObserver != null) businessLogicObserver.didCreateUploader(uploader.getName());
+            if (logger != null) logger.didCreateUploader(uploader.getName());
         } else {
-            if (businessLogicObserver != null) businessLogicObserver.uploaderAlreadyRegistered(uploader.getName());
+            if (logger != null) logger.uploaderAlreadyRegistered(uploader.getName());
             throw new IllegalArgumentException("Username is taken");
         }
     }
@@ -63,7 +63,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
         mediaStorage.addMediaInStorage(media);
 
-        if (businessLogicObserver != null) businessLogicObserver.didUpload(media);
+        if (logger != null) logger.didUpload(media);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
             int count = producerUploadCount.get(media.getUploader());
             producerUploadCount.put(media.getUploader(), count + 1);
         });
-        if (businessLogicObserver != null) businessLogicObserver.didListProducersAndUploadsCount();
+        if (logger != null) logger.didListProducersAndUploadsCount();
         return producerUploadCount;
     }
 
@@ -88,7 +88,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
             result.addAll(mediaContentCRUD.getAll());
         } else {
             // Get media data based on type using isInstance
-            result.addAll(mediaContentCRUD.getAll().stream().filter(type :: isInstance).collect(Collectors.toList()));
+            result.addAll(mediaContentCRUD.getAll().stream().filter(m -> m.getClass().equals(type)).collect(Collectors.toList()));
         }
 
         // update access count
@@ -97,13 +97,13 @@ public class MediaLibraryAdmin implements MediaAdmin {
             //update acessCount in the DB
             mediaContentCRUD.update(content);
         }
-        if (businessLogicObserver != null) businessLogicObserver.didListMedia(result.size());
+        if (logger != null) logger.didListMedia(result.size());
         return result;
     }
 
     @Override
     public synchronized List<Tag> getAllTags() {
-        if (businessLogicObserver != null) businessLogicObserver.didListTags();
+        if (logger != null) logger.didListTags();
         return Arrays.asList(Tag.values());
     }
 
@@ -115,7 +115,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
             for (MediaContent mediaContent : uploaderMediaList) {
                 mediaContentCRUD.deleteById(mediaContent.getAddress());
             }
-            if (businessLogicObserver != null) businessLogicObserver.didDeleteUploaderWithName(name);
+            if (logger != null) logger.didDeleteUploaderWithName(name);
         } else {
             throw new IllegalArgumentException("Uploader name doesn't exist");
         }
@@ -138,7 +138,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         if (mediaContentOptional.isPresent()) {
             mediaStorage.deletedMediaFromStorage(mediaContentOptional.get());
             mediaContentCRUD.deleteById(address);
-            if (businessLogicObserver != null) businessLogicObserver.didDeleteMediaAtAddress(address);
+            if (logger != null) logger.didDeleteMediaAtAddress(address);
         } else {
             throw new IllegalArgumentException("Media doesn't exist");
         }
@@ -147,11 +147,11 @@ public class MediaLibraryAdmin implements MediaAdmin {
     @Override
     public Optional<Uploader> getUploader(String name) {
         Optional<Uploader> uploaderOptional = uploaderCRUD.get(name);
-        if (businessLogicObserver != null) {
+        if (logger != null) {
             if (uploaderOptional.isPresent()) {
-                businessLogicObserver.didRetrieveUploader(name);
+                logger.didRetrieveUploader(name);
             } else {
-                businessLogicObserver.requestedUploaderNotFount(name);
+                logger.requestedUploaderNotFount(name);
             }
         }
         return uploaderOptional;
@@ -161,11 +161,11 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public Optional<MediaContent> retrieveMediaByAddress(String address) {
         Optional<MediaContent> media = mediaContentCRUD.get(address);
         media.ifPresent(mediaContent -> mediaContent.setAccessCount(mediaContent.getAccessCount() + 1));
-        if (businessLogicObserver != null) {
+        if (logger != null) {
             if (media.isPresent()) {
-                businessLogicObserver.didRetrieveMediaAtAddress(address);
+                logger.didRetrieveMediaAtAddress(address);
             } else {
-                businessLogicObserver.mediaNotFoundAtAddress(address);
+                logger.mediaNotFoundAtAddress(address);
             }
         }
         return media;
