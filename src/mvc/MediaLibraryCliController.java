@@ -7,7 +7,10 @@ import events.InputEventHandler;
 import events.InputEventListener;
 import mediaDB.*;
 import model.Producer;
+import observer.MediaStorageObserver;
+import observer.TagsObserver;
 import storage.InsufficientStorageException;
+import storage.MediaStorage;
 import util.MediaParser;
 import util.MediaUtil;
 
@@ -18,11 +21,15 @@ public class MediaLibraryCliController implements MediaController {
 
     private final MediaView mediaView;
     private final MediaAdmin mediaAdmin;
+    private final MediaStorage mediaStorage;
     private final List<Command> commandList = Arrays.asList(Command.values());
+    private MediaStorageObserver mediaStorageObserver;
+    private TagsObserver tagsObserver;
     private Command currentCommand = null;
 
-    public MediaLibraryCliController(MediaView mediaView, MediaAdmin mediaAdmin) {
+    public MediaLibraryCliController(MediaView mediaView, MediaAdmin mediaAdmin, MediaStorage mediaStorage) {
         this.mediaAdmin = mediaAdmin;
+        this.mediaStorage = mediaStorage;
         this.mediaView = mediaView;
 
         InputEventHandler handler = new InputEventHandler();
@@ -33,6 +40,7 @@ public class MediaLibraryCliController implements MediaController {
         handler.add(new DeleteInputListener());
         handler.add(new IncreaseAccessCountListener());
         handler.add(new PresistenceIputListener());
+        handler.add(new ConfigInputListener());
         mediaView.setHandler(handler);
     }
 
@@ -59,6 +67,10 @@ public class MediaLibraryCliController implements MediaController {
                 Optional<Command> commandOptional = commandList.stream().filter(c -> c.getKey().equals(event.getText())).findFirst();
                 if (commandOptional.isPresent()) {
                     currentCommand = commandOptional.get();
+                    if (currentCommand == Command.CONFIG) {
+                        mediaView.displayMessage("Available observers: [ " + MediaStorageObserver.class.getSimpleName() + ", "
+                                + TagsObserver.class.getSimpleName()  +" ]");
+                    }
                 } else {
                     mediaView.displayError("Please insert a valid command");
                 }
@@ -310,4 +322,46 @@ public class MediaLibraryCliController implements MediaController {
             }
         }
     }
+
+    class ConfigInputListener implements InputEventListener {
+        @Override
+        public void onInputEvent(InputEvent event) {
+            if (event.getText() == null) {
+                mediaView.displayError("Not a valid input");
+                return;
+            }
+            if (currentCommand != null && !event.getText().startsWith(":") && currentCommand == Command.CONFIG) {
+                String[] split = event.getText().split(" ");
+                if (split.length == 2) {
+                    if (split[0].equalsIgnoreCase("add")) {
+                        if (split[1].equals(MediaStorageObserver.class.getSimpleName())) {
+                            if (mediaStorageObserver == null) {
+                                mediaStorageObserver = new MediaStorageObserver(mediaStorage);
+                            }
+                            mediaStorage.register(mediaStorageObserver);
+                            return;
+                        } else if (split[1].equals(TagsObserver.class.getSimpleName())) {
+                            if (tagsObserver == null) {
+                                tagsObserver = new TagsObserver(mediaAdmin);
+                            }
+                            mediaAdmin.register(tagsObserver);
+                            return;
+                        }
+                    } else if (split[0].equalsIgnoreCase("remove")) {
+                        if (split[1].equals(MediaStorageObserver.class.getSimpleName())) {
+                            mediaStorage.unregister(mediaStorageObserver);
+                            mediaStorageObserver = null;
+                            return;
+                        } else if (split[1].equals(TagsObserver.class.getSimpleName())) {
+                            mediaAdmin.unregister(tagsObserver);
+                            tagsObserver = null;
+                            return;
+                        }
+                    }
+                }
+                mediaView.displayError("Invalid command");
+            }
+        }
+    }
+
 }

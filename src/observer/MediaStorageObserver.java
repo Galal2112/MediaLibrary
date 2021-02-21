@@ -10,7 +10,6 @@ public class MediaStorageObserver implements Observer {
 
     public MediaStorageObserver(MediaStorage mediaStorage) {
         this.mediaStorage = mediaStorage;
-        this.mediaStorage.register(this);
     }
 
     @Override

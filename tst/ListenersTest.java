@@ -7,6 +7,7 @@ import mvc.MediaView;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import storage.InsufficientStorageException;
+import storage.MediaStorage;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -26,7 +27,8 @@ public class ListenersTest {
         MediaView mediaView = new CliMediaView(console);
 
         MediaAdmin mediaAdmin = Mockito.mock(MediaAdmin.class);
-        new MediaLibraryCliController(mediaView, mediaAdmin);
+        MediaStorage mediaStorage = Mockito.mock(MediaStorage.class);
+        new MediaLibraryCliController(mediaView, mediaAdmin, mediaStorage);
 
         mediaView.readInput(readModeTitle);
         mediaView.readInput(readCommandTitle);
@@ -45,7 +47,8 @@ public class ListenersTest {
         MediaView mediaView = new CliMediaView(console);
 
         MediaAdmin mediaAdmin = Mockito.mock(MediaAdmin.class);
-        new MediaLibraryCliController(mediaView, mediaAdmin);
+        MediaStorage mediaStorage = Mockito.mock(MediaStorage.class);
+        new MediaLibraryCliController(mediaView, mediaAdmin, mediaStorage);
 
         mediaView.readInput(readModeTitle);
         mediaView.readInput(readCommandTitle);

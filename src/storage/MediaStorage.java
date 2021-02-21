@@ -5,14 +5,15 @@ import observer.Observer;
 import observer.Subject;
 
 import java.math.BigDecimal;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MediaStorage implements Subject {
 
     private final Lock lock = new ReentrantLock();
-    private final ConcurrentLinkedQueue<Observer> observerList = new ConcurrentLinkedQueue<>();
+    private final Set<Observer> observerList = ConcurrentHashMap.newKeySet();;
 
     private final BigDecimal diskSize;
     private BigDecimal availableMediaStorageInMB;

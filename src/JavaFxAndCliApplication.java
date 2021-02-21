@@ -59,20 +59,20 @@ public class JavaFxAndCliApplication extends Application {
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
 
-            MediaLibraryCliController cliController = cliController(mediaAdmin);
+            MediaLibraryCliController cliController = cliController(mediaAdmin, mediaStorage);
             Thread cliThread = new Thread(cliController::start);
             cliThread.setDaemon(true);
             cliThread.start();
         }
     }
 
-    private MediaLibraryCliController cliController(MediaAdmin mediaAdmin) {
+    private MediaLibraryCliController cliController(MediaAdmin mediaAdmin, MediaStorage storage) {
         Console console = new Console();
         // create view
         MediaView view = new CliMediaView(console);
 
         // create controller
-        return new MediaLibraryCliController(view, mediaAdmin);
+        return new MediaLibraryCliController(view, mediaAdmin, storage);
     }
 
     private boolean isInvalidSize(String input) {
