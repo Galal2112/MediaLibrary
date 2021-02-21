@@ -167,6 +167,30 @@ class MediaLibraryAdminTest {
     }
 
     @Test
+    void getUsedTags() {
+        InteractiveVideo testedVideo = mock(InteractiveVideo.class);
+        when(testedVideo.getTags()).thenReturn(Arrays.asList(Tag.Lifestyle, Tag.News));
+        when(mediaCRUD.getAll()).thenReturn(Arrays.asList(testedVideo));
+        List<Tag> usedTags = mediaAdmin.getUsedTags();
+        assertEquals(usedTags.size(), testedVideo.getTags().size());
+        for (Tag tag : testedVideo.getTags()) {
+            assertTrue(usedTags.contains(tag));
+        }
+    }
+
+    @Test
+    void getUnusedTags() {
+        InteractiveVideo testedVideo = mock(InteractiveVideo.class);
+        when(testedVideo.getTags()).thenReturn(Arrays.asList(Tag.Lifestyle, Tag.News));
+        when(mediaCRUD.getAll()).thenReturn(Arrays.asList(testedVideo));
+        List<Tag> unusedTags = mediaAdmin.getUnusedTags();
+        assertEquals(unusedTags.size(), Tag.values().length - testedVideo.getTags().size());
+        for (Tag tag : testedVideo.getTags()) {
+            assertFalse(unusedTags.contains(tag));
+        }
+    }
+
+    @Test
     void deleteUploaderByName() {
         String uploaderName = "DeletedUploader";
         Uploader uploader = Mockito.mock(Uploader.class);
@@ -225,5 +249,17 @@ class MediaLibraryAdminTest {
 
         mediaAdmin.deleteMediaByAddress(deletedAddress);
         verify(mediaCRUD).deleteById(deletedAddress);
+    }
+
+    @Test
+    void getUploader() {
+        String uploaderName = "TestUploader";
+        Uploader uploader = Mockito.mock(Uploader.class);
+        when(uploader.getName()).thenReturn(uploaderName);
+        when(uploaderCRUD.get(uploaderName)).thenReturn(Optional.of(uploader));
+        Optional<Uploader> resultUploader = mediaAdmin.getUploader(uploaderName);
+        assertFalse(resultUploader.isEmpty());
+        assertEquals(resultUploader.get().getName(), uploaderName);
+        verify(uploaderCRUD).get(uploaderName);
     }
 }
