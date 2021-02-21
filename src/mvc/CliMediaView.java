@@ -59,8 +59,8 @@ public class CliMediaView implements MediaView {
 
         System.out.println(String.format("%25s | %40s | %30s | %10s", "Type", "Retrieval Address", "Upload Date", "Access Count"));
         System.out.println(String.format("%s", "----------------------------------------------------------------------------------------------------------------"));
-       for(int i =0 ; i< retrievalAddress.length; i++) {
-           System.out.println(String.format("%25s | %40s | %30s | %10s", types[i], retrievalAddress[i], uploadDate[i], accessCount[i]));
-       }//  System.out.format("%20s|%20s|%10s\n", retrievalAddress, uploadDate, accessCount);
+        for (int i = 0; i < retrievalAddress.length; i++) {
+            System.out.println(String.format("%25s | %40s | %30s | %10s", types[i], retrievalAddress[i], uploadDate[i], accessCount[i]));
+        }
     }
 }
