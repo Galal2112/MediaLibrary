@@ -43,10 +43,22 @@ public abstract class ServerSession {
         } else if (currentCommand == Command.CREATE) {
             return handleCreateCommand(command);
         } else if (currentCommand == Command.VIEW) {
-            if (command.equalsIgnoreCase("uploader")) {
+            String[] split = command.split(" ");
+            if (split[0].equalsIgnoreCase("uploader")) {
                 return viewUploaders();
-            } else if (command.toLowerCase().startsWith("content")) {
+            } else if (split[0].equalsIgnoreCase("content")) {
                 return viewContent(command);
+            } else if (split[0].equalsIgnoreCase("tag")) {
+                if (split.length == 2) {
+                    String selection = split[1];
+                    if (selection.equalsIgnoreCase("i")) {
+                        List<Tag> tags = mediaAdmin.getUsedTags();
+                        return "Used tags: " + tags.toString();
+                    } else if (selection.equalsIgnoreCase("e")) {
+                        List<Tag> tags = mediaAdmin.getUnusedTags();
+                        return "Unused tags: " + tags.toString();
+                    }
+                }
             }
         } else if (currentCommand == Command.DELETE) {
             try {

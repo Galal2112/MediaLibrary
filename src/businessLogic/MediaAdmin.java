@@ -24,6 +24,10 @@ public interface MediaAdmin extends Subject {
 
     List<Tag> getAllTags();
 
+    List<Tag> getUsedTags();
+
+    List<Tag> getUnusedTags();
+
     void deleteUploaderByName(String name) throws IllegalArgumentException;
 
     void deleteUploader(Uploader uploader) throws IllegalArgumentException;

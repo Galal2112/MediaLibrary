@@ -24,7 +24,7 @@ import storage.MediaStorage;
 
 import java.util.Optional;
 
-public class CommonMain extends Application {
+public class JavaFxAndCliApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {

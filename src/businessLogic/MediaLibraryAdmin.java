@@ -121,6 +121,22 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
+    public List<Tag> getUsedTags() {
+        Set<Tag> tagsSet = new LinkedHashSet<>();
+        List<MediaContent> mediaList = mediaContentCRUD.getAll();
+        for (MediaContent media : mediaList) {
+            tagsSet.addAll(media.getTags());
+        }
+        return new ArrayList<>(tagsSet);
+    }
+
+    @Override
+    public List<Tag> getUnusedTags() {
+        List<Tag> usedTags = getUsedTags();
+        return Arrays.stream(Tag.values()).filter(tag -> !usedTags.contains(tag)).collect(Collectors.toList());
+    }
+
+    @Override
     public synchronized void deleteUploaderByName(String name) throws IllegalArgumentException {
         if (uploaderCRUD.get(name).isPresent()) {
             uploaderCRUD.deleteById(name);

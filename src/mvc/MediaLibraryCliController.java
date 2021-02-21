@@ -117,10 +117,28 @@ public class MediaLibraryCliController implements MediaController {
             }
 
             if (currentCommand != null && !event.getText().startsWith(":") && currentCommand == Command.VIEW) {
-                if (event.getText().equalsIgnoreCase("uploader")) {
+                String[] split = event.getText().split(" ");
+                if (split[0].equalsIgnoreCase("uploader")) {
                     viewUploaders();
-                } else if (event.getText().toLowerCase().startsWith("content")) {
+                } else if (split[0].equalsIgnoreCase("content")) {
                     viewContent(event);
+                }  else if (split[0].equalsIgnoreCase("tag")) {
+                    if (split.length == 2) {
+                        String selection = split[1];
+                        if (selection.equalsIgnoreCase("i")) {
+                            List<Tag> tags = mediaAdmin.getUsedTags();
+                            mediaView.displayMessage("Used tags: " + tags.toString());
+                        } else if (selection.equalsIgnoreCase("e")) {
+                            List<Tag> tags = mediaAdmin.getUnusedTags();
+                            mediaView.displayMessage("Unused tags: " + tags.toString());
+                        } else {
+                            mediaView.displayError("Invalid tags list command");
+                        }
+                    } else {
+                        mediaView.displayError("Invalid tags list command");
+                    }
+                } else {
+                    mediaView.displayError("Invalid list command");
                 }
             }
         }
