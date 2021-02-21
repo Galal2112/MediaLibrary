@@ -5,10 +5,7 @@ import events.ExitEventListener;
 import events.InputEvent;
 import events.InputEventHandler;
 import events.InputEventListener;
-import mediaDB.Audio;
-import mediaDB.UploadableMediaContent;
-import mediaDB.Uploader;
-import mediaDB.Video;
+import mediaDB.*;
 import model.Producer;
 import storage.InsufficientStorageException;
 import util.MediaParser;
@@ -21,8 +18,7 @@ public class MediaLibraryCliController implements MediaController {
 
     private final MediaView mediaView;
     private final MediaAdmin mediaAdmin;
-    private final ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(Command.CREATE, Command.DELETE,
-            Command.VIEW, Command.PRESISTENCE_MODE));
+    private final List<Command> commandList = Arrays.asList(Command.values());
     private Command currentCommand = null;
 
     public MediaLibraryCliController(MediaView mediaView, MediaAdmin mediaAdmin) {
@@ -35,6 +31,7 @@ public class MediaLibraryCliController implements MediaController {
         handler.add(new CreateInputListener());
         handler.add(new ViewInputListener());
         handler.add(new DeleteInputListener());
+        handler.add(new IncreaseAccessCountListener());
         handler.add(new PresistenceIputListener());
         mediaView.setHandler(handler);
     }
@@ -195,6 +192,25 @@ public class MediaLibraryCliController implements MediaController {
                     } catch (IllegalArgumentException u) {
                         mediaView.displayError("Invalid Input");
                     }
+                }
+            }
+        }
+    }
+
+    class IncreaseAccessCountListener implements InputEventListener {
+
+        @Override
+        public void onInputEvent(InputEvent event) {
+            if (event.getText() == null) {
+                mediaView.displayError("Not a valid input");
+                return;
+            }
+            if (currentCommand != null && !event.getText().startsWith(":") && currentCommand == Command.UPDATE) {
+                Optional<MediaContent> mediaContent = mediaAdmin.retrieveMediaByAddress(event.getText());
+                if (mediaContent.isEmpty()) {
+                    mediaView.displayError("Address not found");
+                } else {
+                    mediaView.displayMessage("New access count: " + mediaContent.get().getAccessCount());
                 }
             }
         }

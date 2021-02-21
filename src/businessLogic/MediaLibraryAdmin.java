@@ -107,7 +107,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         // update access count
         for (MediaContent content : result) {
             content.setAccessCount(content.getAccessCount() + 1);
-            //update acessCount in the DB
+            //update accessCount in the DB
             mediaContentCRUD.update(content);
         }
         if (logger != null) logger.didListMedia(result.size());
@@ -175,7 +175,10 @@ public class MediaLibraryAdmin implements MediaAdmin {
     @Override
     public Optional<MediaContent> retrieveMediaByAddress(String address) {
         Optional<MediaContent> media = mediaContentCRUD.get(address);
-        media.ifPresent(mediaContent -> mediaContent.setAccessCount(mediaContent.getAccessCount() + 1));
+        media.ifPresent(mediaContent -> {
+            mediaContent.setAccessCount(mediaContent.getAccessCount() + 1);
+            notifyObserver();
+        });
         if (logger != null) {
             if (media.isPresent()) {
                 logger.didRetrieveMediaAtAddress(address);

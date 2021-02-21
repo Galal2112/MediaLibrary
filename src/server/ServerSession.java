@@ -1,10 +1,7 @@
 package server;
 
 import businessLogic.MediaAdmin;
-import mediaDB.Audio;
-import mediaDB.UploadableMediaContent;
-import mediaDB.Uploader;
-import mediaDB.Video;
+import mediaDB.*;
 import model.Producer;
 import mvc.Command;
 import storage.InsufficientStorageException;
@@ -19,8 +16,7 @@ public abstract class ServerSession {
 
     final MediaAdmin mediaAdmin;
     private Command currentCommand = null;
-    private final ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(Command.CREATE, Command.DELETE,
-            Command.VIEW, Command.PRESISTENCE_MODE));
+    private final List<Command> commandList = Arrays.asList(Command.values());;
 
     ServerSession(MediaAdmin mediaAdmin) {
         this.mediaAdmin = mediaAdmin;
@@ -64,6 +60,8 @@ public abstract class ServerSession {
                     return "Invalid Input";
                 }
             }
+        } else if (currentCommand == Command.UPDATE) {
+            return handleUpdateCommand(command);
         } else if (currentCommand == Command.PRESISTENCE_MODE) {
             return handlePresistenceCommand(command);
         }
@@ -139,6 +137,15 @@ public abstract class ServerSession {
             response += "\n";
         }
         return response;
+    }
+
+    private String handleUpdateCommand(String command) {
+        Optional<MediaContent> mediaContent = mediaAdmin.retrieveMediaByAddress(command);
+        if (mediaContent.isEmpty()) {
+            return "Address not found";
+        } else {
+            return "New access count: " + mediaContent.get().getAccessCount();
+        }
     }
 
     private String handlePresistenceCommand(String command) {

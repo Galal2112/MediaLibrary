@@ -7,12 +7,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class LibraryTcpClient {
-    private final ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(Command.CREATE, Command.DELETE,
-            Command.VIEW, Command.PRESISTENCE_MODE));
+    private final List<Command> commandList = Arrays.asList(Command.values());
 
     public void run() {
         Console console = new Console();

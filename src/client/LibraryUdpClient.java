@@ -7,12 +7,11 @@ import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class LibraryUdpClient {
-    private final ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(Command.CREATE, Command.DELETE,
-            Command.VIEW, Command.PRESISTENCE_MODE));
+    private final List<Command> commandList = Arrays.asList(Command.values());
 
     private final Console console = new Console();
     private DatagramSocket socket;
