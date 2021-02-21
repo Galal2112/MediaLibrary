@@ -183,11 +183,13 @@ public class MediaLibraryCliController implements MediaController {
                 }
             }
 
+            String[] videoType = new String[mediaList.size()];
             String[] retrievalAddress = new String[mediaList.size()];
             Date[] uploadDate = new Date[mediaList.size()];
             long[] accessCount = new long[mediaList.size()];
             for (int i = 0; i < mediaList.size(); i++) {
                 Object media = mediaList.get(i);
+                videoType[i] = media.getClass().getSimpleName();
                 if (media instanceof Audio) {
                     Audio audio = (Audio) media;
                     retrievalAddress[i] = audio.getAddress();
@@ -200,7 +202,7 @@ public class MediaLibraryCliController implements MediaController {
                     accessCount[i] = video.getAccessCount();
                 }
             }
-            mediaView.displayMedia(retrievalAddress, uploadDate, accessCount);
+            mediaView.displayMedia(videoType, retrievalAddress, uploadDate, accessCount);
         }
     }
 

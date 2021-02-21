@@ -55,12 +55,12 @@ public class CliMediaView implements MediaView {
     }
 
     @Override
-    public void displayMedia(String[] retrievalAddress, Date[] uploadDate, long[] accessCount) {
+    public void displayMedia(String[] types, String[] retrievalAddress, Date[] uploadDate, long[] accessCount) {
 
-        System.out.println(String.format("%20s %15s %10s %32s %10s", "Retrieval Address", "|", "Upload Date", "|", "Access Count"));
+        System.out.println(String.format("%25s | %40s | %30s | %10s", "Type", "Retrieval Address", "Upload Date", "Access Count"));
         System.out.println(String.format("%s", "----------------------------------------------------------------------------------------------------------------"));
        for(int i =0 ; i< retrievalAddress.length; i++) {
-           System.out.println(String.format("%20s %6s %10s %15s %10s", retrievalAddress[i], "|", uploadDate[i], "|", accessCount[i]));
+           System.out.println(String.format("%25s | %40s | %30s | %10s", types[i], retrievalAddress[i], uploadDate[i], accessCount[i]));
        }//  System.out.format("%20s|%20s|%10s\n", retrievalAddress, uploadDate, accessCount);
     }
 }
