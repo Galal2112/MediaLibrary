@@ -17,7 +17,7 @@ import util.MediaUtil;
 import java.io.IOException;
 import java.util.*;
 
-public class MediaLibraryController implements MediaController {
+public class MediaLibraryCliController implements MediaController {
 
     private final MediaView mediaView;
     private final MediaAdmin mediaAdmin;
@@ -25,7 +25,7 @@ public class MediaLibraryController implements MediaController {
             Command.VIEW, Command.PRESISTENCE_MODE));
     private Command currentCommand = null;
 
-    public MediaLibraryController(MediaView mediaView, MediaAdmin mediaAdmin) {
+    public MediaLibraryCliController(MediaView mediaView, MediaAdmin mediaAdmin) {
         this.mediaAdmin = mediaAdmin;
         this.mediaView = mediaView;
 

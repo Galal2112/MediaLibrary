@@ -26,7 +26,7 @@ public class Main {
         MediaView view = new CliMediaView(console);
 
         // create controller
-        MediaController controller = new MediaLibraryController(view, mediaAdmin);
+        MediaController controller = new MediaLibraryCliController(view, mediaAdmin);
         controller.start();
     }
 }

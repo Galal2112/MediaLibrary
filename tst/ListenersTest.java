@@ -2,7 +2,7 @@ import businessLogic.MediaAdmin;
 import mediaDB.LicensedAudioVideo;
 import mvc.CliMediaView;
 import mvc.Console;
-import mvc.MediaLibraryController;
+import mvc.MediaLibraryCliController;
 import mvc.MediaView;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,7 +26,7 @@ public class ListenersTest {
         MediaView mediaView = new CliMediaView(console);
 
         MediaAdmin mediaAdmin = Mockito.mock(MediaAdmin.class);
-        new MediaLibraryController(mediaView, mediaAdmin);
+        new MediaLibraryCliController(mediaView, mediaAdmin);
 
         mediaView.readInput(readModeTitle);
         mediaView.readInput(readCommandTitle);
@@ -45,7 +45,7 @@ public class ListenersTest {
         MediaView mediaView = new CliMediaView(console);
 
         MediaAdmin mediaAdmin = Mockito.mock(MediaAdmin.class);
-        new MediaLibraryController(mediaView, mediaAdmin);
+        new MediaLibraryCliController(mediaView, mediaAdmin);
 
         mediaView.readInput(readModeTitle);
         mediaView.readInput(readCommandTitle);
