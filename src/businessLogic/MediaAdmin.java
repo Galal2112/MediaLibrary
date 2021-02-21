@@ -4,6 +4,7 @@ import mediaDB.MediaContent;
 import mediaDB.Tag;
 import mediaDB.Uploadable;
 import mediaDB.Uploader;
+import observer.Subject;
 import storage.InsufficientStorageException;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public interface MediaAdmin {
+public interface MediaAdmin extends Subject {
 
     void createUploader(Uploader uploader) throws IllegalArgumentException;
     //can i create interface extends MediaContent & Uploadable and use it instead??

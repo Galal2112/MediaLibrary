@@ -6,6 +6,7 @@ import mediaDB.Tag;
 import mediaDB.Uploadable;
 import mediaDB.Uploader;
 import model.*;
+import observer.Observer;
 import storage.InsufficientStorageException;
 import storage.MediaStorage;
 
@@ -13,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 public class MediaLibraryAdmin implements MediaAdmin {
@@ -26,6 +28,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     private final CRUD<MediaContent> mediaContentCRUD;
     private volatile Logger logger;
     private MediaStorage mediaStorage;
+    private final ConcurrentLinkedQueue<Observer> observerList = new ConcurrentLinkedQueue<>();
 
     public MediaLibraryAdmin(MediaStorage mediaStorage, CRUD<Uploader> uploaderCRUD, CRUD<MediaContent> mediaContentCRUD) {
         this.mediaStorage = mediaStorage;
@@ -45,6 +48,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public synchronized void createUploader(Uploader uploader) throws IllegalArgumentException {
         if (!uploaderCRUD.get(uploader.getName()).isPresent()) {
             uploaderCRUD.create(uploader);
+            notifyObserver();
             if (logger != null) logger.didCreateUploader(uploader.getName());
         } else {
             if (logger != null) logger.uploaderAlreadyRegistered(uploader.getName());
@@ -62,7 +66,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         }
 
         // Set address
-        media.setAddress(getAddress(media));
+        media.setAddress(getAddress());
 
         // set date
         media.setUploadDate(new Date());
@@ -71,7 +75,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         mediaContentCRUD.create(media);
 
         mediaStorage.addMediaInStorage(media);
-
+        notifyObserver();
         if (logger != null) logger.didUpload(media);
     }
 
@@ -124,6 +128,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
             for (MediaContent mediaContent : uploaderMediaList) {
                 mediaContentCRUD.deleteById(mediaContent.getAddress());
             }
+            notifyObserver();
             if (logger != null) logger.didDeleteUploaderWithName(name);
         } else {
             throw new IllegalArgumentException("Uploader name doesn't exist");
@@ -147,6 +152,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         if (mediaContentOptional.isPresent()) {
             mediaStorage.deletedMediaFromStorage(mediaContentOptional.get());
             mediaContentCRUD.deleteById(address);
+            notifyObserver();
             if (logger != null) logger.didDeleteMediaAtAddress(address);
         } else {
             throw new IllegalArgumentException("Media doesn't exist");
@@ -183,6 +189,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     @Override
     public <T extends MediaContent & Uploadable> void update(T media) {
         mediaContentCRUD.update(media);
+        notifyObserver();
     }
 
     @Override
@@ -352,10 +359,27 @@ public class MediaLibraryAdmin implements MediaAdmin {
         }
     }
 
-    private static int address = 0;
-    private String getAddress(Object o) {
-        return address++ + "@" + o.getClass().getSimpleName();
+    @Override
+    public void register(Observer observer) {
+        if (observer == null) return;
+        observerList.add(observer);
     }
 
+    @Override
+    public void unregister(Observer observer) {
+        if (observer == null) return;
+        observerList.remove(observer);
+    }
+
+    @Override
+    public void notifyObserver() {
+        for (Observer observer : observerList) {
+            observer.updateObserver();
+        }
+    }
+
+    private String getAddress() {
+        return UUID.randomUUID().toString();
+    }
 
 }

@@ -14,6 +14,7 @@ import mediaDB.MediaContent;
 import mediaDB.UploadableMediaContent;
 import mediaDB.Video;
 import model.Producer;
+import observer.Observer;
 import storage.InsufficientStorageException;
 import util.MediaParser;
 import util.MediaUtil;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class MainController implements Initializable {
+public class MainController implements Initializable, Observer {
 
     @FXML private TableView<ProducerAndUploadsCount> producerTableView;
     @FXML private TableView<MediaItemWithProperties> mediaTableView;
@@ -56,6 +57,7 @@ public class MainController implements Initializable {
 
     public MainController(MediaAdmin mediaAdmin)  {
         this.mediaAdmin = mediaAdmin;
+        mediaAdmin.register(this);
         mediaObservableList = FXCollections.observableArrayList();
         producersObservableList = FXCollections.observableArrayList();
         refreshMediaList();
@@ -106,12 +108,10 @@ public class MainController implements Initializable {
         try {
             mediaAdmin.deleteUploaderByName(deleteCommand);
             deleteMediaTextField.setText("");
-            refreshMediaList();
         } catch (IllegalArgumentException e) {
             try {
                 mediaAdmin.deleteMediaByAddress(deleteCommand);
                 deleteMediaTextField.setText("");
-                refreshMediaList();
             } catch (IllegalArgumentException u) {
                 displayError("Invalid Input");
             }
@@ -128,7 +128,6 @@ public class MainController implements Initializable {
         if (producerAndUploadsCount != null) {
             try {
                 mediaAdmin.deleteUploaderByName(producerAndUploadsCount.getName());
-                refreshMediaList();
             } catch (IllegalArgumentException e) {
                 displayError(e.getMessage());
             }
@@ -140,7 +139,6 @@ public class MainController implements Initializable {
         if (mediaItemWithProperties != null) {
             try {
                 mediaAdmin.deleteMediaByAddress(mediaItemWithProperties.getAddress());
-                refreshMediaList();
             } catch (IllegalArgumentException e) {
                 displayError(e.getMessage());
             }
@@ -221,7 +219,6 @@ public class MainController implements Initializable {
         try {
             mediaAdmin.createUploader(producer);
             createMediaTextField.setText("");
-            refreshMediaList();
         } catch (IllegalArgumentException e) {
             displayError(e.getMessage());
         }
@@ -236,7 +233,6 @@ public class MainController implements Initializable {
     }
 
     private void onMediaUploaded(String address) {
-        refreshMediaList();
         createMediaTextField.setText("");
     }
 
@@ -289,4 +285,8 @@ public class MainController implements Initializable {
         }
     }
 
+    @Override
+    public void updateObserver() {
+        refreshMediaList();
+    }
 }

@@ -12,7 +12,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MediaStorage implements Subject {
 
     private final Lock lock = new ReentrantLock();
-    // what is difference between deque and queue? TODO
     private final ConcurrentLinkedQueue<Observer> observerList = new ConcurrentLinkedQueue<>();
 
     private final BigDecimal diskSize;
