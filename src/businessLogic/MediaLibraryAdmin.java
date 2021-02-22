@@ -399,7 +399,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     private String getAddress() {
-        return UUID.randomUUID().toString();
+        return new Date().getTime() + "@" + UUID.randomUUID().toString();
     }
 
 }
