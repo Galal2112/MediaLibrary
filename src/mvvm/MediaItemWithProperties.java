@@ -11,6 +11,7 @@ import mediaDB.Video;
 public final class MediaItemWithProperties {
 
     private final StringProperty producerProperty = new SimpleStringProperty();
+    private final StringProperty typeProperty = new SimpleStringProperty();
     private final StringProperty addressProperty = new SimpleStringProperty();
     private final StringProperty dateProperty = new SimpleStringProperty();
     private final SimpleLongProperty accessCountProperty = new SimpleLongProperty();
@@ -18,12 +19,14 @@ public final class MediaItemWithProperties {
 
     public MediaItemWithProperties(Object media) {
         this.media = media;
+        this.typeProperty.set(media.getClass().getSimpleName());
         if (media instanceof Audio) {
             bindData((Audio) media);
         } else if (media instanceof Video) {
             bindData((Video) media);
         } else {
             this.producerProperty.set("undefined");
+            this.typeProperty.set("undefined");
             this.dateProperty.set("undefined");
             this.addressProperty.set("undefined");
             this.accessCountProperty.set(0);
@@ -35,12 +38,16 @@ public final class MediaItemWithProperties {
     }
 
     public StringProperty producerProperty() {return this.producerProperty;}
+    public StringProperty typeProperty() {return this.typeProperty;}
     public StringProperty addressProperty() {return this.addressProperty;}
     public StringProperty dateProperty() {return this.dateProperty;}
     public SimpleLongProperty accessCountProperty() {return this.accessCountProperty;}
 
     public String getProducer() {
         return this.producerProperty.get();
+    }
+    public String getType() {
+        return this.typeProperty.get();
     }
     public void setProducer(String value){
         this.producerProperty.set(value);

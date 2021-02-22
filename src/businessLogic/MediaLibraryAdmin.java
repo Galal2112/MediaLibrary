@@ -104,12 +104,6 @@ public class MediaLibraryAdmin implements MediaAdmin {
             result.addAll(mediaContentCRUD.getAll().stream().filter(m -> m.getClass().equals(type)).collect(Collectors.toList()));
         }
 
-        // update access count
-        for (MediaContent content : result) {
-            content.setAccessCount(content.getAccessCount() + 1);
-            //update accessCount in the DB
-            mediaContentCRUD.update(content);
-        }
         if (logger != null) logger.didListMedia(result.size());
         return result;
     }

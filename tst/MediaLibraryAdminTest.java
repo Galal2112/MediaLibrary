@@ -327,4 +327,13 @@ class MediaLibraryAdminTest {
             exception.printStackTrace();
         }
     }
+
+    @Test
+    void saveByAddress() {
+        String testAddress = "test address";
+        InteractiveVideo interactiveVideo = mock(InteractiveVideo.class);
+        when(interactiveVideo.getAddress()).thenReturn(testAddress);
+        when(mediaCRUD.get(testAddress)).thenReturn(Optional.of(interactiveVideo));
+        mediaAdmin.save(testAddress);
+    }
 }

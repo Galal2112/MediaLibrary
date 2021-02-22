@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class MainController implements Initializable, Observer {
     @FXML private TableColumn<MediaItemWithProperties, String> addressColumn;
     @FXML private TableColumn<MediaItemWithProperties, String> dateColumn;
     @FXML private TableColumn<MediaItemWithProperties, Long> accessCountColumn;
+    @FXML private TableColumn<MediaItemWithProperties, String> typeColumn;
     @FXML private TextField createMediaTextField;
     @FXML private TextField deleteMediaTextField;
     @FXML private TableColumn<ProducerAndUploadsCount, String> allProducersColumn;
@@ -43,6 +45,7 @@ public class MainController implements Initializable, Observer {
     @FXML private Button deleteUploaderButton;
     @FXML private TextField saveMediaAddressTextField;
     @FXML private TextField loadMediaAddressTextField;
+    @FXML private TextField retrivalAddressTextField;
 
     private ObservableList<MediaItemWithProperties> mediaObservableList;
     private ObservableList<ProducerAndUploadsCount> producersObservableList;
@@ -69,6 +72,7 @@ public class MainController implements Initializable, Observer {
         this.addressColumn.setCellValueFactory(cellData -> cellData.getValue().addressProperty());
         this.dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
         this.accessCountColumn.setCellValueFactory(cellData -> cellData.getValue().accessCountProperty().asObject());
+        this.typeColumn.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
         this.mediaTableView.setItems(mediaObservableList);
         this.mediaTableView.setRowFactory(tableview -> new MediaListCell(this::onDrageEnded));
         this.mediaTableView.getSelectionModel().selectedItemProperty().addListener((component, oldValue, newValue) -> {
@@ -195,6 +199,18 @@ public class MainController implements Initializable, Observer {
             displaySuccess("Saved");
         } catch (IllegalArgumentException e) {
             displayError(e.getMessage());
+        }
+    }
+
+    public synchronized void retriveMedia(ActionEvent actionEvent) {
+        String address = retrivalAddressTextField.getText().trim();
+        if (!address.isEmpty()) {
+            Optional<MediaContent> media = mediaAdmin.retrieveMediaByAddress(address);
+            if (media.isEmpty()) {
+                displayError("Not found");
+            } else {
+                retrivalAddressTextField.setText("");
+            }
         }
     }
 
