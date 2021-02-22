@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import storage.InsufficientStorageException;
 import storage.MediaStorage;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -261,5 +262,69 @@ class MediaLibraryAdminTest {
         assertFalse(resultUploader.isEmpty());
         assertEquals(resultUploader.get().getName(), uploaderName);
         verify(uploaderCRUD).get(uploaderName);
+    }
+
+    @Test
+    void retrieveMediaByAddress() {
+        String testAddress = "test address";
+        InteractiveVideo interactiveVideo = mock(InteractiveVideo.class);
+        when(interactiveVideo.getAddress()).thenReturn(testAddress);
+        when(mediaCRUD.get(testAddress)).thenReturn(Optional.of(interactiveVideo));
+        Optional<MediaContent> result = mediaAdmin.retrieveMediaByAddress(testAddress);
+        assertFalse(result.isEmpty());
+        assertEquals(result.get().getAddress(), testAddress);
+        verify(interactiveVideo).setAccessCount(1);
+        verify(mediaCRUD).get(testAddress);
+    }
+
+    @Test
+    void updateMedia() {
+        InteractiveVideo interactiveVideo = mock(InteractiveVideo.class);
+        mediaAdmin.update(interactiveVideo);
+        verify(mediaCRUD).update(interactiveVideo);
+    }
+
+    @Test
+    void saveJOS() {
+        try {
+            mediaAdmin.saveJOS();
+            verify(mediaCRUD).saveJOS();
+            verify(uploaderCRUD).saveJOS();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    @Test
+    void loadJOS() {
+        try {
+            mediaAdmin.loadJOS();
+            verify(mediaCRUD).loadJOS();
+            verify(uploaderCRUD).loadJOS();
+        } catch (IOException | ClassNotFoundException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    @Test
+    void saveJBP() {
+        try {
+            mediaAdmin.saveJBP();
+            verify(mediaCRUD).saveJBP();
+            verify(uploaderCRUD).saveJBP();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    @Test
+    void loadJBP() {
+        try {
+            mediaAdmin.loadJBP();
+            verify(mediaCRUD).loadJBP();
+            verify(uploaderCRUD).loadJBP();
+        } catch (IOException | ClassNotFoundException exception) {
+            exception.printStackTrace();
+        }
     }
 }

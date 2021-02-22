@@ -193,6 +193,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
         Optional<MediaContent> media = mediaContentCRUD.get(address);
         media.ifPresent(mediaContent -> {
             mediaContent.setAccessCount(mediaContent.getAccessCount() + 1);
+            mediaContentCRUD.update(mediaContent);
             notifyObserver();
         });
         if (logger != null) {
