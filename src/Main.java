@@ -4,7 +4,7 @@ import crud.CRUD;
 import crud.MediaCRUD;
 import crud.UploaderCRUD;
 import mediaDB.MediaContent;
-import mvc.*;
+import cli.*;
 import observer.MediaStorageObserver;
 import storage.MediaStorage;
 

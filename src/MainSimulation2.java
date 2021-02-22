@@ -1,7 +1,7 @@
 import businessLogic.MediaAdmin;
-import simulation2and3Threads.MediaCreatorThread;
-import simulation2and3Threads.MediaRetrievalThread;
-import simulation2and3Threads.Simultation2DeletionThread;
+import simulation.simulation2and3Threads.MediaCreatorThread;
+import simulation.simulation2and3Threads.MediaRetrievalThread;
+import simulation.simulation2and3Threads.Simultation2DeletionThread;
 import storage.MediaStorage;
 import util.MediaAdminFactory;
 

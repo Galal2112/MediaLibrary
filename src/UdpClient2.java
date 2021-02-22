@@ -1,4 +1,4 @@
-import client.LibraryUdpClient;
+import net.LibraryUdpClient;
 
 import java.io.IOException;
 import java.net.DatagramSocket;

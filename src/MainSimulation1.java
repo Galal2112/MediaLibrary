@@ -1,6 +1,6 @@
 import businessLogic.MediaAdmin;
-import simulation1Threads.MediaCreatorObserverThread;
-import simulation1Threads.MediaListAndRandomDeleteThread;
+import simulation.simulation1Threads.MediaCreatorObserverThread;
+import simulation.simulation1Threads.MediaListAndRandomDeleteThread;
 import storage.MediaStorage;
 import util.MediaAdminFactory;
 

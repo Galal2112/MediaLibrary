@@ -1,4 +1,4 @@
-import client.LibraryTcpClient;
+import net.LibraryTcpClient;
 
 public class TcpClient2 {
 

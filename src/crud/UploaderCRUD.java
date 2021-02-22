@@ -1,6 +1,6 @@
 package crud;
 
-import businessLogic.PresistencyHelper;
+import persistence.PersistenceHelper;
 import mediaDB.Uploader;
 
 import java.io.FileNotFoundException;
@@ -93,14 +93,14 @@ public class UploaderCRUD implements CRUD<Uploader> {
 
     @Override
     public void saveJOS() throws IOException, FileNotFoundException {
-        PresistencyHelper.saveJOS(uploaders, serUploadersFileName);
+        PersistenceHelper.saveJOS(uploaders, serUploadersFileName);
     }
 
     @Override
     public void loadJOS() throws IOException, ClassNotFoundException {
         uploaders.clear();
         try {
-            uploaders.addAll(PresistencyHelper.loadJOS(serUploadersFileName));
+            uploaders.addAll(PersistenceHelper.loadJOS(serUploadersFileName));
         } catch (FileNotFoundException e) {
 
         }
@@ -108,12 +108,12 @@ public class UploaderCRUD implements CRUD<Uploader> {
 
     @Override
     public void saveJBP() throws IOException, FileNotFoundException {
-        PresistencyHelper.saveUploadersUsingJBP(xmlUploadersFileName, uploaders);
+        PersistenceHelper.saveUploadersUsingJBP(xmlUploadersFileName, uploaders);
     }
 
     @Override
     public void loadJBP() throws IOException, ClassNotFoundException, FileNotFoundException {
         uploaders.clear();
-        uploaders.addAll(PresistencyHelper.loadUploaderUsingJBP(xmlUploadersFileName));
+        uploaders.addAll(PersistenceHelper.loadUploaderUsingJBP(xmlUploadersFileName));
     }
 }

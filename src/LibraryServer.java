@@ -4,9 +4,9 @@ import crud.CRUD;
 import crud.MediaCRUD;
 import crud.UploaderCRUD;
 import mediaDB.MediaContent;
-import mvc.Console;
-import server.LibraryTcpServer;
-import server.LibraryUdpServer;
+import cli.Console;
+import net.LibraryTcpServer;
+import net.LibraryUdpServer;
 import storage.MediaStorage;
 
 import java.io.IOException;

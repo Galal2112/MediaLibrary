@@ -1,4 +1,5 @@
-import businessLogic.PresistencyManager;
+import mediaDB.MediaContent;
+import persistence.PersistenceManager;
 import model.InteractiveVideoImpl;
 import model.Producer;
 import org.junit.jupiter.api.Test;
@@ -14,23 +15,25 @@ import static org.mockito.Mockito.*;
 public class SaveLoadTest {
 
     @Test
-    void save() {
-        long seek = 10;
-        RandomAccessFile randomAccessFile = mock(RandomAccessFile.class);
+    void save() throws IOException {
+        String address = "0@TestAddress";
+        RandomAccessFile indexRas = mock(RandomAccessFile.class);
+        when(indexRas.getFilePointer()).thenReturn(0l);
+        RandomAccessFile mediaRas = mock(RandomAccessFile.class);
         InteractiveVideoImpl interactiveVideo = new InteractiveVideoImpl("Interactive", 100, 200,  "DWT", 300, 3600, new Producer("Test"), new ArrayList<>());
-        interactiveVideo.setAddress("Address");
+        interactiveVideo.setAddress(address);
         interactiveVideo.setUploadDate(new Date());
         try {
-            PresistencyManager.saveInteractiveVideo(randomAccessFile, seek, interactiveVideo);
+            PersistenceManager.saveRandom(interactiveVideo, indexRas, mediaRas);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
         }
         try {
-            verify(randomAccessFile, atLeastOnce()).seek(seek);
-            verify(randomAccessFile, atLeastOnce()).writeUTF("Interactive");
-            verify(randomAccessFile, atLeastOnce()).writeInt(100);
-            verify(randomAccessFile, atLeastOnce()).writeLong(300);
+            verify(mediaRas, atLeastOnce()).seek(anyLong());
+            verify(mediaRas, atLeastOnce()).writeUTF("Interactive");
+            verify(mediaRas, atLeastOnce()).writeInt(100);
+            verify(mediaRas, atLeastOnce()).writeLong(300);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
@@ -38,18 +41,21 @@ public class SaveLoadTest {
     }
 
     @Test
-    void load() {
-        RandomAccessFile randomAccessFile = mock(RandomAccessFile.class);
+    void load() throws IOException {
+        RandomAccessFile indexRas = mock(RandomAccessFile.class);
+        when(indexRas.getFilePointer()).thenReturn(0l);
+        RandomAccessFile mediaRas = mock(RandomAccessFile.class);
+
         try {
-            InteractiveVideoImpl interactiveVideo = PresistencyManager.loadInteractiveVideo(randomAccessFile);
+            MediaContent mediaContent = PersistenceManager.loadRandom("0@TestAddress", indexRas, mediaRas);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
         }
         try {
-            verify(randomAccessFile, atLeastOnce()).readUTF();
-            verify(randomAccessFile, atLeastOnce()).readInt();
-            verify(randomAccessFile, atLeastOnce()).readLong();
+            verify(mediaRas, atLeastOnce()).readUTF();
+            verify(mediaRas, atLeastOnce()).readInt();
+            verify(mediaRas, atLeastOnce()).readLong();
         } catch (IOException e) {
             e.printStackTrace();
             fail();

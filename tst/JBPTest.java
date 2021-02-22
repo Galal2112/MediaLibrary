@@ -1,4 +1,4 @@
-import businessLogic.PresistencyManager;
+import persistence.PersistenceManager;
 import mediaDB.InteractiveVideo;
 import mediaDB.LicensedAudioVideo;
 import mediaDB.MediaContent;
@@ -25,7 +25,7 @@ public class JBPTest {
         items.add(mock(InteractiveVideo.class));
         items.add(mock(LicensedAudioVideo.class));
         try {
-            PresistencyManager.saveMediaUsingJBP(xmlEncoder, items);
+            PersistenceManager.saveMediaUsingJBP(xmlEncoder, items);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
@@ -40,7 +40,7 @@ public class JBPTest {
         items.add(mock(Uploader.class));
         items.add(mock(Uploader.class));
         try {
-            PresistencyManager.saveUploadersUsingJBP(xmlEncoder, items);
+            PersistenceManager.saveUploadersUsingJBP(xmlEncoder, items);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
@@ -52,7 +52,7 @@ public class JBPTest {
     void loadMediaJBP() {
         XMLDecoder xmlEncoder = mock(XMLDecoder.class);
         try {
-            List<MediaContent> items = PresistencyManager.loadMediaUsingJBP(xmlEncoder);
+            List<MediaContent> items = PersistenceManager.loadMediaUsingJBP(xmlEncoder);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             fail();
@@ -64,7 +64,7 @@ public class JBPTest {
     void loadUploaderJBP() {
         XMLDecoder xmlEncoder = mock(XMLDecoder.class);
         try {
-            List<Uploader> items = PresistencyManager.loadUploaderUsingJBP(xmlEncoder);
+            List<Uploader> items = PersistenceManager.loadUploaderUsingJBP(xmlEncoder);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             fail();

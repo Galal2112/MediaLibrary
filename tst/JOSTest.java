@@ -1,4 +1,4 @@
-import businessLogic.PresistencyManager;
+import persistence.PersistenceManager;
 import mediaDB.InteractiveVideo;
 import mediaDB.LicensedAudioVideo;
 import mediaDB.MediaContent;
@@ -25,7 +25,7 @@ public class JOSTest {
         items.add(mock(InteractiveVideo.class));
         items.add(mock(LicensedAudioVideo.class));
         try {
-            PresistencyManager.saveJOS(oos, items);
+            PersistenceManager.saveJOS(oos, items);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
@@ -45,7 +45,7 @@ public class JOSTest {
         items.add(mock(Uploader.class));
         items.add(mock(Uploader.class));
         try {
-            PresistencyManager.saveJOS(oos, items);
+            PersistenceManager.saveJOS(oos, items);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
@@ -62,7 +62,7 @@ public class JOSTest {
     void deserializeMedia() {
         ObjectInput objectInput=mock(ObjectInput.class);
         try {
-            List<MediaContent> items = PresistencyManager.loadJOS(objectInput);
+            List<MediaContent> items = PersistenceManager.loadJOS(objectInput);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             fail();
@@ -79,7 +79,7 @@ public class JOSTest {
     void deserializeUploader() {
         ObjectInput objectInput=mock(ObjectInput.class);
         try {
-            List<Uploader> items = PresistencyManager.loadJOS(objectInput);
+            List<Uploader> items = PersistenceManager.loadJOS(objectInput);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             fail();

@@ -15,7 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import mediaDB.MediaContent;
-import mvvm.MainController;
+import gui.MainController;
 import storage.MediaStorage;
 
 import java.util.Optional;

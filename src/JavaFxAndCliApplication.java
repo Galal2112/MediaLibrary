@@ -15,11 +15,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import mediaDB.MediaContent;
-import mvc.CliMediaView;
-import mvc.Console;
-import mvc.MediaLibraryCliController;
-import mvc.MediaView;
-import mvvm.MainController;
+import cli.CliMediaView;
+import cli.Console;
+import cli.MediaLibraryCliController;
+import cli.MediaView;
+import gui.MainController;
 import storage.MediaStorage;
 
 import java.util.Optional;

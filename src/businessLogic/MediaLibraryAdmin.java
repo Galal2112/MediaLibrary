@@ -5,14 +5,13 @@ import mediaDB.MediaContent;
 import mediaDB.Tag;
 import mediaDB.Uploadable;
 import mediaDB.Uploader;
-import model.*;
 import observer.Observer;
+import persistence.PersistenceHelper;
 import storage.InsufficientStorageException;
 import storage.MediaStorage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -21,8 +20,6 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     private static final String mediaFileName = "media.data";
     private static final String mediaIndexFileName = "media.idx";
-    public static final int INDEX_SIZE_SEEK = Long.SIZE / 8;
-    public static final int INDEX_SIZE = (Long.SIZE + Long.SIZE) / 8;
 
     private final CRUD<Uploader> uploaderCRUD;
     private final CRUD<MediaContent> mediaContentCRUD;
@@ -57,7 +54,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     }
 
     @Override
-    public synchronized <T extends MediaContent & Uploadable>  void upload(T media) throws IllegalArgumentException, InsufficientStorageException {
+    public synchronized <T extends MediaContent & Uploadable> void upload(T media) throws IllegalArgumentException, InsufficientStorageException {
 
         // check producer exists
         Optional<Uploader> optionalUploader = uploaderCRUD.get(media.getUploader().getName());
@@ -158,7 +155,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
 
     @Override
     public synchronized void deleteMediaByAddress(String address) throws IllegalArgumentException {
-            Optional<MediaContent> mediaContentOptional =  mediaContentCRUD.get(address);
+        Optional<MediaContent> mediaContentOptional = mediaContentCRUD.get(address);
         if (mediaContentOptional.isPresent()) {
             mediaStorage.deletedMediaFromStorage(mediaContentOptional.get());
             mediaContentCRUD.deleteById(address);
@@ -255,54 +252,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
             throw new IllegalArgumentException("Media not found");
         }
         try {
-            long seek = 0;
-            boolean found = false;
-            long address = Long.parseLong(retrivalAddress.split("@")[0]);
-
-            RandomAccessFile indexRas = new RandomAccessFile(mediaIndexFileName, "rw");
-            indexRas.seek(0);
-            while (indexRas.getFilePointer() <= indexRas.length() - INDEX_SIZE) {
-                long currentddress = indexRas.readLong();
-                if (currentddress == address) {
-                    found = true;
-                    seek = indexRas.readLong();
-                    break;
-                }
-                indexRas.skipBytes(INDEX_SIZE_SEEK);
-            }
-
-            RandomAccessFile mediaRas = new RandomAccessFile(mediaFileName, "rw");
-            if (!found) {
-                indexRas.writeLong(address);
-                indexRas.writeLong(mediaRas.length());
-                indexRas.close();
-                seek = mediaRas.length();
-            }
-            if (media.get() instanceof LicensedAudioVideoImpl) {
-                LicensedAudioVideoImpl licensedAudioVideo = (LicensedAudioVideoImpl) media.get();
-                PresistencyManager.saveLicensedAudioVideo(mediaRas, seek, licensedAudioVideo);
-            } else if (media.get() instanceof InteractiveVideoImpl) {
-                InteractiveVideoImpl interactiveVideo = (InteractiveVideoImpl) media.get();
-                PresistencyManager.saveInteractiveVideo(mediaRas, seek, interactiveVideo);
-            } else if (media.get() instanceof LicensedVideoImpl) {
-                LicensedVideoImpl licensedVideo = (LicensedVideoImpl) media.get();
-                PresistencyManager.saveLicensedVideo(mediaRas, seek, licensedVideo);
-            } else if (media.get() instanceof LicensedAudioImpl) {
-                LicensedAudioImpl licensedAudio = (LicensedAudioImpl) media.get();
-                PresistencyManager.saveLicensedAudio(mediaRas, seek, licensedAudio);
-            } else if (media.get() instanceof AudioVideoImpl) {
-                AudioVideoImpl audioVideo = (AudioVideoImpl) media.get();
-                PresistencyManager.saveAudioVideo(mediaRas, seek, audioVideo);
-            } else if (media.get() instanceof AudioImpl) {
-                AudioImpl audio = (AudioImpl) media.get();
-                PresistencyManager.saveAudio(mediaRas, seek, audio);
-            } else if (media.get() instanceof VideoImpl) {
-                VideoImpl video = (VideoImpl) media.get();
-                PresistencyManager.saveVideo(mediaRas, seek, video);
-            }
-            mediaRas.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            PersistenceHelper.saveRandom(media.get(), mediaIndexFileName, mediaFileName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -311,36 +261,10 @@ public class MediaLibraryAdmin implements MediaAdmin {
     @Override
     public MediaContent load(String retrivalAddress) throws IllegalArgumentException, InsufficientStorageException {
         try {
-            long seek = -1;
-            long address = Long.parseLong(retrivalAddress.split("@")[0]);
 
-            RandomAccessFile indexRas = new RandomAccessFile(mediaIndexFileName, "r");
-            indexRas.seek(0);
-            while (indexRas.getFilePointer() <= indexRas.length() - INDEX_SIZE) {
-                long currentddress = indexRas.readLong();
-                if (currentddress == address) {
-                    seek = indexRas.readLong();
-                    break;
-                }
-                indexRas.skipBytes(INDEX_SIZE_SEEK);
-            }
+            MediaContent mediaContent = PersistenceHelper.loadRandom(retrivalAddress, mediaIndexFileName, mediaFileName);
 
-            if (seek < 0) {
-                throw new IllegalArgumentException("Address not found");
-            }
-
-            RandomAccessFile mediaRas = new RandomAccessFile(mediaFileName, "r");
-
-            mediaRas.seek(seek);
-            String className = mediaRas.readUTF();
-            MediaContent mediaContent = null;
-            if (className.equals(InteractiveVideoImpl.class.getSimpleName())) {
-                mediaContent = PresistencyManager.loadInteractiveVideo(mediaRas);
-            } else {
-                mediaContent = PresistencyManager.loadLicensedAudioVideo(mediaRas);
-            }
-
-            if (mediaContent != null)  {
+            if (mediaContent != null) {
                 if (mediaContentCRUD.get(retrivalAddress).isPresent()) {
                     mediaContentCRUD.update(mediaContent);
                 } else {
@@ -352,8 +276,6 @@ public class MediaLibraryAdmin implements MediaAdmin {
             }
 
             return mediaContent;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
