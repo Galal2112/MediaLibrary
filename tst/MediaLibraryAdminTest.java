@@ -146,15 +146,8 @@ class MediaLibraryAdminTest {
 
         // Test result size
         assertEquals(mediaAdmin.listMedia(mock(InteractiveVideo.class).getClass()).size(), interactiveVideos.size());
-        verify(interactiveVideos.get(0)).setAccessCount(1);
-        verify(mediaCRUD).update(interactiveVideos.get(0));
-
         assertEquals(mediaAdmin.listMedia(mock(LicensedAudioVideo.class).getClass()).size(), audioVideos.size());
-        verify(audioVideos.get(0)).setAccessCount(1);
-        verify(mediaCRUD).update(audioVideos.get(0));
-
         assertEquals(mediaAdmin.listMedia(null).size(), interactiveVideos.size() + audioVideos.size());
-
     }
 
     @Test
@@ -326,14 +319,5 @@ class MediaLibraryAdminTest {
         } catch (IOException | ClassNotFoundException exception) {
             exception.printStackTrace();
         }
-    }
-
-    @Test
-    void saveByAddress() {
-        String testAddress = "test address";
-        InteractiveVideo interactiveVideo = mock(InteractiveVideo.class);
-        when(interactiveVideo.getAddress()).thenReturn(testAddress);
-        when(mediaCRUD.get(testAddress)).thenReturn(Optional.of(interactiveVideo));
-        mediaAdmin.save(testAddress);
     }
 }

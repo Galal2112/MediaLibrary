@@ -45,7 +45,7 @@ public class JavaFxAndCliApplication extends Application {
             UploaderCRUD uploaderCRUD = new UploaderCRUD();
             MediaAdmin mediaAdmin = new MediaLibraryAdmin(mediaStorage, uploaderCRUD, mediaCRUD);
 
-            MainController controller = new MainController(mediaAdmin);
+            MainController controller = new MainController(mediaAdmin, mediaStorage);
             FXMLLoader loader = new FXMLLoader(MainController.class.getResource("main.fxml"));
             loader.setControllerFactory(type -> {
                 if (type == MainController.class) {

@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import mediaDB.Audio;
@@ -16,10 +17,12 @@ import mediaDB.Video;
 import model.Producer;
 import observer.Observer;
 import storage.InsufficientStorageException;
+import storage.MediaStorage;
 import util.MediaParser;
 import util.MediaUtil;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +49,12 @@ public class MainController implements Initializable, Observer {
     @FXML private TextField saveMediaAddressTextField;
     @FXML private TextField loadMediaAddressTextField;
     @FXML private TextField retrivalAddressTextField;
+    @FXML private PieChart sizePieChart;
 
     private ObservableList<MediaItemWithProperties> mediaObservableList;
     private ObservableList<ProducerAndUploadsCount> producersObservableList;
     private final MediaAdmin mediaAdmin;
+    private final MediaStorage mediaStorage;
     private TableColumn<ProducerAndUploadsCount, String> producersSortColumn = null;
     private TableColumn.SortType producerSortType = null;
     private TableColumn<MediaItemWithProperties, String> mediaSortColumn = null;
@@ -57,9 +62,12 @@ public class MainController implements Initializable, Observer {
     private String selectedType;
     private SimpleBooleanProperty isDeleteMediaVisible = new SimpleBooleanProperty();
     private SimpleBooleanProperty isDeleteUploaderVisible = new SimpleBooleanProperty();
+    private final PieChart.Data freeSpaceData = new PieChart.Data("Free", 100);
+    private final PieChart.Data usedSpaceData = new PieChart.Data("Used", 0);
 
-    public MainController(MediaAdmin mediaAdmin)  {
+    public MainController(MediaAdmin mediaAdmin, MediaStorage mediaStorage)  {
         this.mediaAdmin = mediaAdmin;
+        this.mediaStorage = mediaStorage;
         mediaAdmin.register(this);
         mediaObservableList = FXCollections.observableArrayList();
         producersObservableList = FXCollections.observableArrayList();
@@ -94,6 +102,9 @@ public class MainController implements Initializable, Observer {
             selectedType = newValue;
             refreshMediaList();
         } );
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList(freeSpaceData, usedSpaceData);
+        sizePieChart.setData(pieChartData);
     }
 
     private void onDrageEnded(MediaItemWithProperties previousMedia, MediaItemWithProperties newMedia) {
@@ -268,6 +279,12 @@ public class MainController implements Initializable, Observer {
         producersObservableList.clear();
         producersObservableList.addAll(mediaAdmin.listProducersAndUploadsCount().entrySet().stream().map(e -> new ProducerAndUploadsCount(e.getKey().getName(), e.getValue())).collect(Collectors.toList()));
         sortTableOnColumn(producerTableView, producersSortColumn, producerSortType);
+
+        BigDecimal freeSpace = mediaStorage.getAvailableMediaStorageInMB();
+        BigDecimal totalSpace = mediaStorage.getDiskSize();
+        float freeSpacePercent = freeSpace.divide(totalSpace).floatValue() * 100;
+        freeSpaceData.setPieValue(freeSpacePercent);
+        usedSpaceData.setPieValue(100 - freeSpacePercent);
     }
 
     private List<MediaItemWithProperties> getMediaBasedOnType() {
