@@ -6,7 +6,7 @@ import crud.CRUD;
 import crud.MediaCRUD;
 import crud.UploaderCRUD;
 import mediaDB.MediaContent;
-import observer.ConsoleLogger;
+import businessLogic.ConsoleLogger;
 import storage.MediaStorage;
 
 public final class MediaAdminFactory {

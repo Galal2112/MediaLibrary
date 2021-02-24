@@ -1,6 +1,5 @@
-package observer;
+package businessLogic;
 
-import businessLogic.Logger;
 import mediaDB.MediaContent;
 
 public class ConsoleLogger implements Logger {

@@ -28,7 +28,7 @@ public class SimulationTest {
         List<InteractiveVideo> interactiveVideos = Collections.singletonList(interactiveVideo);
         when(mediaAdmin.listMedia(null)).thenReturn((List) interactiveVideos);
         MainSimulation1.startSimulation(mediaAdmin, mediaStorage);
-        sleep(2);
+        sleep(1);
         verify(mediaAdmin, atLeastOnce()).getUploader(any());
         verify(mediaAdmin, atLeastOnce()).createUploader(any());
         verify(mediaAdmin, atLeastOnce()).upload(any());
@@ -48,7 +48,7 @@ public class SimulationTest {
         List<InteractiveVideo> interactiveVideos = Collections.singletonList(interactiveVideo);
         when(mediaAdmin.listMedia(null)).thenReturn((List) interactiveVideos);
         MainSimulation2.startSimulation(mediaAdmin, mediaStorage);
-        sleep(3);
+        sleep(1);
         verify(mediaAdmin, atLeastOnce()).getUploader(any());
         verify(mediaAdmin, atLeastOnce()).createUploader(any());
         verify(mediaAdmin, atLeastOnce()).upload(any());
@@ -68,7 +68,7 @@ public class SimulationTest {
         List<InteractiveVideo> interactiveVideos = Collections.singletonList(interactiveVideo);
         when(mediaAdmin.listMedia(null)).thenReturn((List) interactiveVideos);
         MainSimulation3.startSimulation(mediaAdmin, mediaStorage);
-        sleep(3);
+        sleep(1);
         verify(mediaAdmin, atLeastOnce()).getUploader(any());
         verify(mediaAdmin, atLeastOnce()).createUploader(any());
         verify(mediaAdmin, atLeastOnce()).upload(any());

@@ -152,7 +152,7 @@ public final class PersistenceManager {
         saveVideo(randomAccessFile, seekPos, video, VideoImpl.class);
     }
 
-    private static void saveInteractiveVideo(RandomAccessFile randomAccessFile, long seekPos, InteractiveVideoImpl interactiveVideo) throws IOException {
+    public static void saveInteractiveVideo(RandomAccessFile randomAccessFile, long seekPos, InteractiveVideoImpl interactiveVideo) throws IOException {
         saveVideo(randomAccessFile, seekPos, interactiveVideo, InteractiveVideoImpl.class);
         randomAccessFile.writeUTF(interactiveVideo.getType());
     }
@@ -164,7 +164,7 @@ public final class PersistenceManager {
         randomAccessFile.writeUTF(licensedAudioVideo.getHolder());
     }
 
-    private static InteractiveVideoImpl loadInteractiveVideo(RandomAccessFile randomAccessFile) throws IOException {
+    public static InteractiveVideoImpl loadInteractiveVideo(RandomAccessFile randomAccessFile) throws IOException {
         InteractiveVideoImpl interactiveVideo = new InteractiveVideoImpl();
         interactiveVideo.setWidth(randomAccessFile.readInt());
         interactiveVideo.setHeight(randomAccessFile.readInt());
