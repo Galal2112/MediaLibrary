@@ -133,7 +133,7 @@ public final class PersistenceManager {
         randomAccessFile.writeUTF(licensedVideo.getHolder());
     }
 
-    private static void saveLicensedAudio(RandomAccessFile randomAccessFile, long seekPos, LicensedAudioImpl licensedAudio) throws IOException {
+    public static void saveLicensedAudio(RandomAccessFile randomAccessFile, long seekPos, LicensedAudioImpl licensedAudio) throws IOException {
         saveAudio(randomAccessFile, seekPos, licensedAudio, LicensedAudioImpl.class);
         randomAccessFile.writeUTF(licensedAudio.getHolder());
     }
@@ -198,7 +198,7 @@ public final class PersistenceManager {
         return licensedVideo;
     }
 
-    private static LicensedAudioImpl loadLicensedAudio(RandomAccessFile randomAccessFile) throws IOException {
+    public static LicensedAudioImpl loadLicensedAudio(RandomAccessFile randomAccessFile) throws IOException {
         LicensedAudioImpl licensedAudio = new LicensedAudioImpl();
         licensedAudio.setSamplingRate(randomAccessFile.readInt());
         licensedAudio.setEncoding(randomAccessFile.readUTF());
