@@ -39,6 +39,9 @@ public class LibraryUdpClient {
     public void run() throws IOException {
         System.out.println("Media Library available commands:");
         for (Command command : commandList) {
+            if (command == Command.CONFIG) {
+                continue;
+            }
             System.out.println(command.toString());
         }
 

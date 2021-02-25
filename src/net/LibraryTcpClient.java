@@ -20,6 +20,9 @@ public class LibraryTcpClient {
              DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
             System.out.println("Media Library available commands:");
             for (Command command : commandList) {
+                if (command == Command.CONFIG) {
+                    continue;
+                }
                 System.out.println(command.toString());
             }
 
