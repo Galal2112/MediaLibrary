@@ -1,6 +1,9 @@
+import businessLogic.MediaAdmin;
 import mediaDB.InteractiveVideo;
+import mediaDB.Tag;
 import observer.MediaStorageObserver;
 import observer.Observer;
+import observer.TagsObserver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -10,10 +13,12 @@ import storage.MediaStorage;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ObserverTest {
 
@@ -25,7 +30,7 @@ public class ObserverTest {
     }
 
     @Test
-    void testObserverPrintStorageWarning() {
+    void testStorageObserverPrintStorageWarning() {
         final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         MediaStorage mediaStorage = Mockito.mock(MediaStorage.class);
@@ -38,7 +43,7 @@ public class ObserverTest {
     }
 
     @Test
-    void testObserverIgnoreLessThan90PercenFilled() {
+    void testStorageObserverIgnoreLessThan90PercentFilled() {
         final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         MediaStorage mediaStorage = Mockito.mock(MediaStorage.class);
@@ -59,5 +64,31 @@ public class ObserverTest {
         when(interactiveVideo.getSize()).thenReturn(storage.divide(new BigDecimal(2)));
         mediaStorage.addMediaInStorage(interactiveVideo);
         verify(observer).updateObserver();
+    }
+
+    @Test
+    void testTagsObserverPrintUsedTags() {
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        MediaAdmin mediaAdmin = Mockito.mock(MediaAdmin.class);
+        TagsObserver tagsObserver = new TagsObserver(mediaAdmin);
+        List<Tag> usedTags = Arrays.asList(Tag.News, Tag.Animal);
+        when(mediaAdmin.getUsedTags()).thenReturn(usedTags);
+        tagsObserver.updateObserver();
+        assertEquals("Used tags updated: " + new HashSet<>(usedTags), outContent.toString().trim());
+        verify(mediaAdmin, atLeast(2)).getUsedTags();
+    }
+
+    @Test
+    void testTagsObserverIgnoreUsedTagsIfNoChange() {
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        MediaAdmin mediaAdmin = Mockito.mock(MediaAdmin.class);
+        List<Tag> usedTags = Arrays.asList(Tag.News, Tag.Animal);
+        when(mediaAdmin.getUsedTags()).thenReturn(usedTags);
+        TagsObserver tagsObserver = new TagsObserver(mediaAdmin);
+        tagsObserver.updateObserver();
+        assertEquals("", outContent.toString().trim());
+        verify(mediaAdmin, atLeast(2)).getUsedTags();
     }
 }
