@@ -1,22 +1,24 @@
 import businessLogic.MediaAdmin;
+import cli.Console;
 import model.InteractiveVideoImpl;
+import net.LibraryTcpClient;
+import net.LibraryTcpServer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import net.LibraryTcpServer;
 import storage.InsufficientStorageException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class TcpServerTest {
@@ -24,6 +26,7 @@ public class TcpServerTest {
     private ServerSocket serverSocket;
     private Socket socket;
     private DataOutputStream dos;
+    private final PrintStream systemOut = System.out;
 
     @BeforeEach
     void setup() throws IOException {
@@ -127,6 +130,47 @@ public class TcpServerTest {
         new LibraryTcpServer(serverSocket, mediaAdmin).start();
         sleep(1);
         verify(mediaAdmin).deleteUploaderByName(any());
+    }
+
+    @Test
+    void testTcpClintPrintsCommandsList() throws IOException {
+        Console console = Mockito.mock(Console.class);
+        when(console.readStringFromStdin(anyString())).thenReturn("exit");
+        Socket socket = Mockito.mock(Socket.class);
+        when(socket.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[]{}));
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream(1024);
+        when(socket.getOutputStream()).thenReturn(outStream);
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        LibraryTcpClient tcpClient = new LibraryTcpClient(console, socket);
+        tcpClient.run();
+        System.out.println(outContent.toString().trim());
+        String expectedOutput = "Media Library available commands:\n" +
+                ":c Wechsel in den Einfügemodus\n" +
+                ":r Wechsel in den Anzeigemodus\n" +
+                ":d Wechsel in den Löschmodus\n" +
+                ":u Wechsel in den Änderungsmodus\n" +
+                ":p Wechsel in den Persistenzmodus";
+        assertTrue(outContent.toString().trim().contains(expectedOutput));
+    }
+
+    @Test
+    void testTcpClintExitEvent() throws IOException {
+        Console console = Mockito.mock(Console.class);
+        when(console.readStringFromStdin(anyString())).thenReturn("exit");
+        Socket socket = Mockito.mock(Socket.class);
+        when(socket.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[]{}));
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream(1024);
+        when(socket.getOutputStream()).thenReturn(outStream);
+        LibraryTcpClient tcpClient = new LibraryTcpClient(console, socket);
+        tcpClient.run();
+        assertTrue(outStream.toString(StandardCharsets.UTF_8).contains("exit"));
+        verify(socket).close();
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.setOut(systemOut);
     }
 
     private void sleep(int seconds) {

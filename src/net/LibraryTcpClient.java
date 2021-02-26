@@ -13,10 +13,16 @@ import java.util.List;
 public class LibraryTcpClient {
     private final List<Command> commandList = Arrays.asList(Command.values());
 
+    private final Console console;
+    private final Socket socket;
+
+    public LibraryTcpClient(Console console, Socket socket) {
+        this.console = console;
+        this.socket = socket;
+    }
+
     public void run() {
-        Console console = new Console();
-        try (Socket socket = new Socket("localhost", 9000);
-             DataInputStream in = new DataInputStream(socket.getInputStream());
+        try (DataInputStream in = new DataInputStream(socket.getInputStream());
              DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
             System.out.println("Media Library available commands:");
             for (Command command : commandList) {
