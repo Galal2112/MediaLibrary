@@ -233,7 +233,7 @@ public class MainController implements Initializable, Observer {
         String[] parsedString = inputText.split(" ");
 
         if (parsedString.length == 1) {
-            createProducer(inputText);
+            createProducer(inputText.trim());
             return;
         }
         try {
@@ -246,6 +246,7 @@ public class MainController implements Initializable, Observer {
     }
 
     private void createProducer(String text) {
+        if (text.isEmpty()) return;
         Producer producer = new Producer(text);
         try {
             mediaAdmin.createUploader(producer);
