@@ -1,10 +1,7 @@
 package crud;
 
-import persistence.PersistenceHelper;
 import mediaDB.Uploader;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,10 +10,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class UploaderCRUD implements CRUD<Uploader> {
-    private static final String serUploadersFileName = "uploaders.ser";
-    private static final String xmlUploadersFileName = "uploaders.xml";
 
-    //  Lock statt Monitor .... what is Monitor??
     private final Lock lock = new ReentrantLock();
 
     private static final LinkedList<Uploader> uploaders = new LinkedList<>();
@@ -92,28 +86,7 @@ public class UploaderCRUD implements CRUD<Uploader> {
     }
 
     @Override
-    public void saveJOS() throws IOException, FileNotFoundException {
-        PersistenceHelper.saveJOS(uploaders, serUploadersFileName);
-    }
-
-    @Override
-    public void loadJOS() throws IOException, ClassNotFoundException {
+    public void drop() {
         uploaders.clear();
-        try {
-            uploaders.addAll(PersistenceHelper.loadJOS(serUploadersFileName));
-        } catch (FileNotFoundException e) {
-
-        }
-    }
-
-    @Override
-    public void saveJBP() throws IOException, FileNotFoundException {
-        PersistenceHelper.saveUploadersUsingJBP(xmlUploadersFileName, uploaders);
-    }
-
-    @Override
-    public void loadJBP() throws IOException, ClassNotFoundException, FileNotFoundException {
-        uploaders.clear();
-        uploaders.addAll(PersistenceHelper.loadUploaderUsingJBP(xmlUploadersFileName));
     }
 }

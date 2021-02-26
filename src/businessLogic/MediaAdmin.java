@@ -44,11 +44,11 @@ public interface MediaAdmin extends Subject {
 
     void saveJOS() throws IOException;
 
-    void loadJOS() throws IOException;
+    void loadJOS() throws IOException, InsufficientStorageException;
 
     void saveJBP();
 
-    void loadJBP() throws IOException;
+    void loadJBP() throws IOException, InsufficientStorageException;
 
     void save(String retrivalAddress) throws IllegalArgumentException;
 

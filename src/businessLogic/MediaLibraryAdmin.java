@@ -10,13 +10,18 @@ import persistence.PersistenceHelper;
 import storage.InsufficientStorageException;
 import storage.MediaStorage;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 public class MediaLibraryAdmin implements MediaAdmin {
+
+    private static final String serMediaFileName = "media.ser";
+    private static final String xmlMediaFileName = "media.xml";
+    private static final String serUploadersFileName = "uploaders.ser";
+    private static final String xmlUploadersFileName = "uploaders.xml";
 
     private static final String mediaFileName = "media.data";
     private static final String mediaIndexFileName = "media.idx";
@@ -25,9 +30,15 @@ public class MediaLibraryAdmin implements MediaAdmin {
     private final CRUD<MediaContent> mediaContentCRUD;
     private volatile Logger logger;
     private MediaStorage mediaStorage;
+    private PersistenceHelper persistenceHelper;
     private final ConcurrentLinkedQueue<Observer> observerList = new ConcurrentLinkedQueue<>();
 
     public MediaLibraryAdmin(MediaStorage mediaStorage, CRUD<Uploader> uploaderCRUD, CRUD<MediaContent> mediaContentCRUD) {
+        this(new PersistenceHelper(), mediaStorage, uploaderCRUD, mediaContentCRUD);
+    }
+
+    public MediaLibraryAdmin(PersistenceHelper persistenceHelper, MediaStorage mediaStorage, CRUD<Uploader> uploaderCRUD, CRUD<MediaContent> mediaContentCRUD) {
+        this.persistenceHelper = persistenceHelper;
         this.mediaStorage = mediaStorage;
         this.uploaderCRUD = uploaderCRUD;
         this.mediaContentCRUD = mediaContentCRUD;
@@ -68,10 +79,11 @@ public class MediaLibraryAdmin implements MediaAdmin {
         // set date
         media.setUploadDate(new Date());
 
+        mediaStorage.addMediaInStorage(media);
+
         // save media content
         mediaContentCRUD.create(media);
 
-        mediaStorage.addMediaInStorage(media);
         notifyObserver();
         if (logger != null) logger.didUpload(media);
     }
@@ -206,42 +218,43 @@ public class MediaLibraryAdmin implements MediaAdmin {
     @Override
     public void saveJOS() throws IOException {
         try {
-            mediaContentCRUD.saveJOS();
-            uploaderCRUD.saveJOS();
+            persistenceHelper.saveJOS(mediaContentCRUD.getAll(), serMediaFileName);
+            persistenceHelper.saveJOS(uploaderCRUD.getAll(), serUploadersFileName);
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
 
     @Override
-    public void loadJOS() throws IOException {
+    public void loadJOS() throws IOException, InsufficientStorageException {
         try {
-            uploaderCRUD.loadJOS();
-            mediaContentCRUD.loadJOS();
-            refreshMediaStorageState();
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
+            List<MediaContent> mediaList = persistenceHelper.loadJOS(serMediaFileName);
+            List<Uploader> uploaders = persistenceHelper.loadJOS(serUploadersFileName);
+            save(uploaders, mediaList);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void saveJBP() {
         try {
-            mediaContentCRUD.saveJBP();
-            uploaderCRUD.saveJBP();
+            persistenceHelper.saveMediaUsingJBP(xmlMediaFileName, mediaContentCRUD.getAll());
+            persistenceHelper.saveUploadersUsingJBP(xmlUploadersFileName, uploaderCRUD.getAll());
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
 
     @Override
-    public void loadJBP() throws IOException, FileNotFoundException {
+    public void loadJBP() throws IOException, InsufficientStorageException {
+
         try {
-            uploaderCRUD.loadJBP();
-            mediaContentCRUD.loadJBP();
-            refreshMediaStorageState();
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
+            List<MediaContent> mediaList = persistenceHelper.loadMediaUsingJBP(xmlMediaFileName);
+            List<Uploader> uploaders = persistenceHelper.loadUploaderUsingJBP(xmlUploadersFileName);
+            save(uploaders, mediaList);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -252,7 +265,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
             throw new IllegalArgumentException("Media not found");
         }
         try {
-            PersistenceHelper.saveRandom(media.get(), mediaIndexFileName, mediaFileName);
+            persistenceHelper.saveRandom(media.get(), mediaIndexFileName, mediaFileName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -262,7 +275,7 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public MediaContent load(String retrivalAddress) throws IllegalArgumentException, InsufficientStorageException {
         try {
 
-            MediaContent mediaContent = PersistenceHelper.loadRandom(retrivalAddress, mediaIndexFileName, mediaFileName);
+            MediaContent mediaContent = persistenceHelper.loadRandom(retrivalAddress, mediaIndexFileName, mediaFileName);
 
             if (mediaContent != null) {
                 if (mediaContentCRUD.get(retrivalAddress).isPresent()) {
@@ -283,18 +296,6 @@ public class MediaLibraryAdmin implements MediaAdmin {
         return null;
     }
 
-    private void refreshMediaStorageState() {
-        mediaStorage.clear();
-        List<MediaContent> allMedia = mediaContentCRUD.getAll();
-        try {
-            for (MediaContent content : allMedia) {
-                mediaStorage.addMediaInStorage(content);
-            }
-        } catch (InsufficientStorageException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void register(Observer observer) {
         if (observer == null) return;
@@ -311,6 +312,35 @@ public class MediaLibraryAdmin implements MediaAdmin {
     public void notifyObserver() {
         for (Observer observer : observerList) {
             observer.updateObserver();
+        }
+    }
+
+    private void save(List<Uploader> uploaders, List<MediaContent> mediaList) throws InsufficientStorageException {
+        BigDecimal requiredSize = new BigDecimal(0);
+        for (MediaContent m : mediaList) {
+            requiredSize = requiredSize.add(m.getSize());
+        }
+        if (requiredSize.compareTo(mediaStorage.getDiskSize()) <= 0) {
+            mediaStorage.clear();
+            uploaderCRUD.drop();
+            mediaContentCRUD.drop();
+            // insert uploaders
+            uploaders.forEach(uploader -> {
+                if (getUploader(uploader.getName()).isEmpty()) {
+                    createUploader(uploader);
+                }
+            });
+            // save media content
+            mediaList.forEach(media -> {
+                try {
+                    mediaStorage.addMediaInStorage(media);
+                    mediaContentCRUD.create(media);
+                } catch (InsufficientStorageException e) {
+                    e.printStackTrace();
+                }
+            });
+        } else {
+            throw new InsufficientStorageException();
         }
     }
 

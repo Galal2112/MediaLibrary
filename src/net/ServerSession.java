@@ -173,7 +173,7 @@ public abstract class ServerSession {
                 try {
                     mediaAdmin.loadJOS();
                     return "JOS file is Loaded";
-                } catch (IOException e) {
+                } catch (IOException | InsufficientStorageException e) {
                     return "File not Found, No data is saved";
                 }
             case "saveJBP":
@@ -183,7 +183,7 @@ public abstract class ServerSession {
                 try {
                     mediaAdmin.loadJBP();
                     return "JBP file is Loaded";
-                } catch (IOException e) {
+                } catch (IOException | InsufficientStorageException e) {
                     return "File not Found, No data is saved";
                 }
             default:

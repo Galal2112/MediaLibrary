@@ -34,7 +34,7 @@ public class JBPMain {
             System.out.println("Load JBP");
             mediaAdmin.loadJBP();
             mediaAdmin.listMedia(null).forEach(v -> System.out.println(v.toString()));
-        } catch (IOException e) {
+        } catch (IOException | InsufficientStorageException e) {
             e.printStackTrace();
         }
     }

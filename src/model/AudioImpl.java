@@ -45,8 +45,8 @@ public class AudioImpl implements Audio {
     }
 
 
-    public String setEncoding(String encoding) {
-        return this.encoding;
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 
     @Override

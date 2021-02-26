@@ -167,6 +167,8 @@ public class MainController implements Initializable, Observer {
             displaySuccess("JOS Loaded");
         } catch (IOException e) {
             displayError("File not Found, No data is saved");
+        } catch (InsufficientStorageException e) {
+            displayError(e.getMessage());
         }
     }
 
@@ -186,6 +188,8 @@ public class MainController implements Initializable, Observer {
             displaySuccess("JBP Loaded");
         } catch (IOException e) {
             displayError("File not Found, No data is saved");
+        } catch (InsufficientStorageException e) {
+            displayError(e.getMessage());
         }
     }
     public synchronized void saveJBP(ActionEvent actionEvent) {

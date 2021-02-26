@@ -1,10 +1,7 @@
 package crud;
 
-import persistence.PersistenceHelper;
 import mediaDB.MediaContent;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,9 +10,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MediaCRUD implements CRUD<MediaContent> {
-    private static final String serMediaFileName = "media.ser";
-    private static final String xmlMediaFileName = "media.xml";
-
     private final Lock lock = new ReentrantLock();
     private static final LinkedList<MediaContent> mediaList = new LinkedList<>();
 
@@ -95,28 +89,7 @@ public class MediaCRUD implements CRUD<MediaContent> {
     }
 
     @Override
-    public void saveJOS() throws IOException, FileNotFoundException {
-        PersistenceHelper.saveJOS(mediaList, serMediaFileName);
-    }
-
-    @Override
-    public void loadJOS() throws IOException, ClassNotFoundException {
+    public void drop() {
         mediaList.clear();
-        try {
-            mediaList.addAll(PersistenceHelper.loadJOS(serMediaFileName));
-        } catch (FileNotFoundException e) {
-
-        }
-    }
-
-    @Override
-    public void saveJBP() throws IOException, FileNotFoundException {
-        PersistenceHelper.saveMediaUsingJBP(xmlMediaFileName, mediaList);
-    }
-
-    @Override
-    public void loadJBP() throws IOException, ClassNotFoundException, FileNotFoundException {
-        mediaList.clear();
-        mediaList.addAll(PersistenceHelper.loadMediaUsingJBP(xmlMediaFileName));
     }
 }

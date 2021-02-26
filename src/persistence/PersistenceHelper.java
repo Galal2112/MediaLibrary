@@ -9,51 +9,51 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class PersistenceHelper {
+public class PersistenceHelper {
 
-    private PersistenceHelper() {
+    public PersistenceHelper() {
     }
 
-    public static <T extends Serializable> void saveJOS(List<T> items, String fileName) throws FileNotFoundException, IOException {
+    public <T extends Serializable> void saveJOS(List<T> items, String fileName) throws FileNotFoundException, IOException {
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName));
         PersistenceManager.saveJOS(oos, items);
     }
 
-    public static <T extends Serializable> List<T> loadJOS(String fileName) throws FileNotFoundException, ClassNotFoundException, IOException {
+    public <T extends Serializable> List<T> loadJOS(String fileName) throws FileNotFoundException, ClassNotFoundException, IOException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName));
         List<T> result = PersistenceManager.loadJOS(ois);
         return result == null ? new ArrayList<>() : result;
     }
 
-    public static void saveMediaUsingJBP(String xmlFileName, List<MediaContent> mediaList) throws IOException, FileNotFoundException {
+    public void saveMediaUsingJBP(String xmlFileName, List<MediaContent> mediaList) throws IOException, FileNotFoundException {
         XMLEncoder encoder = createXMLEncoder(xmlFileName);
         PersistenceManager.saveMediaUsingJBP(encoder, mediaList);
         encoder.close();
     }
 
-    public static List<MediaContent> loadMediaUsingJBP(String xmlFileName) throws IOException, ClassNotFoundException, FileNotFoundException {
+    public List<MediaContent> loadMediaUsingJBP(String xmlFileName) throws IOException, ClassNotFoundException, FileNotFoundException {
         XMLDecoder decoder = createXMLDecoder(xmlFileName);
         return PersistenceManager.loadMediaUsingJBP(decoder);
     }
 
-    public static void saveUploadersUsingJBP(String xmlFileName, List<Uploader> uploaders) throws IOException, FileNotFoundException {
+    public void saveUploadersUsingJBP(String xmlFileName, List<Uploader> uploaders) throws IOException, FileNotFoundException {
         XMLEncoder encoder = createXMLEncoder(xmlFileName);
         PersistenceManager.saveUploadersUsingJBP(encoder, uploaders);
         encoder.close();
     }
 
-    public static List<Uploader> loadUploaderUsingJBP(String xmlFileName) throws FileNotFoundException, ClassNotFoundException, IOException {
+    public List<Uploader> loadUploaderUsingJBP(String xmlFileName) throws FileNotFoundException, ClassNotFoundException, IOException {
         XMLDecoder decoder = createXMLDecoder(xmlFileName);
         return PersistenceManager.loadUploaderUsingJBP(decoder);
     }
 
-    public static void saveRandom(MediaContent media, String indexFileName, String mediaFileName) throws IOException, FileNotFoundException {
+    public void saveRandom(MediaContent media, String indexFileName, String mediaFileName) throws IOException, FileNotFoundException {
         RandomAccessFile indexRas = new RandomAccessFile(indexFileName, "rw");
         RandomAccessFile mediaRas = new RandomAccessFile(mediaFileName, "rw");
         PersistenceManager.saveRandom(media, indexRas, mediaRas);
     }
 
-    public static MediaContent loadRandom(String retrivalAddress, String indexFileName, String mediaFileName) throws IOException, FileNotFoundException {
+    public MediaContent loadRandom(String retrivalAddress, String indexFileName, String mediaFileName) throws IOException, FileNotFoundException {
         RandomAccessFile indexRas = new RandomAccessFile(indexFileName, "r");
         RandomAccessFile mediaRas = new RandomAccessFile(mediaFileName, "r");
         return PersistenceManager.loadRandom(retrivalAddress, indexRas, mediaRas);

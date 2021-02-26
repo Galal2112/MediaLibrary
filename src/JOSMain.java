@@ -35,7 +35,7 @@ public class JOSMain {
             System.out.println("Load JOS");
             mediaAdmin.loadJOS();
             mediaAdmin.listMedia(null).forEach(v -> System.out.println(v.toString()));
-        } catch (IOException e) {
+        } catch (IOException | InsufficientStorageException e) {
             e.printStackTrace();
         }
     }

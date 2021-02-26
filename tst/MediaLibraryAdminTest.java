@@ -6,6 +6,7 @@ import mediaDB.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import persistence.PersistenceHelper;
 import storage.InsufficientStorageException;
 import storage.MediaStorage;
 
@@ -22,13 +23,15 @@ class MediaLibraryAdminTest {
     private MediaAdmin mediaAdmin;
     private MediaCRUD mediaCRUD;
     private UploaderCRUD uploaderCRUD;
+    private PersistenceHelper persistenceHelper;
 
     @BeforeEach
     void setUp() {
         mediaStorage = new MediaStorage(10 * 1024);
         mediaCRUD = Mockito.mock(MediaCRUD.class);
         uploaderCRUD = Mockito.mock(UploaderCRUD.class);
-        mediaAdmin = new MediaLibraryAdmin(mediaStorage, uploaderCRUD, mediaCRUD);
+        persistenceHelper = Mockito.mock(PersistenceHelper.class);
+        mediaAdmin = new MediaLibraryAdmin(persistenceHelper, mediaStorage, uploaderCRUD, mediaCRUD);
     }
 
     @Test
@@ -280,9 +283,10 @@ class MediaLibraryAdminTest {
     @Test
     void saveJOS() {
         try {
+            when(mediaCRUD.getAll()).thenReturn(new ArrayList<>());
+            when(uploaderCRUD.getAll()).thenReturn(new ArrayList<>());
             mediaAdmin.saveJOS();
-            verify(mediaCRUD).saveJOS();
-            verify(uploaderCRUD).saveJOS();
+            verify(persistenceHelper, atLeastOnce()).saveJOS(anyList(), anyString());
         } catch (IOException exception) {
             exception.printStackTrace();
         }
@@ -292,9 +296,8 @@ class MediaLibraryAdminTest {
     void loadJOS() {
         try {
             mediaAdmin.loadJOS();
-            verify(mediaCRUD).loadJOS();
-            verify(uploaderCRUD).loadJOS();
-        } catch (IOException | ClassNotFoundException exception) {
+            verify(persistenceHelper, atLeastOnce()).loadJOS(anyString());
+        } catch (IOException | InsufficientStorageException | ClassNotFoundException exception) {
             exception.printStackTrace();
         }
     }
@@ -303,8 +306,8 @@ class MediaLibraryAdminTest {
     void saveJBP() {
         try {
             mediaAdmin.saveJBP();
-            verify(mediaCRUD).saveJBP();
-            verify(uploaderCRUD).saveJBP();
+            verify(persistenceHelper).saveMediaUsingJBP(anyString(), anyList());
+            verify(persistenceHelper).saveUploadersUsingJBP(anyString(), anyList());
         } catch (IOException exception) {
             exception.printStackTrace();
         }
@@ -314,9 +317,9 @@ class MediaLibraryAdminTest {
     void loadJBP() {
         try {
             mediaAdmin.loadJBP();
-            verify(mediaCRUD).loadJBP();
-            verify(uploaderCRUD).loadJBP();
-        } catch (IOException | ClassNotFoundException exception) {
+            verify(persistenceHelper).loadMediaUsingJBP(anyString());
+            verify(persistenceHelper).loadUploaderUsingJBP(anyString());
+        } catch (IOException | ClassNotFoundException | InsufficientStorageException exception) {
             exception.printStackTrace();
         }
     }

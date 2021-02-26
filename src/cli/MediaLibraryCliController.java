@@ -277,7 +277,7 @@ public class MediaLibraryCliController implements MediaController {
                         mediaAdmin.loadJOS();
                         mediaView.displayMessage("JOS file is Loaded");
 
-                    } catch (IOException e) {
+                    } catch (IOException | InsufficientStorageException e) {
                         mediaView.displayError("File not Found, No data is saved");
                     }
                     break;
@@ -290,7 +290,7 @@ public class MediaLibraryCliController implements MediaController {
                     try {
                         mediaAdmin.loadJBP();
                         mediaView.displayMessage("JBP file is Loaded");
-                    } catch (IOException e) {
+                    } catch (IOException | InsufficientStorageException e) {
                         mediaView.displayError("File not Found, No data is saved");
                     }
                     break;
