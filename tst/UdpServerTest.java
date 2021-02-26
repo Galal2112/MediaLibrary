@@ -1,24 +1,30 @@
 import businessLogic.MediaAdmin;
+import cli.Console;
 import model.InteractiveVideoImpl;
+import net.LibraryUdpClient;
+import net.LibraryUdpServer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import net.LibraryUdpServer;
 import storage.InsufficientStorageException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class UdpServerTest {
+    private final PrintStream systemOut = System.out;
 
     @Test
     public void testInsert() throws IOException {
@@ -152,6 +158,45 @@ public class UdpServerTest {
             }
         }
         verify(mediaAdmin).deleteUploaderByName(any());
+    }
+
+    @Test
+    public void testUdpClientPrintsCommandsList() throws IOException {
+        Console console = Mockito.mock(Console.class);
+        when(console.readStringFromStdin(anyString())).thenReturn("exit");
+        DatagramSocket mockSocket = mock(DatagramSocket.class);
+        InetAddress address = mock(InetAddress.class);
+        int port = 9000;
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        LibraryUdpClient udpClient = new LibraryUdpClient(console, mockSocket, address, port);
+        udpClient.init();
+        udpClient.run();
+        System.out.println(outContent.toString().trim());
+        String expectedOutput = "Media Library available commands:\n" +
+                ":c Wechsel in den Einfügemodus\n" +
+                ":r Wechsel in den Anzeigemodus\n" +
+                ":d Wechsel in den Löschmodus\n" +
+                ":u Wechsel in den Änderungsmodus\n" +
+                ":p Wechsel in den Persistenzmodus";
+        assertTrue(outContent.toString().trim().contains(expectedOutput));
+    }
+
+    @Test
+    public void testUdpClientSendInitPacket() throws IOException {
+        Console console = Mockito.mock(Console.class);
+        when(console.readStringFromStdin(anyString())).thenReturn("exit");
+        DatagramSocket mockSocket = mock(DatagramSocket.class);
+        InetAddress address = mock(InetAddress.class);
+        int port = 9000;
+        LibraryUdpClient udpClient = new LibraryUdpClient(console, mockSocket, address, port);
+        udpClient.init();
+        verify(mockSocket).send(any());
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.setOut(systemOut);
     }
 
     private void updatePacketWithCommand(String command, InvocationOnMock invocation, InetAddress address, int port) throws IOException {

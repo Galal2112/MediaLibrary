@@ -13,13 +13,14 @@ import java.util.List;
 public class LibraryUdpClient {
     private final List<Command> commandList = Arrays.asList(Command.values());
 
-    private final Console console = new Console();
+    private final Console console;
     private DatagramSocket socket;
     private InetAddress serverAddress;
     private int serverPort;
     private int sessionId;
 
-    public LibraryUdpClient(DatagramSocket datagramSocket, InetAddress serverAddress, int serverPort) {
+    public LibraryUdpClient(Console console, DatagramSocket datagramSocket, InetAddress serverAddress, int serverPort) {
+        this.console = console;
         this.socket = datagramSocket;
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
