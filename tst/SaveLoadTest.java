@@ -1,5 +1,6 @@
 import model.InteractiveVideoImpl;
 import model.LicensedAudioImpl;
+import model.LicensedVideoImpl;
 import model.Producer;
 import org.junit.jupiter.api.Test;
 import persistence.PersistenceManager;
@@ -94,6 +95,30 @@ public class SaveLoadTest {
             verify(randomAccessFile, atLeastOnce()).readUTF();
             verify(randomAccessFile, atLeastOnce()).readInt();
             verify(randomAccessFile, atLeastOnce()).readLong();
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
+    void saveLicensedVideo() {
+        long seek = 10;
+        RandomAccessFile randomAccessFile = mock(RandomAccessFile.class);
+        LicensedVideoImpl licensedVideo = new LicensedVideoImpl("EdBangerRecords", 8000, 600, "DWT", 640L, 480, new Producer("Test"), new ArrayList<>());
+        licensedVideo.setAddress("Address");
+        licensedVideo.setUploadDate(new Date());
+        try {
+            PersistenceManager.saveLicensedVideo(randomAccessFile, seek, licensedVideo);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
+        }
+        try {
+            verify(randomAccessFile, atLeastOnce()).seek(seek);
+            verify(randomAccessFile, atLeastOnce()).writeUTF("LicensedVideoImpl");
+            verify(randomAccessFile, atLeastOnce()).writeInt(600);
+            verify(randomAccessFile, atLeastOnce()).writeLong(640L);
         } catch (IOException e) {
             e.printStackTrace();
             fail();

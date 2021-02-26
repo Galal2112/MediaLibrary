@@ -128,7 +128,7 @@ public final class PersistenceManager {
         return mediaContent;
     }
 
-    private static void saveLicensedVideo(RandomAccessFile randomAccessFile, long seekPos, LicensedVideoImpl licensedVideo) throws IOException {
+    public static void saveLicensedVideo(RandomAccessFile randomAccessFile, long seekPos, LicensedVideoImpl licensedVideo) throws IOException {
         saveVideo(randomAccessFile, seekPos, licensedVideo, LicensedVideoImpl.class);
         randomAccessFile.writeUTF(licensedVideo.getHolder());
     }
@@ -138,17 +138,17 @@ public final class PersistenceManager {
         randomAccessFile.writeUTF(licensedAudio.getHolder());
     }
 
-    private static void saveAudioVideo(RandomAccessFile randomAccessFile, long seekPos, AudioVideoImpl audioVideo) throws IOException {
+    public static void saveAudioVideo(RandomAccessFile randomAccessFile, long seekPos, AudioVideoImpl audioVideo) throws IOException {
         saveAudio(randomAccessFile, seekPos, audioVideo, AudioVideoImpl.class);
         randomAccessFile.writeInt(audioVideo.getWidth());
         randomAccessFile.writeInt(audioVideo.getHeight());
     }
 
-    private static void saveAudio(RandomAccessFile randomAccessFile, long seekPos, AudioImpl audio) throws IOException {
+    public static void saveAudio(RandomAccessFile randomAccessFile, long seekPos, AudioImpl audio) throws IOException {
         saveAudio(randomAccessFile, seekPos, audio, AudioImpl.class);
     }
 
-    private static void saveVideo(RandomAccessFile randomAccessFile, long seekPos, VideoImpl video) throws IOException {
+    public static void saveVideo(RandomAccessFile randomAccessFile, long seekPos, VideoImpl video) throws IOException {
         saveVideo(randomAccessFile, seekPos, video, VideoImpl.class);
     }
 
@@ -157,7 +157,7 @@ public final class PersistenceManager {
         randomAccessFile.writeUTF(interactiveVideo.getType());
     }
 
-    private static void saveLicensedAudioVideo(RandomAccessFile randomAccessFile, long seekPos, LicensedAudioVideoImpl licensedAudioVideo) throws IOException {
+    public static void saveLicensedAudioVideo(RandomAccessFile randomAccessFile, long seekPos, LicensedAudioVideoImpl licensedAudioVideo) throws IOException {
         saveAudio(randomAccessFile, seekPos, licensedAudioVideo, LicensedAudioVideoImpl.class);
         randomAccessFile.writeInt(licensedAudioVideo.getWidth());
         randomAccessFile.writeInt(licensedAudioVideo.getHeight());
@@ -181,7 +181,7 @@ public final class PersistenceManager {
         return interactiveVideo;
     }
 
-    private static LicensedVideoImpl loadLicensedVideo(RandomAccessFile randomAccessFile) throws IOException {
+    public static LicensedVideoImpl loadLicensedVideo(RandomAccessFile randomAccessFile) throws IOException {
         LicensedVideoImpl licensedVideo = new LicensedVideoImpl();
         licensedVideo.setWidth(randomAccessFile.readInt());
         licensedVideo.setHeight(randomAccessFile.readInt());
@@ -214,7 +214,7 @@ public final class PersistenceManager {
         return licensedAudio;
     }
 
-    private static AudioVideoImpl loadAudioVideo(RandomAccessFile randomAccessFile) throws IOException {
+    public static AudioVideoImpl loadAudioVideo(RandomAccessFile randomAccessFile) throws IOException {
         AudioVideoImpl audioVideo = new AudioVideoImpl();
         audioVideo.setSamplingRate(randomAccessFile.readInt());
         audioVideo.setEncoding(randomAccessFile.readUTF());
@@ -231,7 +231,7 @@ public final class PersistenceManager {
         return audioVideo;
     }
 
-    private static AudioImpl loadAudio(RandomAccessFile randomAccessFile) throws IOException {
+    public static AudioImpl loadAudio(RandomAccessFile randomAccessFile) throws IOException {
         AudioImpl audio = new AudioImpl();
         audio.setSamplingRate(randomAccessFile.readInt());
         audio.setEncoding(randomAccessFile.readUTF());
@@ -246,7 +246,7 @@ public final class PersistenceManager {
         return audio;
     }
 
-    private static VideoImpl loadVideo(RandomAccessFile randomAccessFile) throws IOException {
+    public static VideoImpl loadVideo(RandomAccessFile randomAccessFile) throws IOException {
         VideoImpl video = new VideoImpl();
         video.setWidth(randomAccessFile.readInt());
         video.setHeight(randomAccessFile.readInt());
@@ -262,7 +262,7 @@ public final class PersistenceManager {
         return video;
     }
 
-    private static LicensedAudioVideoImpl loadLicensedAudioVideo(RandomAccessFile randomAccessFile) throws IOException {
+    public static LicensedAudioVideoImpl loadLicensedAudioVideo(RandomAccessFile randomAccessFile) throws IOException {
         LicensedAudioVideoImpl licensedAudioVideo = new LicensedAudioVideoImpl();
         licensedAudioVideo.setSamplingRate(randomAccessFile.readInt());
         licensedAudioVideo.setEncoding(randomAccessFile.readUTF());

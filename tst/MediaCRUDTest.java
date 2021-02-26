@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 
 class MediaCRUDTest {
 
-    private final MediaCRUD mediaCRUD = new MediaCRUD();;
+    private final MediaCRUD mediaCRUD = new MediaCRUD();
 
     @Test
     void getAll() {
